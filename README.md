@@ -52,15 +52,15 @@ Key design decisions include:
 
 ### Repository Structure
 /src
-  InventoryService
-  InventoryService.UnitTests
-  InventoryService.IntegrationTests
+- InventoryService
+- InventoryService.UnitTests
+- InventoryService.IntegrationTests
 /docker
-  Docker Compose configuration
-  SQL Server container
-  Flyway migrations
+- Docker Compose configuration
+- SQL Server container
+- Flyway migrations
 /bruno
-  API collections and environments
+- API collections and environments
 
 ### Unit Testing
 
