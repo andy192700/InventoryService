@@ -22,7 +22,7 @@ public static class IntegrationHttpExtensions
     /// <param name="header">The expected header name.</param>
     /// <param name="value">the expected header value.</param>
     public static void AssertHeader(this HttpResponseMessage response, string header, string value)
-        => response.Headers.GetValues(header).Contains(value);
+        => response.Headers.GetValues(header).Any(x => x.Contains(value)).Should().BeTrue();
 
     /// <summary>
     /// Asserts that a problem details instance has a particular error message.
