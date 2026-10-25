@@ -20,4 +20,7 @@ app.UseRouting();
 
 app.Run();
 
+/// <summary>
+/// Partial <see cref="Program"/> class, in place for assembly scanning reasons (MediatR/Integration tests).
+/// </summary>
 public partial class Program { }

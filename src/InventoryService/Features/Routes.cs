@@ -14,6 +14,11 @@ namespace InventoryService.Features;
 
 public static class Routes
 {
+    /// <summary>
+    /// Register the application's endpoints.
+    /// </summary>
+    /// <param name="routeBuilder">The application builder, expressed as a <see cref="IEndpointRouteBuilder"/></param>
+    /// <returns>The builder.</returns>
     public static IEndpointRouteBuilder RegisterEndpoints(this IEndpointRouteBuilder routeBuilder)
     {
         var group = routeBuilder

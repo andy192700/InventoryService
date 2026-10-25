@@ -15,6 +15,11 @@ namespace InventoryService;
 
 public static class ServiceRegistrations
 {
+    /// <summary>
+    /// Register the application's services.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <returns>The application's service collection.</returns>
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
         // infra
