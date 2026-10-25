@@ -1,0 +1,33 @@
+info:
+  name: Create Purchase Order
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{API_URL}}/v1/inventory/purchase-order"
+  body:
+    type: json
+    data: |-
+      {
+        "CustomerId": "2",
+        "CountryId": "1",
+        "lines": [
+          {
+            "ProductId": "1",
+            "OrderQuantity": "3"
+          },
+          {
+            "ProductId": "4",
+            "OrderQuantity": "5"      
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

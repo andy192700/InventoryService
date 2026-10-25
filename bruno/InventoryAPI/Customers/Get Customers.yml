@@ -1,0 +1,21 @@
+info:
+  name: Get Customers
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{API_URL}}/v1/inventory/customers"
+  params:
+    - name: filter
+      value: jane
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

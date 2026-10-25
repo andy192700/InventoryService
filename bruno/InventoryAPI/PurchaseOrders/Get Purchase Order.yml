@@ -1,0 +1,20 @@
+info:
+  name: Get Purchase Order
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{API_URL}}/v1/inventory/purchase-order?purchaseOrderId=2"
+  params:
+    - name: purchaseOrderId
+      value: "2"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

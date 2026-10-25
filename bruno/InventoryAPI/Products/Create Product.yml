@@ -1,0 +1,33 @@
+info:
+  name: Create Product
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{API_URL}}/v1/inventory/product"
+  body:
+    type: json
+    data: |-
+      {
+        "productName": "something",
+        "productDesc": "somethingElse",
+        "productCountries": [
+          {
+            "countryId": "1",
+            "unitPrice": "4.32"
+          },
+          {
+            "countryId": "3",
+            "unitPrice": "2.10"     
+          }
+        ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

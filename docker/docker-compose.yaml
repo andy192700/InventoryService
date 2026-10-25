@@ -1,0 +1,67 @@
+services:
+  sqlserver:
+    build:
+      context: .
+      dockerfile: sqlserver.dockerfile
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/mssql-tools18/bin/sqlcmd",
+          "-S",
+          "localhost",
+          "-U",
+          "sa",
+          "-P",
+          "YourStrong!Passw0rd",
+          "-C",
+          "-Q",
+          "SELECT 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  flyway:
+    build:
+      context: .
+      dockerfile: flyway.dockerfile
+    container_name: flyway
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/flyway/sql
+    command:
+      - migrate
+      - -url=jdbc:sqlserver://host.docker.internal:1433;databaseName=master;encrypt=false;trustServerCertificate=true
+      - -user=sa
+      - -password=YourStrong!Passw0rd
+      - -schemas=dbo
+      - -connectRetries=60
+
+  inventoryservice:
+    build:
+      context: ..
+      dockerfile: docker/inventoryservice.dockerfile
+    container_name: inventoryservice
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    ports:
+      - "6000:6000"
+    environment:
+      ASPNETCORE_URLS: http://+:6000
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Inventory: "Server=sqlserver,1433;Database=Inventory;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Encrypt=False;"
+
+volumes:
+  sqlserver_data:

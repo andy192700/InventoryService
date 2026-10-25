@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="InventoryService.IntegrationTests/InventoryService.IntegrationTests.csproj" Id="75194ab2-7636-4bfb-8770-d11fa4228d52" />
+  <Project Path="InventoryService.UnitTests/InventoryService.UnitTests.csproj" Id="ff936ece-2756-4cc9-ad56-ef7c0edaddbe" />
+  <Project Path="InventoryService/InventoryService.csproj" />
+</Solution>

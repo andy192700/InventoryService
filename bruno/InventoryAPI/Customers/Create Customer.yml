@@ -1,0 +1,23 @@
+info:
+  name: Create Customer
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{API_URL}}/v1/inventory/customer"
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "John",
+        "lastName": "Smith"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
