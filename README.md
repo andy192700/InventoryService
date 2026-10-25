@@ -55,10 +55,12 @@ Key design decisions include:
 - InventoryService
 - InventoryService.UnitTests
 - InventoryService.IntegrationTests
+
 /docker
 - Docker Compose configuration
 - SQL Server container
 - Flyway migrations
+
 /bruno
 - API collections and environments
 
