@@ -4,6 +4,11 @@ using Testcontainers.MsSql;
 
 namespace InventoryService.IntegrationTests;
 
+/// <summary>
+/// Test fixture standing up a real SQL docker container,
+/// which runs the flyway migrations before the tests commence.
+/// Upon the tests completing, the container is destroyed.
+/// </summary>
 public sealed class IntegrationTestFixture : IAsyncLifetime
 {
     private const int ExposedServerPort = 45000;
@@ -11,11 +16,15 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
 
     private MsSqlContainer _sqlContainer = default!;
 
+    /// <summary>
+    /// Obtain a connection string, which points to the correct database for the integration test's database docker container.
+    /// </summary>
     public string ConnectionString => new SqlConnectionStringBuilder(_sqlContainer.GetConnectionString())
     {
         InitialCatalog = "Inventory"
     }.ConnectionString;
 
+    /// <inheritdoc/>
     public async Task InitializeAsync()
     {
         _sqlContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest")
@@ -59,6 +68,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         }
     }
 
+    /// <inheritdoc/>
     public async Task DisposeAsync()
     {
         await _sqlContainer.DisposeAsync();

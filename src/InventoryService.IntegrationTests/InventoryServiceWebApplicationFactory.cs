@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace InventoryService.IntegrationTests;
 
+/// <summary>
+/// Intgeration test web application factory.
+/// </summary>
 public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly IntegrationTestFixture _sqlFixture;
