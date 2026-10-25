@@ -4,13 +4,25 @@ using System.Data;
 
 namespace InventoryService.Features.Products.GetProduct;
 
+/// <summary>
+/// Queries the database for a product.
+/// </summary>
 public interface IGetProductDBQuery
 {
+    /// <summary>
+    /// Retrieves a product from the database.
+    /// </summary>
+    /// <param name="dBParameters">The database parameters for the query.</param>
+    /// <param name="cancellationToken">A token used to cancel the operation.</param>
+    /// <returns>A database response containing the product.</returns>
     Task<GetProductDBResponse> GetProductAsync(
-        GetProductDBParameters dBParameters, 
+        GetProductDBParameters dBParameters,
         CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Queries the database for a product.
+/// </summary>
 public class GetProductDBQuery : IGetProductDBQuery
 {
     private readonly ISQLConnectionProvider _sqlConnectionProvider;
@@ -20,6 +32,7 @@ public class GetProductDBQuery : IGetProductDBQuery
         _sqlConnectionProvider = sqlConnectionProvider;
     }
 
+    /// <inheritdoc />
     public async Task<GetProductDBResponse> GetProductAsync(
         GetProductDBParameters dBParameters,
         CancellationToken cancellationToken)

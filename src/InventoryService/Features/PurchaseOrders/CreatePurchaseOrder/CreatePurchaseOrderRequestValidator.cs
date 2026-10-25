@@ -2,6 +2,9 @@
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
+/// <summary>
+/// A validator for a <see cref="CreatePurchaseOrderRequest"/>
+/// </summary>
 public class CreatePurchaseOrderRequestValidator : AbstractValidator<CreatePurchaseOrderRequest>
 {
     public CreatePurchaseOrderRequestValidator()
@@ -15,6 +18,9 @@ public class CreatePurchaseOrderRequestValidator : AbstractValidator<CreatePurch
     }
 }
 
+/// <summary>
+/// A validator for a <see cref="CreatePurchaseOrderPayload"/>
+/// </summary>
 public class CreatePurchaseOrderPayloadValidator : AbstractValidator<CreatePurchaseOrderPayload>
 {
     public CreatePurchaseOrderPayloadValidator()
@@ -35,6 +41,9 @@ public class CreatePurchaseOrderPayloadValidator : AbstractValidator<CreatePurch
     }
 }
 
+/// <summary>
+/// A validator for a <see cref="CreatePurchaseOrderPayloadLine"/>
+/// </summary>
 public class CreatePurchaseOrderPayloadLineValidator : AbstractValidator<CreatePurchaseOrderPayloadLine>
 {
     public CreatePurchaseOrderPayloadLineValidator()

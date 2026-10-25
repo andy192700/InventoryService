@@ -5,11 +5,24 @@ using System.Data;
 
 namespace InventoryService.Features.Customers.CreateCustomer;
 
+/// <summary>
+/// A contract for returning the required infromation after creating a new customer in the database.
+/// </summary>
 public interface ICreateCustomerDBCommand
 {
+    /// <summary>
+    /// Create the customer in the database.
+    /// </summary>
+    /// <param name="dbParameters">The database parameters.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>A task of type <see cref="CreateCustomerDBResponse"/>, containing the database response.</returns>
     Task<CreateCustomerDBResponse> CreateCustomerAsync(CreateCustomerDBParameters dbParameters, CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Concrete implementation of a <see cref="ICreateCustomerDBCommand"/>, which uses a <see cref="ISQLConnectionProvider"/>
+/// to obtain a SQL connection.
+/// </summary>
 public class CreateCustomerDBCommand : ICreateCustomerDBCommand
 {
     private readonly ISQLConnectionProvider _connectionProvider;
@@ -24,6 +37,7 @@ public class CreateCustomerDBCommand : ICreateCustomerDBCommand
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public async Task<CreateCustomerDBResponse> CreateCustomerAsync(CreateCustomerDBParameters dbParameters, CancellationToken cancellationToken)
     {
 

@@ -5,6 +5,14 @@ namespace InventoryService.UnitTests;
 
 public static class LoggerMockExtensions
 {
+    /// <summary>
+    /// Verify that the mock logger has indeed logged as required.
+    /// </summary>
+    /// <typeparam name="T">The type in which the logger is observing.</typeparam>
+    /// <param name="logger">The logger.</param>
+    /// <param name="level">The log level.</param>
+    /// <param name="containsMessage">The message that ought to have been logged.</param>
+    /// <param name="times">The number of occurrences.</param>
     public static void VerifyLog<T>(
         this Mock<ILogger<T>> logger,
         LogLevel level,
@@ -22,6 +30,14 @@ public static class LoggerMockExtensions
             times);
     }
 
+    /// <summary>
+    /// Verify that the mock logger has indeed logged an exception as required.
+    /// </summary>
+    /// <typeparam name="T">The type in which the logger is observing.</typeparam>
+    /// <param name="logger">The logger.</param>
+    /// <param name="containsMessage">The message that ought to have been logged.</param>
+    /// <param name="expectedException">The exception which should have been logged.</param>
+    /// <param name="times">The number of occurrences.</param>
     public static void VerifyExceptionLog<T>(
         this Mock<ILogger<T>> logger,
         string containsMessage,

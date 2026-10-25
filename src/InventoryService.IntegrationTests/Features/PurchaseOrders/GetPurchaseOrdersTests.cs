@@ -2,7 +2,6 @@
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using static System.Net.WebRequestMethods;
 
 namespace InventoryService.IntegrationTests.Features.PurchaseOrders;
 

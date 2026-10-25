@@ -2,6 +2,9 @@
 
 namespace InventoryService.Features.Customers.CreateCustomer;
 
+/// <summary>
+/// A validator for a <see cref="CreateCustomerRequest"/>
+/// </summary>
 public class CreateCustomerRequestValidator : AbstractValidator<CreateCustomerRequest>
 {
     public CreateCustomerRequestValidator()
@@ -14,6 +17,10 @@ public class CreateCustomerRequestValidator : AbstractValidator<CreateCustomerRe
     }
 }
 
+
+/// <summary>
+/// A validator for a <see cref="CreateCustomerRequestPayload"/>
+/// </summary>
 public class CreateCustomerRequestPayloadValidator : AbstractValidator<CreateCustomerRequestPayload>
 {
     public CreateCustomerRequestPayloadValidator()

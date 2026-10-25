@@ -13,6 +13,10 @@ using System.Data;
 
 namespace InventoryService.UnitTests;
 
+/// <summary>
+/// A test method attribute for injecting constructed objects into tests,
+/// supplying its own specimens to overwrite AutoFixture's default behaviour.
+/// </summary>
 public class AutoMoqDataAttribute : AutoDataAttribute
 {
     public AutoMoqDataAttribute()
@@ -38,6 +42,11 @@ public class AutoMoqDataAttribute : AutoDataAttribute
     }
 }
 
+/// <summary>
+/// A test method attribute for injecting constructed objects into tests,
+/// supplying its own specimens to overwrite AutoFixture's default behaviour.
+/// This attribute has the option of suppying in line parameters at a method level.
+/// </summary>
 public class InlineAutoMoqDataAttribute : CompositeDataAttribute
 {
     public InlineAutoMoqDataAttribute(params object[] values)

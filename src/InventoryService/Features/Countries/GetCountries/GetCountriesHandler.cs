@@ -4,6 +4,9 @@ using MediatR;
 
 namespace InventoryService.Features.Countries.GetCountries;
 
+/// <summary>
+/// Handles a request for retrieving Countries, where the request is a <see cref="GetCountriesRequest"/>.
+/// </summary>
 public class GetCountriesHandler : IRequestHandler<GetCountriesRequest, Result<ICollection<GetCountriesResponse>>>
 {
     private IGetCountriesDBQuery _dbQuery;
@@ -18,6 +21,7 @@ public class GetCountriesHandler : IRequestHandler<GetCountriesRequest, Result<I
         _mapper = mapper;
     }
 
+    /// <inheritdoc/>
     public async Task<Result<ICollection<GetCountriesResponse>>> Handle(GetCountriesRequest request, CancellationToken cancellationToken)
     {
         var dbResponse = await _dbQuery.GetCountriesAsync(cancellationToken);

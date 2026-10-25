@@ -1,5 +1,8 @@
 ﻿namespace InventoryService.Infrastructure;
 
+/// <summary>
+/// Middleware which will intercept all incoming requests and log accordingly.
+/// </summary>
 public sealed class RequestLoggingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -13,6 +16,11 @@ public sealed class RequestLoggingMiddleware
         _logger = logger;
     }
 
+    /// <summary>
+    /// Invokes the middleware.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns>A task encapsulating the middleware's invocation.</returns>
     public async Task Invoke(HttpContext context)
     {
         _logger.LogInformation(

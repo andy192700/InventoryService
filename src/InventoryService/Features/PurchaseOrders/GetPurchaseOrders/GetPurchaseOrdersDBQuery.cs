@@ -4,11 +4,23 @@ using System.Data;
 
 namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 
+/// <summary>
+/// Queries the database for purchase orders.
+/// </summary>
 public interface IGetPurchaseOrdersDBQuery
 {
+    /// <summary>
+    /// Return the purchase orders from the database, as per the supplied parameters.
+    /// </summary>
+    /// <param name="dbParameters">The database parameters.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task of <see cref="GetPurchaseOrdersDBResponse"/>.</returns>
     Task<GetPurchaseOrdersDBResponse> GetPurchaseOrdersAsync(GetPurchaseOrdersDBParameters dbParameters, CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Queries the database for purchase orders.
+/// </summary>
 public class GetPurchaseOrdersDBQuery : IGetPurchaseOrdersDBQuery
 {
     private readonly ISQLConnectionProvider _connectionProvider;
@@ -18,6 +30,7 @@ public class GetPurchaseOrdersDBQuery : IGetPurchaseOrdersDBQuery
         _connectionProvider = connectionProvider;
     }
 
+    /// <inheritdoc/>
     public async Task<GetPurchaseOrdersDBResponse> GetPurchaseOrdersAsync(
         GetPurchaseOrdersDBParameters dBParameters,
         CancellationToken cancellationToken)

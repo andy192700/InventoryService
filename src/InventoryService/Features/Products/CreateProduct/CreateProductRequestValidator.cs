@@ -2,6 +2,9 @@
 
 namespace InventoryService.Features.Products.CreateProduct;
 
+/// <summary>
+/// A validator for a <see cref="CreateProductRequest"/>
+/// </summary>
 public class CreateProductRequestValidator : AbstractValidator<CreateProductRequest>
 {
     public CreateProductRequestValidator()
@@ -15,6 +18,9 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
     }
 }
 
+/// <summary>
+/// A validator for a <see cref="CreateProductRequestPayload"/>
+/// </summary>
 public class CreateProductRequestPayloadValidator : AbstractValidator<CreateProductRequestPayload>
 {
     public CreateProductRequestPayloadValidator()
@@ -41,6 +47,9 @@ public class CreateProductRequestPayloadValidator : AbstractValidator<CreateProd
     }
 }
 
+/// <summary>
+/// A validator for a <see cref="CreateProductRequestProductCountries"/>
+/// </summary>
 public class CreateProductRequestProductCountriesValidator : AbstractValidator<CreateProductRequestProductCountries>
 {
     public CreateProductRequestProductCountriesValidator()

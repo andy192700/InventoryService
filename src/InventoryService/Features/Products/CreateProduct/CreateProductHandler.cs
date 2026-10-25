@@ -1,10 +1,12 @@
 ﻿using FluentResults;
 using InventoryService.Infrastructure;
 using MediatR;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace InventoryService.Features.Products.CreateProduct;
 
+/// <summary>
+/// Handles a request for creating a product, where the request is a <see cref="CreateProductRequest"/>.
+/// </summary>
 public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>
 {
     private readonly ICreateProductDBParametersMapper _dbParametersMapper;
@@ -27,6 +29,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result
         _locationBuilder = locationBuilder;
     }
 
+    /// <inheritdoc/>
     public async Task<Result<CreateProductResponse>> Handle(CreateProductRequest request, CancellationToken cancellationToken)
     {
         var dbParams = _dbParametersMapper.Map(request);
