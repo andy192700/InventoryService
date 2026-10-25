@@ -4,6 +4,9 @@ using MediatR;
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
+/// <summary>
+/// Handles a request for creating a product, where the request is a <see cref="CreatePurchaseOrderRequest"/>.
+/// </summary>
 public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>
 {
     private readonly ICreatePurchaseOrderDBParametersMapper _parametersMapper;
@@ -26,6 +29,7 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         _locationBuilder = locationBuilder;
     }
 
+    /// <inheritdoc/>
     public async Task<Result<CreatePurchaseOrderResponse>> Handle(CreatePurchaseOrderRequest request, CancellationToken cancellationToken)
     {
         var dbParams = _parametersMapper.Map(request);

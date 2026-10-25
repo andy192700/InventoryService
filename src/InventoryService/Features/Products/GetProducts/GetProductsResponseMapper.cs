@@ -1,12 +1,24 @@
 ﻿namespace InventoryService.Features.Products.GetProducts;
 
+/// <summary>
+/// Maps a database response to a products response.
+/// </summary>
 public interface IGetProductsResponseMapper
 {
+    /// <summary>
+    /// Maps the database response to a product response.
+    /// </summary>
+    /// <param name="getProductsDBProductsResponse">The database response to map.</param>
+    /// <returns>A product response.</returns>
     ICollection<GetProductsResponse> Map(GetProductsDBResponse getProductsDBProductsResponse);
 }
 
+/// <summary>
+/// Maps a database response to a products response.
+/// </summary>
 public class GetProductsResponseMapper : IGetProductsResponseMapper
 {
+    /// <inheritdoc/>
     public ICollection<GetProductsResponse> Map(GetProductsDBResponse getProductsDBResponse)
     {
         var products = new List<GetProductsResponse>();

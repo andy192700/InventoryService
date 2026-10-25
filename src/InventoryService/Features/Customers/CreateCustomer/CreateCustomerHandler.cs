@@ -1,10 +1,12 @@
 ﻿using FluentResults;
 using InventoryService.Infrastructure;
 using MediatR;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace InventoryService.Features.Customers.CreateCustomer;
 
+/// <summary>
+/// Handles a request for retrieving Countries, where the request is a <see cref="CreateCustomerRequest"/>.
+/// </summary>
 public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResponse>>
 {
     private readonly ICreateCustomerDBCommand _dBCommand;
@@ -27,6 +29,7 @@ public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Resu
         _locationBuilder = locationBuilder;
     }
 
+    /// <inheritdoc/>
     public async Task<Result<CreateCustomerResponse>> Handle(CreateCustomerRequest request, CancellationToken cancellationToken)
     {
         var dbParams = _parametersMapper.Map(request);

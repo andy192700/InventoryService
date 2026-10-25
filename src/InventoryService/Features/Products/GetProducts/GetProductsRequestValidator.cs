@@ -2,6 +2,9 @@
 
 namespace InventoryService.Features.Products.GetProducts;
 
+/// <summary>
+/// A validator for a <see cref="GetProductsRequest"/>
+/// </summary>
 public class GetProductsRequestValidator : AbstractValidator<GetProductsRequest>
 {
     public GetProductsRequestValidator()

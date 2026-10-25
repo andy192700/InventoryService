@@ -2,13 +2,25 @@
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
+/// <summary>
+/// Maps a purchase order request to database parameters.
+/// </summary>
 public interface ICreatePurchaseOrderDBParametersMapper
 {
+    /// <summary>
+    /// Maps the purchase order request to database parameters.
+    /// </summary>
+    /// <param name="request">The purchase order request to map.</param>
+    /// <returns>Database parameters.</returns>
     CreatePurchaseOrderDBParameters Map(CreatePurchaseOrderRequest request);
 }
 
+/// <summary>
+/// Maps a purchase order request to database parameters.
+/// </summary>
 public class CreatePurchaseOrderDBParametersMapper : ICreatePurchaseOrderDBParametersMapper
 {
+    /// <inheritdoc/>
     public CreatePurchaseOrderDBParameters Map(CreatePurchaseOrderRequest request)
     {
         var linesdt = new DataTable();

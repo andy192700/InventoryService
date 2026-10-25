@@ -5,13 +5,25 @@ using System.Data;
 
 namespace InventoryService.Features.Products.CreateProduct;
 
+/// <summary>
+/// Executes database commands to create a product.
+/// </summary>
 public interface ICreateProductDBCommand
 {
+    /// <summary>
+    /// Creates a product in the database.
+    /// </summary>
+    /// <param name="parameters">The database parameters for the command.</param>
+    /// <param name="cancellationToken">A token used to cancel the operation.</param>
+    /// <returns>A database response containing the created product.</returns>
     Task<CreateProductDBResponse> CreateProductAsync(
         CreateProductDBParameters parameters,
         CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Executes database commands to create a product.
+/// </summary>
 public class CreateProductDBCommand : ICreateProductDBCommand
 {
     private readonly ISQLConnectionProvider _sqlConnectionProvider;
@@ -26,6 +38,7 @@ public class CreateProductDBCommand : ICreateProductDBCommand
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public async Task<CreateProductDBResponse> CreateProductAsync(CreateProductDBParameters parameters, CancellationToken cancellationToken)
     {
         using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);

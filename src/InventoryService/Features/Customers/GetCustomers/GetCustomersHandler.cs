@@ -4,6 +4,9 @@ using MediatR;
 
 namespace InventoryService.Features.Customers.GetCustomers;
 
+/// <summary>
+/// Handles a request for retrieving a list ofcustomer, where the request is a <see cref="GetCustomersRequest"/>.
+/// </summary>
 public class GetCustomersHandler : IRequestHandler<GetCustomersRequest, Result<ICollection<GetCustomersResponse>>>
 {
     private readonly IGetCustomersDBQuery _getCustomersDBQuery;
@@ -22,6 +25,7 @@ public class GetCustomersHandler : IRequestHandler<GetCustomersRequest, Result<I
         _getCustomersDBParametersMapper = getCustomersDBParametersMapper;
     }
 
+    /// <inheritdoc/>
     public async Task<Result<ICollection<GetCustomersResponse>>> Handle(GetCustomersRequest request, CancellationToken cancellationToken)
     {
         var dbParams = _getCustomersDBParametersMapper.Map(request);

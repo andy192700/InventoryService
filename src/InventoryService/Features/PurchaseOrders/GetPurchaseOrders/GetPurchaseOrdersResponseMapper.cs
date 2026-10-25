@@ -1,12 +1,24 @@
 ﻿namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 
+/// <summary>
+/// A purchase Orders response mapper.
+/// </summary>
 public interface IGetPurchaseOrdersResponseMapper
 {
+    /// <summary>
+    /// Map the database response to a handler response.
+    /// </summary>
+    /// <param name="dbResponse">The database response.</param>
+    /// <returns>The handler response.</returns>
     ICollection<GetPurchaseOrdersResponse> Map(GetPurchaseOrdersDBResponse dbResponse);
 }
 
+/// <summary>
+/// A purchase Orders response mapper.
+/// </summary>
 public class GetPurchaseOrdersResponseMapper : IGetPurchaseOrdersResponseMapper
 {
+    /// <inheritdoc/>
     public ICollection<GetPurchaseOrdersResponse> Map(GetPurchaseOrdersDBResponse dbResponse)
     {
         var orders = new List<GetPurchaseOrdersResponse>();

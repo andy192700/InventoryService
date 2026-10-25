@@ -2,6 +2,9 @@
 
 namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 
+/// <summary>
+/// A validator for a <see cref="GetPurchaseOrdersRequest"/>
+/// </summary>
 public class GetPurchaseOrdersRequestValidator : AbstractValidator<GetPurchaseOrdersRequest>
 {
     public GetPurchaseOrdersRequestValidator()
