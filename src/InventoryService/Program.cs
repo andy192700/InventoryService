@@ -1,9 +1,4 @@
-using InventoryService;
-using InventoryService.Features;
-using InventoryService.Infrastructure;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using InventoryService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +6,7 @@ builder.Services.RegisterServices();
 
 var app = builder.Build();
 
-app.UseMiddleware<RequestLoggingMiddleware>()
-    .UseRouting()
-    .UseAuthentication()
-    .UseAuthorization()
-    .UseEndpoints(endpoints => app.RegisterEndpoints());
+app.RegisterMiddleware();
 
 app.Run();
 

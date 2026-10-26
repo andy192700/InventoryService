@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
-namespace InventoryService;
+namespace InventoryService.Extensions;
 
 public static class ServiceRegistrations
 {
