@@ -17,6 +17,8 @@ public class CreateProductTests : IntegrationTestBase
     public async Task CreateProduct_ReturnsOk(CreateProductIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert

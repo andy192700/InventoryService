@@ -18,6 +18,8 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsOk(CreateCustomerIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -37,6 +39,7 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsBadRequest(CreateCustomerIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
         request.FirstName = string.Empty;
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

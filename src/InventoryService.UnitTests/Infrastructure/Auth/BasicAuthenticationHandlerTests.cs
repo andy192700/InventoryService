@@ -1,6 +1,5 @@
 ﻿using AutoFixture.Xunit2;
 using FluentAssertions;
-using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;

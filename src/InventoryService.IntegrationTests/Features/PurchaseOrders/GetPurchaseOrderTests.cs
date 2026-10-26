@@ -15,6 +15,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = 2;
 
         // Act
@@ -44,6 +46,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsNotFound()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = 200;
 
         // Act
@@ -63,6 +67,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = -2;
 
         // Act

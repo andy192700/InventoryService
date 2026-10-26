@@ -15,6 +15,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.GetAsync(RequestURI);
 
         // Assert

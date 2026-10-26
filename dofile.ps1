@@ -55,7 +55,7 @@ VALUES
 
     Invoke-Sqlcmd -ServerInstance $sqlServerInstance -Database $databaseName -Username $sqlLoginName -Password $sqlPass -TrustServerCertificate -Query $sql;
 
-    [byte[]] $bytes = [Encoding]::UTF8.GetBytes("$($username):$($passwordHash)");
+    [byte[]] $bytes = [Encoding]::UTF8.GetBytes("$($username):$($password)");
     [string] $base64 = [Convert]::ToBase64String($bytes);
 
     Write-Host "Created credential $username";

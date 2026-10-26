@@ -15,6 +15,8 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -42,6 +44,8 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductId_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 1;
 
         // Act

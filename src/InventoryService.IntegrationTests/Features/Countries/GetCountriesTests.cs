@@ -14,6 +14,7 @@ public class GetCountriesTests : IntegrationTestBase
     public async Task GetCountries_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
         var response = await Client.GetAsync(RequestURI);
 
         // Assert

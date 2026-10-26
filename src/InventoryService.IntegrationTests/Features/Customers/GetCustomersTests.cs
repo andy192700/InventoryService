@@ -16,6 +16,8 @@ public class GetCustomersTests : IntegrationTestBase
     public async Task GetCustomers_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -36,6 +38,7 @@ public class GetCustomersTests : IntegrationTestBase
     public async Task GetCustomers_WithFilter_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
         var filter = "jo";
 
         // Act

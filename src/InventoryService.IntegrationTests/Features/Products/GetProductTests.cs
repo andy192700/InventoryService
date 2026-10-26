@@ -15,6 +15,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 4;
 
         // Act

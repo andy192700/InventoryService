@@ -17,6 +17,8 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsOk(CreatePurchaseOrderIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -36,6 +38,8 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsBadRequest(CreatePurchaseOrderIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         request.CustomerId = string.Empty;
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

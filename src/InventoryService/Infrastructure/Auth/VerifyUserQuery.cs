@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Data;
 
-namespace InventoryService.Infrastructure;
+namespace InventoryService.Infrastructure.Auth;
 
 /// <summary>
 /// Contract for verifying user credentials.

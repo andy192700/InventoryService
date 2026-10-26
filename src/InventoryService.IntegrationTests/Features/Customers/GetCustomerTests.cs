@@ -16,6 +16,8 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var customerId = 3;
 
         // Act
