@@ -26,11 +26,11 @@ public class CreatePurchaseOrderPayloadValidator : AbstractValidator<CreatePurch
     public CreatePurchaseOrderPayloadValidator()
     {
         RuleFor(x => x.CustomerId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("CustomerId must be a positive integer.");
 
         RuleFor(x => x.CountryId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("CountryId must be a positive integer.");
 
         RuleFor(x => x.lines)
@@ -49,11 +49,11 @@ public class CreatePurchaseOrderPayloadLineValidator : AbstractValidator<CreateP
     public CreatePurchaseOrderPayloadLineValidator()
     {
         RuleFor(x => x.OrderQuantity)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("OrderQuantity must be a positive integer.");
 
         RuleFor(x => x.ProductId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("ProductId must be a positive integer.");
     }
 }

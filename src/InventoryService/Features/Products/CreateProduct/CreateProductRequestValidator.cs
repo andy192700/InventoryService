@@ -55,11 +55,11 @@ public class CreateProductRequestProductCountriesValidator : AbstractValidator<C
     public CreateProductRequestProductCountriesValidator()
     {
         RuleFor(x => x.CountryId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("CountryId must be a positive integer.");
 
         RuleFor(x => x.UnitPrice)
-            .Must(x => ValidationHelpers.IsValidDoubleId(x))
+            .Must(x => ValidationHelpers.IsValidDouble(x))
             .WithMessage("UnitPrice must be a positive double.");
     }
 }

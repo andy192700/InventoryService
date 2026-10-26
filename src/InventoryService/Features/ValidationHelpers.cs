@@ -5,13 +5,13 @@ public static class ValidationHelpers
     /// <summary>
     /// Validate an integer is positive and not empty.
     /// </summary>
-    /// <param name="value">The supplied string.</param>
+    /// <param name="testString">The supplied string.</param>
     /// <returns>A boolean indicating success.</returns>
-    public static bool IsValidIntegerId(string? value)
+    public static bool IsValidInteger(string? testString)
     {
-        if (!string.IsNullOrEmpty(value) && int.TryParse(value, out var id))
+        if (!string.IsNullOrEmpty(testString) && int.TryParse(testString, out var value))
         {
-            return id > 0;
+            return value > 0;
         }
 
         return false;
@@ -20,13 +20,13 @@ public static class ValidationHelpers
     /// <summary>
     /// Validate an double is positive and not empty.
     /// </summary>
-    /// <param name="value">The supplied string.</param>
+    /// <param name="testString">The supplied string.</param>
     /// <returns>A boolean indicating success.</returns>
-    public static bool IsValidDoubleId(string? value)
+    public static bool IsValidDouble(string? testString)
     {
-        if (!string.IsNullOrEmpty(value) && double.TryParse(value, out var id))
+        if (!string.IsNullOrEmpty(testString) && double.TryParse(testString, out var value))
         {
-            return id > 0;
+            return value > 0;
         }
 
         return false;
