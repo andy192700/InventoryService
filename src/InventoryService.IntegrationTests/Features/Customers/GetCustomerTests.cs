@@ -40,6 +40,8 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsNotFound()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var customerId = 300;
 
         // Act
@@ -59,6 +61,7 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
         var customerId = -3;
 
         // Act

@@ -42,6 +42,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var filter = "ha";
 
         // Act
@@ -72,6 +74,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var filter = new string('A', 101);
 
         // Act

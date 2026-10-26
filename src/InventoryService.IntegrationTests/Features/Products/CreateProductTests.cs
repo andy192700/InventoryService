@@ -38,6 +38,8 @@ public class CreateProductTests : IntegrationTestBase
     public async Task CreateProduct_ReturnsBadRequest(CreateProductIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         request.ProductName = string.Empty;
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

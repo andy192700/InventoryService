@@ -78,6 +78,8 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductIdAndCountryId_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 1;
         var countryId = 2;
 
@@ -112,6 +114,8 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductIdAndCountryIdAndCustomerId_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 1;
         var countryId = 2;
         var customerId = 5;
@@ -148,6 +152,8 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductId_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = -1;
 
         // Act

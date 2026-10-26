@@ -64,6 +64,7 @@ public class GetCustomersTests : IntegrationTestBase
     public async Task GetCustomers_WithFilter_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
         var filter = new string('A', 101);
 
         // Act

@@ -44,6 +44,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsNotFound()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 400;
 
         // Act
@@ -63,6 +65,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = -4;
 
         // Act
