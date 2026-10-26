@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using FluentResults;
+using FluentValidation;
 using InventoryService.Features.Countries.GetCountries;
 using InventoryService.Features.Customers.CreateCustomer;
 using InventoryService.Features.Customers.GetCustomer;
@@ -11,6 +12,7 @@ using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -31,7 +33,6 @@ public static class ServiceRegistrations
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddHttpContextAccessor();
-        services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
         // Authentication / Authorization
         services.AddOptions<HashOptions>()
@@ -55,58 +56,68 @@ public static class ServiceRegistrations
         services.AddScoped<IGetProductsResponseMapper, GetProductsResponseMapper>();
         services.AddScoped<IValidator<GetProductsRequest>, GetProductsRequestValidator>();
         services.AddScoped<IGetProductsDBParametersMapper, GetProductsDBParametersMapper>();
+        services.AddScoped<IRequestHandler<GetProductsRequest, Result<ICollection<GetProductsResponse>>>, GetProductsHandler>();
 
         // Get Product
         services.AddScoped<IGetProductDBParametersMapper, GetProductDBParametersMapper>();
         services.AddScoped<IValidator<GetProductRequest>, GetProductRequestValidator>();
         services.AddScoped<IGetProductDBQuery, GetProductDBQuery>();
         services.AddScoped<IGetProductResponseMapper, GetProductResponseMapper>();
+        services.AddScoped<IRequestHandler<GetProductRequest, Result<GetProductResponse>>, GetProductHandler>();
 
         // Create Product
         services.AddScoped<ICreateProductDBParametersMapper, CreateProductDBParametersMapper>();
         services.AddScoped<IValidator<CreateProductRequest>, CreateProductRequestValidator>();
         services.AddScoped<ICreateProductDBCommand, CreateProductDBCommand>();
         services.AddScoped<ICreateProductResponseMapper, CreateProductResponseMapper>();
+        services.AddScoped<IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>, CreateProductHandler>();
 
         // Get Customers
         services.AddScoped<IGetCustomersDBQuery, GetCustomersDBQuery>();
         services.AddScoped<IGetCustomersResponseMapper, GetCustomersResponseMapper>();
         services.AddScoped<IGetCustomersDBParametersMapper, GetCustomersDBParametersMapper>();
         services.AddScoped<IValidator<GetCustomersRequest>,  GetCustomersRequestValidator>();
+        services.AddScoped<IRequestHandler<GetCustomersRequest, Result<ICollection<GetCustomersResponse>>>, GetCustomersHandler>();
 
         // Get Customer
         services.AddScoped<IGetCustomerDBParametersMapper, GetCustomerDBParametersMapper>();
         services.AddScoped<IValidator<GetCustomerRequest>, GetCustomerRequestValidator>();
         services.AddScoped<IGetCustomerDBQuery, GetCustomerDBQuery>();
         services.AddScoped<IGetCustomerResponseMapper, GetCustomerResponseMapper>();
+        services.AddScoped<IRequestHandler<GetCustomerRequest, Result<GetCustomerResponse>>, GetCustomerHandler>();
 
         // Create Customer
         services.AddScoped<ICreateCustomerDBParametersMapper, CreateCustomerDBParametersMapper>();
         services.AddScoped<IValidator<CreateCustomerRequest>, CreateCustomerRequestValidator>();
         services.AddScoped<ICreateCustomerDBCommand, CreateCustomerDBCommand>();
         services.AddScoped<ICreateCustomerResponseMapper, CreateCustomerResponseMapper>();
+        services.AddScoped<IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResponse>>, CreateCustomerHandler>();
 
         // Get Purchase Orders
         services.AddScoped<IGetPurchaseOrdersResponseMapper, GetPurchaseOrdersResponseMapper>();
         services.AddScoped<IGetPurchaseOrdersDBQuery, GetPurchaseOrdersDBQuery>();
         services.AddScoped<IGetPurchaseOrdersDBParametersMapper, GetPurchaseOrdersDBParametersMapper>();
         services.AddScoped<IValidator<GetPurchaseOrdersRequest>, GetPurchaseOrdersRequestValidator>();
+        services.AddScoped<IRequestHandler<GetPurchaseOrdersRequest, Result<ICollection<GetPurchaseOrdersResponse>>>, GetPurchaseOrdersHandler>();
 
         // Get Purchase Order
         services.AddScoped<IGetPurchaseOrderDBParametersMapper, GetPurchaseOrderDBParametersMapper>();
         services.AddScoped<IValidator<GetPurchaseOrderRequest>, GetPurchaseOrderRequestValidator>();
         services.AddScoped<IGetPurchaseOrderDBQuery, GetPurchaseOrderDBQuery>();
         services.AddScoped<IGetPurchaseOrderResponseMapper, GetPurchaseOrderResponseMapper>();
+        services.AddScoped<IRequestHandler<GetPurchaseOrderRequest, Result<GetPurchaseOrderResponse>>, GetPurchaseOrderHandler>();
 
         // Create Purchase Order
         services.AddScoped<ICreatePurchaseOrderDBParametersMapper, CreatePurchaseOrderDBParametersMapper>();
         services.AddScoped<IValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderRequestValidator>();
         services.AddScoped<ICreatePurchaseOrderDBCommand, CreatePurchaseOrderDBCommand>();
         services.AddScoped<ICreatePurchaseOrderResponseMapper,  CreatePurchaseOrderResponseMapper>();
+        services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>();
 
         // Get Countries
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
         services.AddScoped<IGetCountriesResponseMapper, GetCountriesResponseMapper>();
+        services.AddScoped<IRequestHandler<GetCountriesRequest, Result<ICollection<GetCountriesResponse>>>, GetCountriesHandler>();
 
         return services;
     }

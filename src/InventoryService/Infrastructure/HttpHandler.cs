@@ -11,21 +11,19 @@ public static class HttpHandler
     /// Request handler delegate for handling http requests, not that a <see cref="IRequestHandler"/> of the
     /// required generic types must exist, this is picked up via assembly scan.
     /// </summary>
-    /// <typeparam name="TInput">The request type.</typeparam>
+    /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>
     /// <param name="input">An instance of the request.</param>
     /// <param name="serviceProvider">A <see cref="IServiceProvider"/>, injected by DI.</param>
-    /// <param name="mediator">A <see cref="IMediator"/> instance, injected by DI.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns></returns>
-    public static async Task<IResult> HandleAsync<TInput, TResponse>(
-        [AsParameters] TInput input,
+    public static async Task<IResult> HandleAsync<TRequest, TResponse>(
+        [AsParameters] TRequest input,
         [FromServices] IServiceProvider serviceProvider,
-        [FromServices] IMediator mediator,
         CancellationToken cancellationToken)
-        where TInput : IRequest<Result<TResponse>>
+        where TRequest : IRequest<Result<TResponse>>
     {
-        var validator = serviceProvider.GetService<IValidator<TInput>>();
+        var validator = serviceProvider.GetService<IValidator<TRequest>>();
 
         if (validator is not null)
         {
@@ -44,7 +42,14 @@ public static class HttpHandler
             }
         }
 
-        var result = await mediator.Send(input, cancellationToken);
+        var handler = serviceProvider.GetService<IRequestHandler<TRequest, Result<TResponse>>>();
+
+        if (handler is null)
+        {
+            Results.Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+
+        var result = await handler!.Handle(input, cancellationToken);
 
         if (result.IsSuccess)
         {
