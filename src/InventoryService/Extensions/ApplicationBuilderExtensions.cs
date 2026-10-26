@@ -11,10 +11,9 @@ public static class ApplicationBuilderExtensions
     /// <returns>The application builder.</returns>
     public static IApplicationBuilder RegisterMiddleware(this IApplicationBuilder applicationBuilder)
     {
-        return app.UseMiddleware<RequestLoggingMiddleware>()
+        return applicationBuilder.UseMiddleware<RequestLoggingMiddleware>()
             .UseRouting()
             .UseAuthentication()
-            .UseAuthorization()
-            .UseEndpoints(endpoints => app.RegisterEndpoints());
+            .UseAuthorization();
     }
 }
