@@ -49,6 +49,7 @@ Key design decisions include:
 - Middleware for cross-cutting concerns such as request logging
 - Flyway for database versioning and migration management
 - Docker Compose for local environment orchestration
+- Lightweight basic authorization/authentication
 
 ### Repository Structure
 /src
@@ -117,4 +118,9 @@ To run the tests via the commandline, run:
 
 ```PowerShell
 doing exec -target DotnetTest
+```
+
+To create a new API login, run the following:
+```PowerShell
+doing exec -target CreateCredential -username MyUser -password MyPassword
 ```
