@@ -10,6 +10,11 @@ using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
+using InventoryService.Infrastructure.Auth;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace InventoryService;
 
@@ -23,8 +28,27 @@ public static class ServiceRegistrations
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
         // infra
-        services.AddScoped<ISQLConnectionProvider, SQLConnectionProvider>();
-        services.AddScoped<ILocationBuilder, LocationBuilder>();
+        services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
+        services.AddSingleton<ILocationBuilder, LocationBuilder>();
+        services.AddHttpContextAccessor();
+        services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+        // Authentication / Authorization
+        services.AddOptions<HashOptions>()
+            .BindConfiguration("Hash")
+            .ValidateOnStart();
+        services.AddSingleton<IComputeHash, ComputeHash>();
+        services.AddSingleton<IValidateOptions<HashOptions>, HashOptionsValidator>();
+        services.AddSingleton<IVerifyUserQuery, VerifyUserQuery>();
+        services.AddSingleton<IAuthorizationHandler, AuthorizationHandler>();
+        services.AddAuthentication(AuthenticationConstants.AuthorizationScheme)
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.AuthorizationScheme, null);
+        services.AddAuthorizationBuilder()
+            .AddPolicy(AuthenticationConstants.AuthorizationPolicy, policy =>
+            {
+                policy.RequireClaim(ClaimTypes.Name);
+                policy.AddRequirements(new AuthorizationHandlerRequirement());
+            });
 
         // Get Products
         services.AddScoped<IGetProductsDBQuery, GetProductsDBQuery>();

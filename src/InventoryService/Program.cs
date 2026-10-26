@@ -1,22 +1,21 @@
 using InventoryService;
 using InventoryService.Features;
 using InventoryService.Infrastructure;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 builder.Services.RegisterServices();
 
 var app = builder.Build();
 
-app.UseMiddleware<RequestLoggingMiddleware>();
-
-app.RegisterEndpoints();
-
-app.UseRouting();
+app.UseMiddleware<RequestLoggingMiddleware>()
+    .UseRouting()
+    .UseAuthentication()
+    .UseAuthorization()
+    .UseEndpoints(endpoints => app.RegisterEndpoints());
 
 app.Run();
 

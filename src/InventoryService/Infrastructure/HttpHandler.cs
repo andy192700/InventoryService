@@ -54,15 +54,15 @@ public static class HttpHandler
                 ICreated created => Results.Created(
                     created.Location,
                     result.Value),
-                _ => Results.Problem(statusCode: 500)
+                _ => Results.Problem(statusCode: StatusCodes.Status200OK)
             };
         }
 
         return result.Errors.First() switch
         {
-            NotFoundError e => Results.Problem(e.Message, statusCode: 404),
-            InternalServerError e => Results.Problem(e.Message, statusCode: 500),
-            _ => Results.Problem(statusCode: 500)
+            NotFoundError e => Results.Problem(e.Message, statusCode: StatusCodes.Status404NotFound),
+            InternalServerError e => Results.Problem(e.Message, statusCode: StatusCodes.Status500InternalServerError),
+            _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };
     }
 }

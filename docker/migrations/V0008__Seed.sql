@@ -104,3 +104,7 @@ VALUES
 -- Order 5 (GB)
 (5, 6, 7),   -- Hammer
 (5, 8, 2);   -- Saw
+
+INSERT INTO dbo.UserCredential
+(UserName, PasswordHash)
+VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B')

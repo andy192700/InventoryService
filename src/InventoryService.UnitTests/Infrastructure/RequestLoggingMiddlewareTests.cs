@@ -14,7 +14,8 @@ public class RequestLoggingMiddlewareTests
     public async Task Invoke_LogsStartAndFinish(
         [Frozen] Mock<ILogger<RequestLoggingMiddleware>> mockLogger,
         string method,
-        string path)
+        string path,
+        TestRequestDelegate requestDelegate)
     {
         // Arrange
         var context = new DefaultHttpContext();
@@ -23,23 +24,15 @@ public class RequestLoggingMiddlewareTests
         context.Request.Path = $"/{path}";
         context.Response.StatusCode = StatusCodes.Status200OK;
 
-        var nextCalled = false;
-
-        RequestDelegate next = ctx =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        };
-
         var sut = new RequestLoggingMiddleware(
-            next,
+            requestDelegate.Next(),
             mockLogger.Object);
 
         // Act
         await sut.Invoke(context);
 
         // Assert
-        nextCalled.Should().BeTrue();
+        requestDelegate.NextCalled.Should().BeTrue();
 
         mockLogger.VerifyLog(
             LogLevel.Information,
@@ -63,7 +56,8 @@ public class RequestLoggingMiddlewareTests
         [Frozen] Mock<ILogger<RequestLoggingMiddleware>> mockLogger,
         string exceptionMessage,
         string method,
-        string path)
+        string path,
+        TestRequestDelegate requestDelegate)
     {
         // Arrange
         var context = new DefaultHttpContext();
@@ -73,10 +67,8 @@ public class RequestLoggingMiddlewareTests
 
         var exception = new InvalidOperationException(exceptionMessage);
 
-        RequestDelegate next = _ => throw exception;
-
         var sut = new RequestLoggingMiddleware(
-            next,
+            requestDelegate.Next(_ => throw exception),
             mockLogger.Object);
 
         // Act

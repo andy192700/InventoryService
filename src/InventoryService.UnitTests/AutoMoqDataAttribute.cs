@@ -33,8 +33,9 @@ public class AutoMoqDataAttribute : AutoDataAttribute
             fixture.Customizations.Add(new CreateProductDBParametersSpecimenBuilder());
             fixture.Customizations.Add(new CreatePurchaseOrderDBParametersSpecimenBuilder());
             fixture.Customizations.Add(new GetProductRequestSpecimenBuilder());
-            fixture.Customizations.Add(new GetCustomerRequestSpecimenBuilder());
+            fixture.Customizations.Add(new GetCustomerRequestSpecimenBuilder()); 
             fixture.Customizations.Add(new QueryStringSpecimenBuilder());
+            fixture.Customizations.Add(new TestRequestDelegateSpecimenBuilder());
 
             return fixture;
         })
@@ -325,3 +326,17 @@ public class QueryStringSpecimenBuilder : ISpecimenBuilder
         return new NoSpecimen();
     }
 }
+
+public class TestRequestDelegateSpecimenBuilder : ISpecimenBuilder
+{
+    public object Create(object request, ISpecimenContext context)
+    {
+        if (request is Type type && type == typeof(TestRequestDelegate))
+        {
+            return new TestRequestDelegate();
+        }
+
+        return new NoSpecimen();
+    }
+}
+
