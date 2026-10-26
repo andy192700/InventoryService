@@ -10,7 +10,7 @@ public class GetPurchaseOrderRequestValidator : AbstractValidator<GetPurchaseOrd
     public GetPurchaseOrderRequestValidator()
     {
         RuleFor(x => x.PurchaseOrderId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("PurchaseOrderId must be a positive integer.");
     }
 }

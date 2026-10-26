@@ -15,6 +15,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = 2;
 
         // Act
@@ -44,6 +46,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsNotFound()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = 200;
 
         // Act
@@ -63,6 +67,8 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var purchaseOrderId = -2;
 
         // Act
@@ -76,5 +82,23 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails($"PurchaseOrderId must be a positive integer.");
+    }
+
+    [Fact]
+    public async Task GetPurchaseOrder_ReturnsUnauthorized()
+    {
+        // Act
+        var purchaseOrderId = 2;
+
+        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

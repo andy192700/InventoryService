@@ -15,6 +15,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 4;
 
         // Act
@@ -42,6 +44,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsNotFound()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = 400;
 
         // Act
@@ -61,6 +65,8 @@ public class GetProductTests : IntegrationTestBase
     public async Task GetProduct_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var productId = -4;
 
         // Act
@@ -74,5 +80,24 @@ public class GetProductTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails($"ProductId must be a positive integer.");
+    }
+
+    [Fact]
+    public async Task GetProduct_ReturnsUnauthorized()
+    {
+        // Act
+        var productId = 4;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?productId={productId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

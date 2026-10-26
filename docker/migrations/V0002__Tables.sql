@@ -44,11 +44,11 @@ PRIMARY KEY (ProductCountryId)
 
 ALTER TABLE dbo.ProductCountry
 ADD CONSTRAINT FK_ProductCountry_Product
-FOREIGN KEY (ProductId) REFERENCES dbo.Product(ProductId);
+FOREIGN KEY (ProductId) REFERENCES dbo.Product(ProductId)
 
 ALTER TABLE dbo.ProductCountry
 ADD CONSTRAINT FK_ProductCountry_Country
-FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId);
+FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId)
 
 CREATE UNIQUE INDEX UX_ProductCountry_ProductId_CountryId
 ON dbo.ProductCountry (ProductId, CountryId)
@@ -83,11 +83,11 @@ PRIMARY KEY (PurchaseOrderId)
 
 ALTER TABLE dbo.PurchaseOrder
 ADD CONSTRAINT FK_PurchaseOrder_Customer
-FOREIGN KEY (CustomerId) REFERENCES dbo.Customer(CustomerId);
+FOREIGN KEY (CustomerId) REFERENCES dbo.Customer(CustomerId)
 
 ALTER TABLE dbo.PurchaseOrder
 ADD CONSTRAINT FK_PurchaseOrder_Country
-FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId);
+FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId)
 
 GO
 
@@ -131,16 +131,31 @@ PRIMARY KEY (PurchaseOrderLineId)
 
 ALTER TABLE dbo.PurchaseOrderLine
 ADD CONSTRAINT FK_PurchaseOrderLine_PurchaseOrderLine
-FOREIGN KEY (PurchaseOrderId) REFERENCES dbo.PurchaseOrder(PurchaseOrderId);
+FOREIGN KEY (PurchaseOrderId) REFERENCES dbo.PurchaseOrder(PurchaseOrderId)
 
 ALTER TABLE dbo.PurchaseOrderLine
 ADD CONSTRAINT FK_PurchaseOrder_ProductCountryId
-FOREIGN KEY (ProductCountryId) REFERENCES dbo.ProductCountry(ProductCountryId);
+FOREIGN KEY (ProductCountryId) REFERENCES dbo.ProductCountry(ProductCountryId)
 
 ALTER TABLE dbo.PurchaseOrderLine
 ADD CONSTRAINT CK_PurchaseOrderLine_CountryMatch
-CHECK (dbo.udf_PurchaseOrderCountryMatch(PurchaseOrderId, ProductCountryId) = 1);
+CHECK (dbo.udf_PurchaseOrderCountryMatch(PurchaseOrderId, ProductCountryId) = 1)
 
 CREATE UNIQUE INDEX UX_PurchaseOrderLine_PurchaseOrderId_ProductCountryId
 ON dbo.PurchaseOrderLine (PurchaseOrderId, ProductCountryId)
 
+GO
+
+CREATE TABLE dbo.UserCredential
+(
+    UserCredentialId INT IDENTITY(1,1) not null,
+    UserName VARCHAR(50) NOT NULL,
+    PasswordHash NVARCHAR(255) NOT NULL
+)
+
+ALTER TABLE dbo.UserCredential
+ADD CONSTRAINT PK_UserCredential
+PRIMARY KEY (UserCredentialId)
+
+CREATE UNIQUE INDEX UX_UserCredential_UserCredentialId
+ON dbo.UserCredential (UserName)

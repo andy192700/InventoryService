@@ -13,12 +13,12 @@ public class ValidationHelpersTests
     [InlineAutoMoqData("-1", false)]
     [InlineAutoMoqData("1", true)]
     [InlineAutoMoqData("100", true)]
-    public void IsValidIntegerId_ReturnsAsExpected(
+    public void IsValidInteger_ReturnsAsExpected(
         string id,
         bool expectedResult)
     {
         // Act
-        var result = ValidationHelpers.IsValidIntegerId(id);
+        var result = ValidationHelpers.IsValidInteger(id);
 
         // Assert
         result.Should().Be(expectedResult);
@@ -36,12 +36,12 @@ public class ValidationHelpersTests
     [InlineAutoMoqData("100.0", true)]
     [InlineAutoMoqData("1", true)]
     [InlineAutoMoqData("100", true)]
-    public void IsValidDoubleId_ReturnsAsExpected(
+    public void IsValidDouble_ReturnsAsExpected(
         string id,
         bool expectedResult)
     {
         // Act
-        var result = ValidationHelpers.IsValidDoubleId(id);
+        var result = ValidationHelpers.IsValidDouble(id);
 
         // Assert
         result.Should().Be(expectedResult);

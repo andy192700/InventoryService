@@ -9,6 +9,8 @@ using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
+using InventoryService.Infrastructure.Auth;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryService.Features;
 
@@ -23,7 +25,7 @@ public static class Routes
     {
         var group = routeBuilder
             .MapGroup("/v1/inventory")
-            .AllowAnonymous();
+            .RequireAuthorization(AuthenticationConstants.AuthorizationPolicy);
 
         group.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>);
         group.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>);

@@ -18,6 +18,8 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsOk(CreateCustomerIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -37,6 +39,7 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsBadRequest(CreateCustomerIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
         request.FirstName = string.Empty;
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
@@ -49,6 +52,22 @@ public class CreateCustomerTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails("'First Name' must not be empty.");
+    }
 
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateCustomer_ReturnsUnauthorized(CreateCustomerIntRequest request)
+    {
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

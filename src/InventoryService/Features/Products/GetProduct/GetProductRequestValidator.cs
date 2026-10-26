@@ -10,7 +10,7 @@ public class GetProductRequestValidator : AbstractValidator<GetProductRequest>
     public GetProductRequestValidator()
     {
         RuleFor(x => x.ProductId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("ProductId must be a positive integer.");
     }
 }

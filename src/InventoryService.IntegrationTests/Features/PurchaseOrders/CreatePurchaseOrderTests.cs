@@ -17,6 +17,8 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsOk(CreatePurchaseOrderIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -36,6 +38,8 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsBadRequest(CreatePurchaseOrderIntRequest request)
     {
         // Act
+        AddBasicAuthHeader();
+
         request.CustomerId = string.Empty;
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
@@ -48,5 +52,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails($"CustomerId must be a positive integer.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreatePurchaseOrder_ReturnsUnauthorized(CreatePurchaseOrderIntRequest request)
+    {
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Countries.GetCountries;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace InventoryService.IntegrationTests.Features.Countries;
@@ -14,6 +15,7 @@ public class GetCountriesTests : IntegrationTestBase
     public async Task GetCountries_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -27,5 +29,21 @@ public class GetCountriesTests : IntegrationTestBase
         result.First().CountryId.Should().Be(1);
         result.First().CountryCode.Should().Be("US");
         result.First().CurrencyCode.Should().Be("USD");
+    }
+
+    [Fact]
+    public async Task GetCountries_ReturnsUnauthorized()
+    {
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

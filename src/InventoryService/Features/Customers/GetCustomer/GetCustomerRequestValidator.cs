@@ -10,7 +10,7 @@ public class GetCustomerRequestValidator : AbstractValidator<GetCustomerRequest>
     public GetCustomerRequestValidator()
     {
         RuleFor(x => x.CustomerId)
-            .Must(x => ValidationHelpers.IsValidIntegerId(x))
+            .Must(x => ValidationHelpers.IsValidInteger(x))
             .WithMessage("CustomerId must be a positive integer.");
     }
 }

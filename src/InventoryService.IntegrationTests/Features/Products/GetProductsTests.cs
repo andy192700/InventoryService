@@ -15,6 +15,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_ReturnsOk()
     {
         // Act
+        AddBasicAuthHeader();
+
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -40,6 +42,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsOk()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var filter = "ha";
 
         // Act
@@ -70,6 +74,8 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsBadRequest()
     {
         // Arrange
+        AddBasicAuthHeader();
+
         var filter = new string('A', 101);
 
         // Act
@@ -83,5 +89,21 @@ public class GetProductsTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails($"The length of 'Filter' must be 100 characters or fewer. You entered {filter.Length} characters.");
+    }
+
+    [Fact]
+    public async Task GetProducts_ReturnsUnauthorized()
+    {
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }
