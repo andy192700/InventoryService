@@ -53,4 +53,21 @@ public class CreateProductTests : IntegrationTestBase
 
         result.AssertProblemDetails("'Product Name' must not be empty.");
     }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateProduct_ReturnsUnauthorized(CreateProductIntRequest request)
+    {
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
+    }
 }

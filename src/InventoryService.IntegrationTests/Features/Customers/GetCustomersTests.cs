@@ -79,4 +79,20 @@ public class GetCustomersTests : IntegrationTestBase
 
         result.AssertProblemDetails($"The length of 'Filter' must be 100 characters or fewer. You entered {filter.Length} characters.");
     }
+
+    [Fact]
+    public async Task GetCustomers_ReturnsUnauthorized()
+    {
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
+    }
 }

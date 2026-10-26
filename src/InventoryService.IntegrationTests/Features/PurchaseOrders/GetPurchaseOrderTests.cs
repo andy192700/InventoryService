@@ -83,4 +83,22 @@ public class GetPurchaseOrderTests : IntegrationTestBase
 
         result.AssertProblemDetails($"PurchaseOrderId must be a positive integer.");
     }
+
+    [Fact]
+    public async Task GetPurchaseOrder_ReturnsUnauthorized()
+    {
+        // Act
+        var purchaseOrderId = 2;
+
+        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
+    }
 }

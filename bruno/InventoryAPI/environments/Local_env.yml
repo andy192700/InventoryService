@@ -1,5 +1,5 @@
 name: Local_env
 variables:
   - name: API_URL
-    value: http://localhost:5230
+    value: http://localhost:6000
     description: ""

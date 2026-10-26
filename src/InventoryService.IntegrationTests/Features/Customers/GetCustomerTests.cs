@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Castle.Core.Resource;
+using FluentAssertions;
 using InventoryService.Features.Customers.GetCustomer;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -75,5 +76,23 @@ public class GetCustomerTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails($"CustomerId must be a positive integer.");
+    }
+
+    [Fact]
+    public async Task GetCustomer_ReturnsUnauthorized()
+    {
+        // Act
+        var customerId = 3;
+
+        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }

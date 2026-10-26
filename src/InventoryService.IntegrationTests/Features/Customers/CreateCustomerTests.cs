@@ -52,6 +52,22 @@ public class CreateCustomerTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertProblemDetails("'First Name' must not be empty.");
+    }
 
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateCustomer_ReturnsUnauthorized(CreateCustomerIntRequest request)
+    {
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Detail.Should().Be("Missing Authorization Header");
     }
 }
