@@ -45,7 +45,7 @@ public static class HttpHandler
 
         if (handler is null)
         {
-            Results.Problem(statusCode: StatusCodes.Status404NotFound);
+            return Results.Problem(statusCode: StatusCodes.Status404NotFound);
         }
 
         var result = await handler!.Handle(input, cancellationToken);
@@ -58,7 +58,7 @@ public static class HttpHandler
                 ICreated created => Results.Created(
                     created.Location,
                     result.Value),
-                _ => Results.Problem(statusCode: StatusCodes.Status200OK)
+                _ => Results.Ok()
             };
         }
 

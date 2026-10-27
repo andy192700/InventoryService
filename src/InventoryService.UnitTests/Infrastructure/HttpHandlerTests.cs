@@ -6,6 +6,7 @@ using FluentValidation.Results;
 using InventoryService.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 
 namespace InventoryService.UnitTests.Infrastructure;
@@ -45,7 +46,12 @@ public class HttpHandlerTests
             cancellation);
 
         // Assert
-        result.Should().BeAssignableTo<IValueHttpResult>();
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
     }
 
     [Theory]
@@ -76,6 +82,10 @@ public class HttpHandlerTests
 
         // Assert
         result.Should().BeAssignableTo<Microsoft.AspNetCore.Http.HttpResults.Ok<TestResponse>>();
+
+        var particular = result as Microsoft.AspNetCore.Http.HttpResults.Ok<TestResponse>;
+        particular.Should().NotBeNull();
+        particular.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Theory]
@@ -111,6 +121,10 @@ public class HttpHandlerTests
 
         // Assert
         result.Should().BeAssignableTo<Microsoft.AspNetCore.Http.HttpResults.Ok<TestResponse>>();
+
+        var particular = result as Microsoft.AspNetCore.Http.HttpResults.Ok<TestResponse>;
+        particular.Should().NotBeNull();
+        particular.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Theory]
@@ -131,8 +145,10 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
 
+        var responseValue = HttpResponses.Created(response, location);
+
         mockHandler.Setup(x => x.Handle(request, cancellation))
-            .ReturnsAsync(HttpResponses.Created(response, location));
+            .ReturnsAsync(responseValue);
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
@@ -142,14 +158,17 @@ public class HttpHandlerTests
 
         // Assert
         result.Should().BeAssignableTo<Microsoft.AspNetCore.Http.HttpResults.Created<TestResponse>>();
+        
+        var particular = result as Microsoft.AspNetCore.Http.HttpResults.Created<TestResponse>;
+        particular.Should().NotBeNull();
+        particular.StatusCode.Should().Be(StatusCodes.Status201Created);
     }
 
     [Theory]
     [AutoMoqData]
-    public async Task HandleAsync_Returns500_WhenSuccessResultIsUnknownType(
+    public async Task HandleAsync_ReturnsNotFound_WhenHandlerNotRegistered(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler,
         CancellationToken cancellation)
     {
         // Arrange
@@ -158,7 +177,7 @@ public class HttpHandlerTests
             .Returns((object?)null);
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);
+            .Returns((IRequestHandler<TestRequest, Result<TestResponse>>)null!);
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
@@ -167,7 +186,47 @@ public class HttpHandlerTests
             cancellation);
 
         // Assert
-        result.Should().BeAssignableTo<IResult>();
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+    }
+
+    [Theory]
+    [AutoMoqData]
+    public async Task HandleAsync_Returns200_WhenSuccessResultIsUnknownType(
+        [Frozen] Mock<IServiceProvider> mockServiceProvider,
+        TestRequest request,
+        Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        CancellationToken cancellation,
+        Result<TestResponse> response)
+    {
+        // Arrange
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
+            .Returns((object?)null);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
+            .Returns(mockHandler.Object);
+
+        mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(response);
+
+        // Act
+        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+            request,
+            mockServiceProvider.Object,
+            cancellation);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<Ok>();
+
+        var asParticular = result as Ok;
+        asParticular.Should().NotBeNull();
+        asParticular.StatusCode.Should().Be(StatusCodes.Status200OK);
     }
 
     [Theory]
@@ -175,7 +234,8 @@ public class HttpHandlerTests
     public async Task HandleAsync_Returns404_WhenNotFoundErrorReturned(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler,
+        Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        string message,
         CancellationToken cancellation)
     {
         // Arrange
@@ -184,7 +244,10 @@ public class HttpHandlerTests
             .Returns((object?)null);
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);
+            .Returns(mockHandler.Object);
+
+        mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(HttpResponses.Notfound(message));
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
@@ -193,7 +256,13 @@ public class HttpHandlerTests
             cancellation);
 
         // Assert
-        result.Should().BeAssignableTo<IResult>();
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+        problemDetails.ProblemDetails.Detail.Should().Be(message);
     }
 
     [Theory]
@@ -201,7 +270,8 @@ public class HttpHandlerTests
     public async Task HandleAsync_Returns500_WhenInternalServerErrorReturned(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler,
+        Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        string message,
         CancellationToken cancellation)
     {
         // Arrange
@@ -210,8 +280,10 @@ public class HttpHandlerTests
             .Returns((object?)null);
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);
+            .Returns(mockHandler.Object);
 
+        mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(HttpResponses.InternalServerError(message));
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
@@ -220,7 +292,13 @@ public class HttpHandlerTests
             cancellation);
 
         // Assert
-        result.Should().BeAssignableTo<IResult>();
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        problemDetails.ProblemDetails.Detail.Should().Be(message);
     }
 
     [Theory]
@@ -228,8 +306,9 @@ public class HttpHandlerTests
     public async Task HandleAsync_Returns500_WhenUnknownErrorReturned(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler,
-        CancellationToken cancellation)
+        Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        CancellationToken cancellation,
+        IError error)
     {
         // Arrange
         mockServiceProvider
@@ -237,7 +316,10 @@ public class HttpHandlerTests
             .Returns((object?)null);
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);            
+            .Returns(mockHandler.Object);
+
+        mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Fail(error));
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
@@ -246,7 +328,12 @@ public class HttpHandlerTests
             cancellation);
 
         // Assert
-        result.Should().BeAssignableTo<IResult>();
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 
     public sealed record TestRequest(string Name)
