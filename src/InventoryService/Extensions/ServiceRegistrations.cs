@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using FluentValidation;
+using InventoryService.Features;
 using InventoryService.Features.Countries.GetCountries;
 using InventoryService.Features.Customers.CreateCustomer;
 using InventoryService.Features.Customers.GetCustomer;

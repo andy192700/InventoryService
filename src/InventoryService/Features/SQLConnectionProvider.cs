@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace InventoryService.Infrastructure;
+namespace InventoryService.Features;
 
 /// <summary>
 /// Provides a fresh SQL connection.

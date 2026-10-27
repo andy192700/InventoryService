@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using InventoryService.Infrastructure;
 using Microsoft.Data.SqlClient;
 using System.Data;
 

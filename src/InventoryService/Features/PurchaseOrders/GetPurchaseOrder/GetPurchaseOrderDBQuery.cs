@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using InventoryService.Infrastructure;
 using System.Data;
 
 namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrder;

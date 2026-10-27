@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using InventoryService.Features;
 using System.Data;
 
 namespace InventoryService.Infrastructure.Auth;
