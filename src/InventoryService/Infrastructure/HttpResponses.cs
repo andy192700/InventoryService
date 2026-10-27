@@ -29,6 +29,14 @@ public static class HttpResponses
     /// <returns>A <see cref="Result"/> instance.</returns>
     public static Result Notfound(string message)
         => Result.Fail(new NotFoundError(message));
+
+    /// <summary>
+    /// Indicates that the response status code is 500.
+    /// </summary>
+    /// <param name="message">The message detailing the particulars.</param>
+    /// <returns>A <see cref="Result"/> instance.</returns>
+    public static Result InternalServerError(string message)
+        => Result.Fail(new InternalServerError(message));
 }
 
 /// <summary>

@@ -1,6 +1,6 @@
 USE Inventory
 
-INSERT INTO dbo.Country
+INSERT INTO warehouse.Country
 (
     CountryCode,
     CurrencyCode
@@ -10,7 +10,7 @@ VALUES
 ('GB', 'GBP'),
 ('FR', 'EUR');
 
-INSERT INTO dbo.Product
+INSERT INTO warehouse.Product
 (
     CreatedDate,
     ProductName,
@@ -24,7 +24,7 @@ VALUES
 (SYSDATETIMEOFFSET(), 'Screwdriver Set', '6 piece screwdriver set');
 
 
-INSERT INTO dbo.ProductCountry
+INSERT INTO warehouse.ProductCountry
 (
     ProductId,
     CountryId,
@@ -52,7 +52,7 @@ VALUES
 (4, 3, 9.49),
 (5, 3, 13.49);
 
-INSERT INTO dbo.Customer
+INSERT INTO warehouse.Customer
 (
     CreatedDate,
     FirstName,
@@ -65,7 +65,7 @@ VALUES
 (SYSDATETIMEOFFSET(), 'Mary', 'Taylor'),
 (SYSDATETIMEOFFSET(), 'Tom', 'Walker');
 
-INSERT INTO dbo.PurchaseOrder
+INSERT INTO warehouse.PurchaseOrder
 (
     OrderDate,
     CountryId,
@@ -78,7 +78,7 @@ VALUES
 (DATEADD(DAY, -4, SYSDATETIMEOFFSET()), 3, 3),
 (DATEADD(DAY, -2, SYSDATETIMEOFFSET()), 2, 5);
 
-INSERT INTO dbo.PurchaseOrderLine
+INSERT INTO warehouse.PurchaseOrderLine
 (
     PurchaseOrderId,
     ProductCountryId,
@@ -105,6 +105,6 @@ VALUES
 (5, 6, 7),   -- Hammer
 (5, 8, 2);   -- Saw
 
-INSERT INTO dbo.UserCredential
+INSERT INTO governance.UserCredential
 (UserName, PasswordHash)
 VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B')

@@ -36,7 +36,7 @@ public class GetPurchaseOrderDBQuery : IGetPurchaseOrderDBQuery
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
         using var result = await conn.QueryMultipleAsync(
-            "dbo.usp_GetPurchaseOrder",
+            "warehouse.usp_GetPurchaseOrder",
             param: new
             {
                 dbParameters.PurchaseOrderId

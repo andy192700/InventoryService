@@ -2,13 +2,13 @@ USE Inventory
 
 GO
 
-CREATE PROC dbo.usp_VerifyCredentials @UserName VARCHAR(50), @PasswordHash NVARCHAR(255)
+CREATE PROC governance.usp_VerifyCredentials @UserName VARCHAR(50), @PasswordHash NVARCHAR(255)
 AS
 BEGIN
     IF EXISTS 
     (
         SELECT 1
-        FROM dbo.UserCredential
+        FROM governance.UserCredential
         WHERE UserName = @UserName
         AND PasswordHash = @PasswordHash
     )

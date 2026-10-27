@@ -51,7 +51,7 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertProblemDetails("'First Name' must not be empty.");
+        result.AssertValidationErrorPresent("'First Name' must not be empty.");
     }
 
     [Theory]

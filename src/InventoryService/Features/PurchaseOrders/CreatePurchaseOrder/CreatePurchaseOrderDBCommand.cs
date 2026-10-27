@@ -48,7 +48,7 @@ public class CreatePurchaseOrderDBCommand : ICreatePurchaseOrderDBCommand
         try
         {
             purchaseOrderId = await conn.ExecuteScalarAsync<int>(
-                "dbo.usp_CreatePurchaseOrder",
+                "warehouse.usp_CreatePurchaseOrder",
                 transaction: transaction,
                 param: new
                 {

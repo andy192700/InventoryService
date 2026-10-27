@@ -36,7 +36,7 @@ public class VerifyUserQuery : IVerifyUserQuery
         var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
         return conn.ExecuteScalar<bool>(
-            "dbo.usp_VerifyCredentials",
+            "governance.usp_VerifyCredentials",
             param: new
             {
                 UserName = userName,
