@@ -1,4 +1,5 @@
-﻿using InventoryService.Infrastructure;
+﻿using InventoryService.Features;
+using InventoryService.Infrastructure;
 
 namespace InventoryService.Extensions;
 
@@ -14,6 +15,7 @@ public static class ApplicationBuilderExtensions
         return applicationBuilder.UseMiddleware<RequestLoggingMiddleware>()
             .UseRouting()
             .UseAuthentication()
-            .UseAuthorization();
+            .UseAuthorization()
+            .UseEndpoints(endpoints => endpoints.RegisterEndpoints());
     }
 }

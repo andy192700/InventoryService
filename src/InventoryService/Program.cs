@@ -1,5 +1,4 @@
 using InventoryService.Extensions;
-using InventoryService.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,9 +6,7 @@ builder.Services.RegisterServices();
 
 var app = builder.Build();
 
-app
-    .RegisterMiddleware()
-    .UseEndpoints(endpoints => endpoints.RegisterEndpoints());
+app.RegisterMiddleware();
 
 app.Run();
 
