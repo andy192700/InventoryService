@@ -92,7 +92,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
         var problemDetails = new
         {
-            type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+            type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
             title = "Unauthorized",
             detail = _failureMessage ?? "Valid credentials are required to access this resource.",
             status = StatusCodes.Status401Unauthorized
