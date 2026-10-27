@@ -77,6 +77,9 @@ ALTER TABLE warehouse.Customer
 ADD CONSTRAINT PK_Customer
 PRIMARY KEY (CustomerId)
 
+CREATE UNIQUE INDEX UX_Customer_FirstName_LastName
+ON warehouse.Customer (FirstName, LastName)
+
 GO
 
 CREATE TABLE warehouse.PurchaseOrder
