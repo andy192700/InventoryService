@@ -75,7 +75,7 @@ public class GetCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertProblemDetails($"CustomerId must be a positive integer.");
+        result.AssertValidationErrorPresent($"CustomerId must be a positive integer.");
     }
 
     [Fact]

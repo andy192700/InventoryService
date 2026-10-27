@@ -1,19 +1,29 @@
 USE Inventory
 
-CREATE TABLE dbo.Country
+GO
+
+CREATE SCHEMA governance
+
+GO
+
+CREATE SCHEMA warehouse
+
+GO
+
+CREATE TABLE warehouse.Country
 (
     CountryId INT NOT NULL IDENTITY(1,1),
     CountryCode VARCHAR(2) NOT NULL,
     CurrencyCode VARCHAR(3) NOT NULL
 )
 
-ALTER TABLE dbo.Country
+ALTER TABLE warehouse.Country
 ADD CONSTRAINT PK_Country
 PRIMARY KEY (CountryId)
 
 GO
 
-CREATE TABLE dbo.Product
+CREATE TABLE warehouse.Product
 (
     ProductId INT NOT NULL IDENTITY(1,1),
     CreatedDate DATETIMEOFFSET(3) NOT NULL,
@@ -21,16 +31,16 @@ CREATE TABLE dbo.Product
     ProductDesc VARCHAR(255) NOT NULL
 )
 
-ALTER TABLE dbo.Product
+ALTER TABLE warehouse.Product
 ADD CONSTRAINT PK_Product
 PRIMARY KEY (ProductId)
 
 CREATE UNIQUE INDEX UX_Product_ProductName
-ON dbo.Product (ProductName)
+ON warehouse.Product (ProductName)
 
 GO
 
-CREATE TABLE dbo.ProductCountry
+CREATE TABLE warehouse.ProductCountry
 (
     ProductCountryId INT NOT NULL IDENTITY(1,1),
     ProductId INT NOT NULL,
@@ -38,24 +48,24 @@ CREATE TABLE dbo.ProductCountry
     UnitPrice DECIMAL(18,2) NOT NULL
 )
 
-ALTER TABLE dbo.ProductCountry
+ALTER TABLE warehouse.ProductCountry
 ADD CONSTRAINT PK_ProductCountry
 PRIMARY KEY (ProductCountryId)
 
-ALTER TABLE dbo.ProductCountry
+ALTER TABLE warehouse.ProductCountry
 ADD CONSTRAINT FK_ProductCountry_Product
-FOREIGN KEY (ProductId) REFERENCES dbo.Product(ProductId)
+FOREIGN KEY (ProductId) REFERENCES warehouse.Product(ProductId)
 
-ALTER TABLE dbo.ProductCountry
+ALTER TABLE warehouse.ProductCountry
 ADD CONSTRAINT FK_ProductCountry_Country
-FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId)
+FOREIGN KEY (CountryId) REFERENCES warehouse.Country(CountryId)
 
 CREATE UNIQUE INDEX UX_ProductCountry_ProductId_CountryId
-ON dbo.ProductCountry (ProductId, CountryId)
+ON warehouse.ProductCountry (ProductId, CountryId)
 
 GO
 
-CREATE TABLE dbo.Customer
+CREATE TABLE warehouse.Customer
 (
     CustomerId INT NOT NULL IDENTITY(1,1),
     CreatedDate DATETIMEOFFSET(3) NOT NULL,
@@ -63,13 +73,13 @@ CREATE TABLE dbo.Customer
     LastName VARCHAR(100) NOT NULL
 )
 
-ALTER TABLE dbo.Customer
+ALTER TABLE warehouse.Customer
 ADD CONSTRAINT PK_Customer
 PRIMARY KEY (CustomerId)
 
 GO
 
-CREATE TABLE dbo.PurchaseOrder
+CREATE TABLE warehouse.PurchaseOrder
 (
     PurchaseOrderId INT NOT NULL IDENTITY(1,1),
     OrderDate DATETIMEOFFSET(3) NOT NULL,
@@ -77,21 +87,21 @@ CREATE TABLE dbo.PurchaseOrder
     CustomerId INT NOT NULL
 )
 
-ALTER TABLE dbo.PurchaseOrder
+ALTER TABLE warehouse.PurchaseOrder
 ADD CONSTRAINT PK_PurchaseOrder
 PRIMARY KEY (PurchaseOrderId)
 
-ALTER TABLE dbo.PurchaseOrder
+ALTER TABLE warehouse.PurchaseOrder
 ADD CONSTRAINT FK_PurchaseOrder_Customer
-FOREIGN KEY (CustomerId) REFERENCES dbo.Customer(CustomerId)
+FOREIGN KEY (CustomerId) REFERENCES warehouse.Customer(CustomerId)
 
-ALTER TABLE dbo.PurchaseOrder
+ALTER TABLE warehouse.PurchaseOrder
 ADD CONSTRAINT FK_PurchaseOrder_Country
-FOREIGN KEY (CountryId) REFERENCES dbo.Country(CountryId)
+FOREIGN KEY (CountryId) REFERENCES warehouse.Country(CountryId)
 
 GO
 
-CREATE FUNCTiON dbo.udf_PurchaseOrderCountryMatch
+CREATE FUNCTiON warehouse.udf_PurchaseOrderCountryMatch
 (
     @PurchaseOrderId INT,
     @ProductCountryId INT
@@ -102,8 +112,8 @@ BEGIN
     IF EXISTS 
     (
         SELECT 1
-        FROM dbo.PurchaseOrder po
-        JOIN dbo.ProductCountry pc
+        FROM warehouse.PurchaseOrder po
+        JOIN warehouse.ProductCountry pc
         ON pc.CountryId = po.CountryId
         AND pc.ProductCountryId = @ProductCountryId
         WHERE po.PurchaseOrderId = @PurchaseOrderId
@@ -117,7 +127,7 @@ END
 
 GO
 
-CREATE TABLE dbo.PurchaseOrderLine
+CREATE TABLE warehouse.PurchaseOrderLine
 (
     PurchaseOrderLineId INT NOT NULL IDENTITY(1,1),
     PurchaseOrderId INT NOT NULL,
@@ -125,37 +135,37 @@ CREATE TABLE dbo.PurchaseOrderLine
     OrderQuantity INT NOT NULL
 )
 
-ALTER TABLE dbo.PurchaseOrderLine
+ALTER TABLE warehouse.PurchaseOrderLine
 ADD CONSTRAINT PK_PurchaseOrderLine
 PRIMARY KEY (PurchaseOrderLineId)
 
-ALTER TABLE dbo.PurchaseOrderLine
+ALTER TABLE warehouse.PurchaseOrderLine
 ADD CONSTRAINT FK_PurchaseOrderLine_PurchaseOrderLine
-FOREIGN KEY (PurchaseOrderId) REFERENCES dbo.PurchaseOrder(PurchaseOrderId)
+FOREIGN KEY (PurchaseOrderId) REFERENCES warehouse.PurchaseOrder(PurchaseOrderId)
 
-ALTER TABLE dbo.PurchaseOrderLine
+ALTER TABLE warehouse.PurchaseOrderLine
 ADD CONSTRAINT FK_PurchaseOrder_ProductCountryId
-FOREIGN KEY (ProductCountryId) REFERENCES dbo.ProductCountry(ProductCountryId)
+FOREIGN KEY (ProductCountryId) REFERENCES warehouse.ProductCountry(ProductCountryId)
 
-ALTER TABLE dbo.PurchaseOrderLine
+ALTER TABLE warehouse.PurchaseOrderLine
 ADD CONSTRAINT CK_PurchaseOrderLine_CountryMatch
-CHECK (dbo.udf_PurchaseOrderCountryMatch(PurchaseOrderId, ProductCountryId) = 1)
+CHECK (warehouse.udf_PurchaseOrderCountryMatch(PurchaseOrderId, ProductCountryId) = 1)
 
 CREATE UNIQUE INDEX UX_PurchaseOrderLine_PurchaseOrderId_ProductCountryId
-ON dbo.PurchaseOrderLine (PurchaseOrderId, ProductCountryId)
+ON warehouse.PurchaseOrderLine (PurchaseOrderId, ProductCountryId)
 
 GO
 
-CREATE TABLE dbo.UserCredential
+CREATE TABLE governance.UserCredential
 (
     UserCredentialId INT IDENTITY(1,1) not null,
     UserName VARCHAR(50) NOT NULL,
     PasswordHash NVARCHAR(255) NOT NULL
 )
 
-ALTER TABLE dbo.UserCredential
+ALTER TABLE governance.UserCredential
 ADD CONSTRAINT PK_UserCredential
 PRIMARY KEY (UserCredentialId)
 
 CREATE UNIQUE INDEX UX_UserCredential_UserCredentialId
-ON dbo.UserCredential (UserName)
+ON governance.UserCredential (UserName)

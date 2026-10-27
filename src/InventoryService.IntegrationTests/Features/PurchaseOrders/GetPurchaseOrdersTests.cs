@@ -166,7 +166,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertProblemDetails($"ProductId must be a positive integer.");
+        result.AssertValidationErrorPresent($"ProductId must be a positive integer.");
     }
 
     [Fact]

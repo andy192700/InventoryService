@@ -40,7 +40,7 @@ public class GetProductDBQuery : IGetProductDBQuery
         using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
         using var result = await conn.QueryMultipleAsync(
-            "dbo.usp_GetProduct",
+            "warehouse.usp_GetProduct",
             param: new
             {
                 dBParameters.ProductId

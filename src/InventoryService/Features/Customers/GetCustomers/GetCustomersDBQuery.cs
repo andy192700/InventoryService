@@ -36,7 +36,7 @@ public class GetCustomersDBQuery : IGetCustomersDBQuery
         using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
         using var result = await conn.QueryMultipleAsync(
-            "dbo.usp_GetCustomers",
+            "warehouse.usp_GetCustomers",
             param: new
             {
                 dbParams.Filter

@@ -2,7 +2,7 @@ USE Inventory
 
 GO
 
-CREATE PROC dbo.usp_GetPurchaseOrders
+CREATE PROC warehouse.usp_GetPurchaseOrders
     @ProductId INT = 0,
     @CountryId INT = 0,
     @CustomerId INT = 0
@@ -21,14 +21,14 @@ BEGIN
            po.OrderDate,
            co.CustomerId,
            c.CountryId
-    FROM dbo.PurchaseOrder po
-    JOIN dbo.Customer co
+    FROM warehouse.PurchaseOrder po
+    JOIN warehouse.Customer co
     ON co.CustomerId = po.CustomerId
     AND 
     (
         @CustomerId = 0 OR co.CustomerId = @CustomerId
     )
-    JOIN dbo.Country c
+    JOIN warehouse.Country c
     ON c.CountryId = po.CountryId
     AND 
     (
@@ -47,8 +47,8 @@ BEGIN
            pc.ProductId,
            pol.OrderQuantity,
            ROW_NUMBER() OVER(PARTITION BY pol.PurchaseOrderId ORDER BY pol.PurchaseOrderLineId) RowNo
-    FROM dbo.PurchaseOrderLine pol
-    JOIN dbo.ProductCountry pc
+    FROM warehouse.PurchaseOrderLine pol
+    JOIN warehouse.ProductCountry pc
     ON pc.ProductCountryId = pol.ProductCountryId
     AND
     (
@@ -62,7 +62,7 @@ END
 
 GO
 
-CREATE PROC dbo.usp_GetPurchaseOrder
+CREATE PROC warehouse.usp_GetPurchaseOrder
     @PurchaseOrderId INT
 AS
 BEGIN
@@ -70,10 +70,10 @@ BEGIN
            po.OrderDate,
            co.CustomerId,
            c.CountryId
-    FROM dbo.PurchaseOrder po
-    JOIN dbo.Customer co
+    FROM warehouse.PurchaseOrder po
+    JOIN warehouse.Customer co
     ON co.CustomerId = po.CustomerId
-    JOIN dbo.Country c
+    JOIN warehouse.Country c
     ON c.CountryId = po.CountryId
     WHERE po.PurchaseOrderId = @PurchaseOrderId
 
@@ -81,8 +81,8 @@ BEGIN
            pc.ProductId,
            pol.OrderQuantity,           
            ROW_NUMBER() OVER(ORDER BY pol.PurchaseOrderLineId) RowNo
-    FROM dbo.PurchaseOrderLine pol
-    JOIN dbo.ProductCountry pc
+    FROM warehouse.PurchaseOrderLine pol
+    JOIN warehouse.ProductCountry pc
     ON pc.ProductCountryId = pol.ProductCountryId
     WHERE pol.PurchaseOrderId = @PurchaseOrderId
     ORDER BY RowNo
@@ -90,7 +90,7 @@ END
 
 GO
 
-CREATE TYPE dbo.PurchaseOrderLine AS TABLE
+CREATE TYPE warehouse.PurchaseOrderLine AS TABLE
 (
     ProductId INT NOT NULL,
     OrderQuantity INT NOT NULL
@@ -98,15 +98,15 @@ CREATE TYPE dbo.PurchaseOrderLine AS TABLE
 
 GO
 
-CREATE PROC dbo.usp_CreatePurchaseOrder
+CREATE PROC warehouse.usp_CreatePurchaseOrder
     @CustomerId INT,
     @CountryId INT,
-    @OrderLines dbo.PurchaseOrderLine READONLY
+    @OrderLines warehouse.PurchaseOrderLine READONLY
 AS
 BEGIN
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
-    INSERT INTO dbo.PurchaseOrder
+    INSERT INTO warehouse.PurchaseOrder
     (OrderDate, CountryId, CustomerId)
     SELECT @Now, 
            @CountryId,
@@ -114,13 +114,13 @@ BEGIN
 
     DECLARE @PurchaseOrderId INT = SCOPE_IDENTITY()
 
-    INSERT INTO dbo.PurchaseOrderLine
+    INSERT INTO warehouse.PurchaseOrderLine
     (PurchaseOrderId, ProductCountryId, OrderQuantity)
     SELECT @PurchaseOrderId,
            pc.ProductCountryId,
            o.OrderQuantity
     FROM @OrderLines o
-    JOIN dbo.ProductCountry pc
+    JOIN warehouse.ProductCountry pc
     ON pc.ProductId = o.ProductId
     AND pc.CountryId = @CountryId
 

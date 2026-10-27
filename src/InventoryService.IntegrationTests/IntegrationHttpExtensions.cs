@@ -25,11 +25,11 @@ public static class IntegrationHttpExtensions
         => response.Headers.GetValues(header).Any(x => x.Contains(value)).Should().BeTrue();
 
     /// <summary>
-    /// Asserts that a problem details instance has a particular error message.
+    /// Asserts that a problem details instance has a particular validation error message.
     /// </summary>
     /// <param name="problemDetails">The problem details.</param>
     /// <param name="errorMessage">The expected error message.</param>
-    public static void AssertProblemDetails(this ProblemDetails problemDetails, string errorMessage)
+    public static void AssertValidationErrorPresent(this ProblemDetails problemDetails, string errorMessage)
     {
         problemDetails.Extensions["errors"].Should().NotBeNull();
         problemDetails.Extensions["errors"]!.ToString().Should().Contain(errorMessage);

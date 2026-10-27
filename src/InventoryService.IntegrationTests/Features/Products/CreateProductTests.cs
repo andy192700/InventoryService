@@ -51,7 +51,7 @@ public class CreateProductTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertProblemDetails("'Product Name' must not be empty.");
+        result.AssertValidationErrorPresent("'Product Name' must not be empty.");
     }
 
     [Theory]

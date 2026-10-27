@@ -50,7 +50,7 @@ public class CreateCustomerDBCommand : ICreateCustomerDBCommand
         try
         {
             customerId = await conn.ExecuteScalarAsync<int>(
-                "dbo.usp_CreateCustomer",
+                "warehouse.usp_CreateCustomer",
                 transaction: transaction,
                 param: new
                 {

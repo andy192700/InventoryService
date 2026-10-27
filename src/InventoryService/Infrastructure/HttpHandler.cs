@@ -8,8 +8,7 @@ namespace InventoryService.Infrastructure;
 public static class HttpHandler
 {
     /// <summary>
-    /// Request handler delegate for handling http requests, not that a <see cref="IRequestHandler"/> of the
-    /// required generic types must exist, this is picked up via assembly scan.
+    /// Request handler delegate for handling http requests.
     /// </summary>
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>

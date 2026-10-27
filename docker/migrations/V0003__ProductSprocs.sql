@@ -2,7 +2,7 @@ USE Inventory
 
 GO
 
-CREATE PROC dbo.usp_GetProducts
+CREATE PROC warehouse.usp_GetProducts
     @Filter VARCHAR(100) = NULL
 AS
 BEGIN
@@ -19,7 +19,7 @@ BEGIN
            CreatedDate,
            ProductName,
            ProductDesc
-    FROM dbo.Product
+    FROM warehouse.Product
     WHERE @Filter IS NULL
     OR (ProductName + ProductDesc) LIKE '%' + @Filter + '%'
 
@@ -33,8 +33,8 @@ BEGIN
     SELECT p.ProductId,
            c.CountryId,
            pc.UnitPrice
-    FROM dbo.Country c
-    JOIN dbo.ProductCountry pc
+    FROM warehouse.Country c
+    JOIN warehouse.ProductCountry pc
     ON pc.CountryId = c.CountryId
     JOIN @Products p
     ON p.ProductId = pc.ProductId
@@ -44,7 +44,7 @@ END
 
 GO
 
-CREATE PROC dbo.usp_GetProduct 
+CREATE PROC warehouse.usp_GetProduct 
     @ProductId INT
 AS
 BEGIN
@@ -52,15 +52,15 @@ BEGIN
            CreatedDate,
            ProductName,
            ProductDesc
-    FROM dbo.Product
+    FROM warehouse.Product
     WHERE ProductId = @ProductId
 
     SELECT c.CountryId,
            pc.UnitPrice
-    FROM dbo.Country c
-    JOIN dbo.ProductCountry pc
+    FROM warehouse.Country c
+    JOIN warehouse.ProductCountry pc
     ON pc.CountryId = c.CountryId
-    JOIN dbo.Product p
+    JOIN warehouse.Product p
     ON p.ProductId = pc.ProductId
     AND p.ProductId = @ProductId
     ORDER BY CountryId
@@ -68,7 +68,7 @@ END
 
 GO
 
-CREATE TYPE dbo.tvp_ProductCountry AS TABLE
+CREATE TYPE warehouse.tvp_ProductCountry AS TABLE
 (
     CountryId INT NOT NULL,
     UnitPrice DECIMAL(18,2) NOT NULL
@@ -76,21 +76,21 @@ CREATE TYPE dbo.tvp_ProductCountry AS TABLE
 
 GO
 
-CREATE PROC dbo.usp_CreateProduct 
+CREATE PROC warehouse.usp_CreateProduct 
     @ProductName VARCHAR(100),
     @ProductDesc VARCHAR(255),
-    @ProductCountries dbo.tvp_ProductCountry READONLY
+    @ProductCountries warehouse.tvp_ProductCountry READONLY
 AS
 BEGIN
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
-    INSERT INTO dbo.Product
+    INSERT INTO warehouse.Product
     (CreatedDate, ProductName, ProductDesc)
     VALUES (@Now, @ProductName, @ProductDesc)
 
     DECLARE @ProductId INT = SCOPE_IDENTITY()
 
-    INSERT INTO dbo.ProductCountry
+    INSERT INTO warehouse.ProductCountry
     (ProductId, CountryId, UnitPrice)
     SELECT @ProductId,
            CountryId,
