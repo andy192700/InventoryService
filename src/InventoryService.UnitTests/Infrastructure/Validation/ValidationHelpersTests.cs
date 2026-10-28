@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using InventoryService.Features;
+using InventoryService.Infrastructure.Validation;
 
-namespace InventoryService.UnitTests.Features;
+namespace InventoryService.UnitTests.Infrastructure.Validation;
 
 public class ValidationHelpersTests
 {

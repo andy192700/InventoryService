@@ -35,9 +35,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     {
         if (!Request.Headers.TryGetValue(AuthenticationConstants.AuthorizationHeader, out var authHeader))
         {
-            _failureMessage = "Missing Authorization Header";
-            
-            return AuthenticateResult.Fail(_failureMessage);
+            return Fail("Missing Authorization Header");
         }
 
         try
@@ -47,9 +45,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
             if (!string.Equals(header.Scheme, AuthenticationConstants.AuthenticationType, StringComparison.OrdinalIgnoreCase)
              || string.IsNullOrWhiteSpace(header.Parameter))
             {
-                _failureMessage = "Invalid Authorization Scheme";
-
-                return AuthenticateResult.Fail(_failureMessage);
+                return Fail("Invalid Authorization Scheme");
             }
             
             var credentialBytes = Convert.FromBase64String(header.Parameter);
@@ -58,9 +54,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             if (credentials.Length != 2)
             {
-                _failureMessage = "Invalid Authorization Header";
-
-                return AuthenticateResult.Fail(_failureMessage);
+                return Fail("Invalid Authorization Header");
             }
 
             var username = credentials[0];
@@ -71,9 +65,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             if (!validCredentials)
             {
-                _failureMessage = "Invalid Username or Password";
-
-                return AuthenticateResult.Fail(_failureMessage);
+                return Fail("Invalid Username or Password");
             }
             
             var claims = new[] { new Claim(ClaimTypes.Name, username) };
@@ -88,9 +80,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         }
         catch
         {
-            _failureMessage = "Invalid Authorization Header";
-
-            return AuthenticateResult.Fail(_failureMessage);
+            return Fail("Invalid Authorization Header");
         }
     }
 
@@ -102,12 +92,19 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
         var problemDetails = new
         {
-            type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+            type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
             title = "Unauthorized",
             detail = _failureMessage ?? "Valid credentials are required to access this resource.",
             status = StatusCodes.Status401Unauthorized
         };
 
         await Response.WriteAsJsonAsync(problemDetails);
+    }
+
+    private AuthenticateResult Fail(string reason)
+    {
+        _failureMessage = reason;
+
+        return AuthenticateResult.Fail(_failureMessage);
     }
 }

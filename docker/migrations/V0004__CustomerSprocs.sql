@@ -45,3 +45,42 @@ BEGIN
 
     SELECT SCOPE_IDENTITY()
 END
+
+GO
+
+CREATE PROC warehouse.usp_CheckCustomerName
+    @FirstName VARCHAR(100),
+    @LastName VARCHAR(100)
+AS
+BEGIN
+    IF EXISTS
+    (
+        SELECT 1
+        FROM warehouse.Customer
+        WHERE FirstName = @FirstName
+        AND LastName = @LastName
+    )
+    BEGIN
+        SELECT 0
+    END
+
+    SELECT 1
+END
+
+GO
+
+CREATE PROC warehouse.usp_CheckCustomerExists @CustomerId INT
+AS
+BEGIN
+    IF EXISTS
+    (
+        SELECT 1
+        FROM warehouse.Customer
+        WHERE CustomerId = @CustomerId
+    )
+    BEGIN
+        SELECT 1
+    END
+
+    SELECT 0
+END

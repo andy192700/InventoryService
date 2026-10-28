@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using FluentValidation;
+using InventoryService.Infrastructure.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ public static class HttpHandler
     public static async Task<IResult> HandleAsync<TRequest, TResponse>(
         [AsParameters] TRequest input,
         [FromServices] IServiceProvider serviceProvider,
+        [FromServices] IValidationProblemWriter validationProblemWriter,
         CancellationToken cancellationToken)
         where TRequest : IRequest<Result<TResponse>>
     {
@@ -30,14 +32,19 @@ public static class HttpHandler
 
             if (!validationResult.IsValid)
             {
-                var errorDictionary = new Dictionary<string, string[]>();
+                return validationProblemWriter.Write(validationResult);
+            }
+        }
 
-                foreach (var error in validationResult.Errors)
-                {
-                    errorDictionary.Add(error.PropertyName, [error.ErrorMessage]);
-                }
+        var evaluator = serviceProvider.GetService<IDataIntegrityEvaluator<TRequest>>();
 
-                return Results.ValidationProblem(errorDictionary);
+        if (evaluator is not null)
+        {
+            var evaluationResult = await evaluator.EvaluateAsync(input, cancellationToken);
+
+            if (!evaluationResult.IsValid)
+            {
+                return validationProblemWriter.Write(evaluationResult);
             }
         }
 

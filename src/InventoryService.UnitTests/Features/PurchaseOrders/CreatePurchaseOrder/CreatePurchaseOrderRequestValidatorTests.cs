@@ -22,17 +22,82 @@ public class CreatePurchaseOrderRequestValidatorTests
     }
 
     [Fact]
+    public void Validate_IsInValid_WhenPurchaseOrderLineNotSupplied()
+    {
+        // Arrange
+
+        var request = new CreatePurchaseOrderRequest
+        (
+            new CreatePurchaseOrderPayload
+            {
+                CustomerId = "1",
+                CountryId = "2"
+            }
+        );
+
+        var sut = new CreatePurchaseOrderRequestValidator();
+
+        // Act
+        var result = sut.Validate(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().HaveCount(1);
+        result.Errors[0].ErrorMessage.Should().Be($"'lines' must not be empty.");
+    }
+
+    [Fact]
+    public void Validate_IsInValid_WhenDuplicateProductIdsSupplied()
+    {
+        // Arrange
+
+        var request = new CreatePurchaseOrderRequest
+        (
+            new CreatePurchaseOrderPayload
+            {
+                CustomerId = "1",
+                CountryId = "2",
+                lines = 
+                [
+                    new CreatePurchaseOrderPayloadLine
+                    {
+                        OrderQuantity = "2",
+                        ProductId = "1"
+                    },
+                    new CreatePurchaseOrderPayloadLine
+                    {
+                        OrderQuantity = "2",
+                        ProductId = "1"
+                    }
+                ]
+            }
+        );
+
+        var sut = new CreatePurchaseOrderRequestValidator();
+
+        // Act
+        var result = sut.Validate(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().HaveCount(1);
+        result.Errors[0].ErrorMessage.Should().Be($"Requested Purchase Order Lines must have unique ProductIds.");
+    }
+
+    [Fact]
     public void Validate_IsInValid()
     {
         // Arrange
         var lines = new List<CreatePurchaseOrderPayloadLine>()
+        {
+            new CreatePurchaseOrderPayloadLine
             {
-                new CreatePurchaseOrderPayloadLine
-                {
-                    OrderQuantity = "abc",
-                    ProductId = "abc"
-                }
-            };
+                OrderQuantity = "abc",
+                ProductId = "abc"
+            }
+        };
 
         var request = new CreatePurchaseOrderRequest
         (

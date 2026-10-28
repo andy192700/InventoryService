@@ -70,4 +70,46 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Detail.Should().Be("Missing Authorization Header");
     }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenCustomerDoesNotExist(CreatePurchaseOrderIntRequest request)
+    {
+        // Act
+        AddBasicAuthHeader();
+
+        request.CustomerId = "300";
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.AssertValidationErrorPresent($"A Customer with the requested CustomerId does not exist.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenProductIdDoesNotMatchSuppliedCountry(CreatePurchaseOrderIntRequest request)
+    {
+        // Act
+        AddBasicAuthHeader();
+
+        request.lines!.First().ProductId = "300";
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.AssertValidationErrorPresent("One or more of the requested Product Countries does not exist.");
+    }
 }

@@ -99,3 +99,37 @@ BEGIN
 
     SELECT @ProductId
 END
+
+GO
+
+CREATE PROC warehouse.usp_CheckProductName @ProductName VARCHAR(100)
+AS
+BEGIN
+    IF EXISTS 
+    (
+        SELECT 1
+        FROM warehouse.Product
+        WHERE ProductName = @ProductName
+    )
+    BEGIN
+        SELECT 0
+    END
+
+    SELECT 1
+END
+
+GO
+
+CREATE PROC warehouse.usp_CheckProductCountriesExist @ProductCountries warehouse.tvp_ProductCountry READONLY
+AS
+BEGIN
+    DECLARE @CountryCount INT = (SELECT COUNT(1) from @ProductCountries)
+    DECLARE @CountryFoundCount INT
+
+    SELECT @CountryFoundCount = COALESCE(COUNT(1), 0)
+    FROM warehouse.Country c
+    JOIN @ProductCountries p
+    ON p.CountryId = c.CountryId
+
+    SELECT IIF(@CountryFoundCount = @CountryCount, 1, 0)    
+END 

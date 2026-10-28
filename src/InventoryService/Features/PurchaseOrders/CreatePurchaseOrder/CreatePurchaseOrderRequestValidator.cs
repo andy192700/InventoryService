@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using InventoryService.Features.Products.CreateProduct;
+using InventoryService.Infrastructure.Validation;
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
@@ -36,8 +38,20 @@ public class CreatePurchaseOrderPayloadValidator : AbstractValidator<CreatePurch
         RuleFor(x => x.lines)
             .NotEmpty();
 
+        RuleFor(x => x.lines)
+            .Must(x => HaveUniqueProductIds(x!))
+            .WithMessage("Requested Purchase Order Lines must have unique ProductIds.")
+            .When(x => x.lines is not null);
+
         RuleForEach(x => x.lines)
             .SetValidator(new CreatePurchaseOrderPayloadLineValidator());
+    }
+
+    private static bool HaveUniqueProductIds(ICollection<CreatePurchaseOrderPayloadLine> lines)
+    {
+        var distinctCount = lines.Select(x => x.ProductId).Distinct().Count();
+
+        return distinctCount == lines.Count;
     }
 }
 

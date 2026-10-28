@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using InventoryService.Infrastructure.Validation;
 
 namespace InventoryService.Features.Customers.GetCustomer;
 

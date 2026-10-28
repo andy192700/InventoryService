@@ -1,4 +1,4 @@
-﻿namespace InventoryService.Features;
+﻿namespace InventoryService.Infrastructure.Validation;
 
 public static class ValidationHelpers
 {
