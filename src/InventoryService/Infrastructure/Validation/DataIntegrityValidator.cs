@@ -57,7 +57,7 @@ public interface IDataIntegrityEvaluator<TRequest>
     Task<ValidationResult> EvaluateAsync(TRequest request, CancellationToken cancellationToken);
 }
 
-public class DataIntegrityEvaluator<TRequest>
+public sealed class DataIntegrityEvaluator<TRequest>
 {
     private readonly ICollection<IDataIntegrityValidator<TRequest>> _validators;
 

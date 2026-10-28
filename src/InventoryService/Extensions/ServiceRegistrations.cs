@@ -12,6 +12,7 @@ using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
+using InventoryService.Infrastructure.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -29,12 +30,25 @@ public static class ServiceRegistrations
     /// <returns>The application's service collection.</returns>
     public static IServiceCollection RegisterServices(this IServiceCollection services)
     {
-        // infra
+        services.AddInfrastructure();
+        services.AddSecurity();
+        services.AddHandlerServices();
+        services.AddDataIntegrityEvaluators();
+
+        return services;
+    }
+
+    private static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    {
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddHttpContextAccessor();
 
-        // Authentication / Authorization
+        return services;
+    }
+
+    private static IServiceCollection AddSecurity(this IServiceCollection services)
+    {
         services.AddOptions<HashOptions>()
             .BindConfiguration("Hash")
             .ValidateOnStart();
@@ -51,6 +65,11 @@ public static class ServiceRegistrations
                 policy.AddRequirements(new AuthorizationHandlerRequirement());
             });
 
+        return services;
+    }
+
+    private static IServiceCollection AddHandlerServices(this IServiceCollection services)
+    {
         // Get Products
         services.AddScoped<IGetProductsDBQuery, GetProductsDBQuery>();
         services.AddScoped<IGetProductsResponseMapper, GetProductsResponseMapper>();
@@ -76,7 +95,7 @@ public static class ServiceRegistrations
         services.AddScoped<IGetCustomersDBQuery, GetCustomersDBQuery>();
         services.AddScoped<IGetCustomersResponseMapper, GetCustomersResponseMapper>();
         services.AddScoped<IGetCustomersDBParametersMapper, GetCustomersDBParametersMapper>();
-        services.AddScoped<IValidator<GetCustomersRequest>,  GetCustomersRequestValidator>();
+        services.AddScoped<IValidator<GetCustomersRequest>, GetCustomersRequestValidator>();
         services.AddScoped<IRequestHandler<GetCustomersRequest, Result<ICollection<GetCustomersResponse>>>, GetCustomersHandler>();
 
         // Get Customer
@@ -111,13 +130,33 @@ public static class ServiceRegistrations
         services.AddScoped<ICreatePurchaseOrderDBParametersMapper, CreatePurchaseOrderDBParametersMapper>();
         services.AddScoped<IValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderRequestValidator>();
         services.AddScoped<ICreatePurchaseOrderDBCommand, CreatePurchaseOrderDBCommand>();
-        services.AddScoped<ICreatePurchaseOrderResponseMapper,  CreatePurchaseOrderResponseMapper>();
+        services.AddScoped<ICreatePurchaseOrderResponseMapper, CreatePurchaseOrderResponseMapper>();
         services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>();
 
         // Get Countries
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
         services.AddScoped<IGetCountriesResponseMapper, GetCountriesResponseMapper>();
         services.AddScoped<IRequestHandler<GetCountriesRequest, Result<ICollection<GetCountriesResponse>>>, GetCountriesHandler>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddDataIntegrityEvaluators(this IServiceCollection services)
+    {
+        var requestTypes = services
+            .Where(x =>
+                x.ServiceType.IsGenericType &&
+                x.ServiceType.GetGenericTypeDefinition() == typeof(IDataIntegrityValidator<>))
+            .Select(x => x.ServiceType.GenericTypeArguments[0])
+            .Distinct();
+
+        foreach (var requestType in requestTypes)
+        {
+            var abstrType = typeof(IDataIntegrityEvaluator<>).MakeGenericType(requestType);
+            var implType = typeof(DataIntegrityEvaluator<>).MakeGenericType(requestType);
+
+            services.AddScoped(abstrType, implType);
+        }
 
         return services;
     }
