@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using FluentValidation.Results;
-using InventoryService.Infrastructure;
+using System.Collections;
 using System.Data;
 
 namespace InventoryService.Infrastructure.Validation;
@@ -57,11 +57,11 @@ public interface IDataIntegrityEvaluator<TRequest>
     Task<ValidationResult> EvaluateAsync(TRequest request, CancellationToken cancellationToken);
 }
 
-public sealed class DataIntegrityEvaluator<TRequest>
+public sealed class DataIntegrityEvaluator<TRequest> : IDataIntegrityEvaluator<TRequest>
 {
-    private readonly ICollection<IDataIntegrityValidator<TRequest>> _validators;
+    private readonly IEnumerable<DataIntegrityValidator<TRequest>> _validators;
 
-    public DataIntegrityEvaluator(ICollection<IDataIntegrityValidator<TRequest>> validators)
+    public DataIntegrityEvaluator(IEnumerable<DataIntegrityValidator<TRequest>> validators)
     {
         _validators = validators;
     }

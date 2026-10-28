@@ -99,3 +99,21 @@ BEGIN
 
     SELECT @ProductId
 END
+
+GO
+
+CREATE PROC warehouse.usp_CheckProductName @ProductName VARCHAR(100)
+AS
+BEGIN
+    IF EXISTS 
+    (
+        SELECT 1
+        FROM warehouse.Product
+        WHERE ProductName = @ProductName
+    )
+    BEGIN
+        SELECT 0
+    END
+
+    SELECT 1
+END

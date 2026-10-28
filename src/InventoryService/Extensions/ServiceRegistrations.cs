@@ -91,6 +91,7 @@ public static class ServiceRegistrations
         services.AddScoped<ICreateProductDBCommand, CreateProductDBCommand>();
         services.AddScoped<ICreateProductResponseMapper, CreateProductResponseMapper>();
         services.AddScoped<IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>, CreateProductHandler>();
+        services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductDataIntegrityValidator>();
 
         // Get Customers
         services.AddScoped<IGetCustomersDBQuery, GetCustomersDBQuery>();
@@ -147,9 +148,10 @@ public static class ServiceRegistrations
         var requestTypes = services
             .Where(x =>
                 x.ServiceType.IsGenericType &&
-                x.ServiceType.GetGenericTypeDefinition() == typeof(IDataIntegrityValidator<>))
+                x.ServiceType.GetGenericTypeDefinition() == typeof(DataIntegrityValidator<>))
             .Select(x => x.ServiceType.GenericTypeArguments[0])
-            .Distinct();
+            .Distinct()
+            .ToList();
 
         foreach (var requestType in requestTypes)
         {
