@@ -20,6 +20,7 @@ public static class HttpHandler
     public static async Task<IResult> HandleAsync<TRequest, TResponse>(
         [AsParameters] TRequest input,
         [FromServices] IServiceProvider serviceProvider,
+        [FromServices] IValidationProblemWriter validationProblemWriter,
         CancellationToken cancellationToken)
         where TRequest : IRequest<Result<TResponse>>
     {
@@ -31,14 +32,7 @@ public static class HttpHandler
 
             if (!validationResult.IsValid)
             {
-                var errorDictionary = new Dictionary<string, string[]>();
-
-                foreach (var error in validationResult.Errors)
-                {
-                    errorDictionary.Add(error.PropertyName, [error.ErrorMessage]);
-                }
-
-                return Results.ValidationProblem(errorDictionary);
+                return validationProblemWriter.Write(validationResult);
             }
         }
 
@@ -50,14 +44,7 @@ public static class HttpHandler
 
             if (!evaluationResult.IsValid)
             {
-                var errorDictionary = new Dictionary<string, string[]>();
-
-                foreach (var error in evaluationResult.Errors)
-                {
-                    errorDictionary.Add(error.PropertyName, [error.ErrorMessage]);
-                }
-
-                return Results.ValidationProblem(errorDictionary);
+                return validationProblemWriter.Write(evaluationResult);
             }
         }
 

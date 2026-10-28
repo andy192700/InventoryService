@@ -21,6 +21,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         IRequestHandler<TestRequest, Result<TestResponse>> handler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
         string failReason)
     {
@@ -33,9 +34,11 @@ public class HttpHandlerTests
             .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
             .Returns(mockValidator.Object);
 
-        mockValidator
-            .Setup(x => x.ValidateAsync(request, cancellation))
+        mockValidator.Setup(x => x.ValidateAsync(request, cancellation))
             .ReturnsAsync(validationResult);
+
+        mockWriter.Setup(x => x.Write(validationResult))
+            .Returns(Results.ValidationProblem([]));
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(handler);
@@ -47,6 +50,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -63,6 +67,7 @@ public class HttpHandlerTests
     public async Task HandleAsync_ReturnsOk_WhenMediatorReturnsOk(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation)
@@ -85,6 +90,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -101,6 +107,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IValidator<TestRequest>> mockValidator,
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation)
@@ -127,6 +134,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -142,6 +150,7 @@ public class HttpHandlerTests
     public async Task HandleAsync_ReturnsCreated_WhenMediatorReturnsCreated(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation,
@@ -167,6 +176,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -181,6 +191,7 @@ public class HttpHandlerTests
     [AutoMoqData]
     public async Task HandleAsync_ReturnsNotFound_WhenHandlerNotRegistered(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         TestRequest request,
         CancellationToken cancellation)
     {
@@ -199,6 +210,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -216,6 +228,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
         Result<TestResponse> response)
     {
@@ -237,6 +250,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -254,6 +268,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         string message,
         CancellationToken cancellation)
     {
@@ -275,6 +290,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -293,6 +309,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         string message,
         CancellationToken cancellation)
     {
@@ -314,6 +331,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert
@@ -332,6 +350,7 @@ public class HttpHandlerTests
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
         IError error)
     {
@@ -353,6 +372,7 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockServiceProvider.Object,
+            mockWriter.Object,
             cancellation);
 
         // Assert

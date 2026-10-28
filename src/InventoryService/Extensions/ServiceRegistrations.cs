@@ -42,6 +42,7 @@ public static class ServiceRegistrations
     {
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
+        services.AddSingleton<IValidationProblemWriter, ValidationProblemWriter>();
         services.AddHttpContextAccessor();
 
         return services;
