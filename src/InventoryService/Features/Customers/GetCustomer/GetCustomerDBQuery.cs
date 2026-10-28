@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using InventoryService.Infrastructure;
 using System.Data;
 
 namespace InventoryService.Features.Customers.GetCustomer;

@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using InventoryService.Features;
+using InventoryService.Infrastructure.Validation;
 
 namespace InventoryService.UnitTests.Features;
 

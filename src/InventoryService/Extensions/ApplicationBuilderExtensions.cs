@@ -1,5 +1,4 @@
-﻿using InventoryService.Features;
-using InventoryService.Infrastructure;
+﻿using InventoryService.Infrastructure;
 
 namespace InventoryService.Extensions;
 

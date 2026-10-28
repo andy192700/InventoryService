@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using FluentValidation;
-using InventoryService.Features;
+using InventoryService.Infrastructure.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

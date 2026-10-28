@@ -1,8 +1,9 @@
 ﻿using Dapper;
 using FluentValidation.Results;
+using InventoryService.Infrastructure;
 using System.Data;
 
-namespace InventoryService.Features;
+namespace InventoryService.Infrastructure.Validation;
 
 public interface IDataIntegrityValidator<TRequest>
 {

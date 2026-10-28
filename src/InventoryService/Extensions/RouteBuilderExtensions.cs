@@ -12,9 +12,9 @@ using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authorization;
 
-namespace InventoryService.Features;
+namespace InventoryService.Extensions;
 
-public static class Routes
+public static class RouteBuilderExtensions
 {
     /// <summary>
     /// Register the application's endpoints.
