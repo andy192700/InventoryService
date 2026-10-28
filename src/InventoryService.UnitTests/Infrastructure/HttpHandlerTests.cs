@@ -3,6 +3,7 @@ using FluentAssertions;
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
+using InventoryService.Features;
 using InventoryService.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,9 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(handler);
 
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
@@ -70,6 +74,9 @@ public class HttpHandlerTests
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
@@ -110,6 +117,9 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
 
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
 
@@ -145,6 +155,9 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
 
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
         var responseValue = HttpResponses.Created(response, location);
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
@@ -179,6 +192,9 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns((IRequestHandler<TestRequest, Result<TestResponse>>)null!);
 
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
@@ -210,6 +226,9 @@ public class HttpHandlerTests
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
 
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
@@ -245,6 +264,9 @@ public class HttpHandlerTests
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
 
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.Notfound(message));
@@ -282,6 +304,9 @@ public class HttpHandlerTests
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
 
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.InternalServerError(message));
 
@@ -317,6 +342,9 @@ public class HttpHandlerTests
 
         mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
             .Returns(mockHandler.Object);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
 
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Fail(error));

@@ -34,9 +34,9 @@ public class VerifyUserQuery : IVerifyUserQuery
     /// <inheritdoc/>
     public async Task<bool> VerifyUserAsync(string userName, string passwordHash, CancellationToken cancellationToken)
     {
-        var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
+        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        return conn.ExecuteScalar<bool>(
+        return await conn.ExecuteScalarAsync<bool>(
             "governance.usp_VerifyCredentials",
             param: new
             {

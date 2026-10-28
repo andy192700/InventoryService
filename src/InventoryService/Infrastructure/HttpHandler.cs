@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using FluentValidation;
+using InventoryService.Features;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,25 @@ public static class HttpHandler
                 var errorDictionary = new Dictionary<string, string[]>();
 
                 foreach (var error in validationResult.Errors)
+                {
+                    errorDictionary.Add(error.PropertyName, [error.ErrorMessage]);
+                }
+
+                return Results.ValidationProblem(errorDictionary);
+            }
+        }
+
+        var evaluator = serviceProvider.GetService<IDataIntegrityEvaluator<TRequest>>();
+
+        if (evaluator is not null)
+        {
+            var evaluationResult = await evaluator.EvaluateAsync(input, cancellationToken);
+
+            if (!evaluationResult.IsValid)
+            {
+                var errorDictionary = new Dictionary<string, string[]>();
+
+                foreach (var error in evaluationResult.Errors)
                 {
                     errorDictionary.Add(error.PropertyName, [error.ErrorMessage]);
                 }
