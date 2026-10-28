@@ -70,4 +70,25 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.Detail.Should().Be("Missing Authorization Header");
     }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateCustomer_ReturnsBadRequest_WhenCustomerNameAlreadyExists(CreateCustomerIntRequest request)
+    {
+        // Act
+        AddBasicAuthHeader();
+        request.FirstName = "John";
+        request.LastName = "Smith";
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.AssertValidationErrorPresent("A Customer with the requested full name already exists.");
+    }
 }

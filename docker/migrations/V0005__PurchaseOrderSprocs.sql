@@ -126,3 +126,23 @@ BEGIN
 
     SELECT @PurchaseOrderId
 END
+
+GO
+
+CREATE PROC warehouse.usp_CheckPurchaseOrderProductCountry
+    @CountryId INT,
+    @OrderLines warehouse.PurchaseOrderLine READONLY
+AS
+BEGIN
+    DECLARE @SuppliedLineCount INT = (SELECT COUNT(1) FROM @OrderLines)
+
+    DECLARE @ProductCountryFoundCount INT
+
+    SELECT @ProductCountryFoundCount = COUNT(1)
+    FROM warehouse.ProductCountry pc
+    JOIN @OrderLines o
+    ON o.ProductId = pc.ProductId
+    WHERE pc.CountryId = @CountryId
+
+    SELECT IIF(@SuppliedLineCount = @ProductCountryFoundCount, 1, 0)
+END

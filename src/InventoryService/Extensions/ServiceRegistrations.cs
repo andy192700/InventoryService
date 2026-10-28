@@ -38,6 +38,11 @@ public static class ServiceRegistrations
         return services;
     }
 
+    /// <summary>
+    /// Add the application's cross cutting infrastructure services.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <returns>The application's service collection.</returns>
     private static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
@@ -48,6 +53,11 @@ public static class ServiceRegistrations
         return services;
     }
 
+    /// <summary>
+    /// Add services to support the applications Authentication/Authorization sub-system.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <returns>The application's service collection.</returns>
     private static IServiceCollection AddSecurity(this IServiceCollection services)
     {
         services.AddOptions<HashOptions>()
@@ -69,6 +79,11 @@ public static class ServiceRegistrations
         return services;
     }
 
+    /// <summary>
+    /// Adds feature level services to the collection.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <returns>The application's service collection.</returns>
     private static IServiceCollection AddHandlerServices(this IServiceCollection services)
     {
         // Get Products
@@ -90,8 +105,9 @@ public static class ServiceRegistrations
         services.AddScoped<IValidator<CreateProductRequest>, CreateProductRequestValidator>();
         services.AddScoped<ICreateProductDBCommand, CreateProductDBCommand>();
         services.AddScoped<ICreateProductResponseMapper, CreateProductResponseMapper>();
-        services.AddScoped<IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>, CreateProductHandler>();
-        services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductDataIntegrityValidator>();
+        services.AddScoped<IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>, CreateProductHandler>(); 
+        services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductCheckProductNameValidator>();
+        services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductCheckCountriesExistValidator>();
 
         // Get Customers
         services.AddScoped<IGetCustomersDBQuery, GetCustomersDBQuery>();
@@ -113,6 +129,7 @@ public static class ServiceRegistrations
         services.AddScoped<ICreateCustomerDBCommand, CreateCustomerDBCommand>();
         services.AddScoped<ICreateCustomerResponseMapper, CreateCustomerResponseMapper>();
         services.AddScoped<IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResponse>>, CreateCustomerHandler>();
+        services.AddScoped<DataIntegrityValidator<CreateCustomerRequest>, CreateCustomerCheckCustomerNameValidator>();
 
         // Get Purchase Orders
         services.AddScoped<IGetPurchaseOrdersResponseMapper, GetPurchaseOrdersResponseMapper>();
@@ -133,7 +150,9 @@ public static class ServiceRegistrations
         services.AddScoped<IValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderRequestValidator>();
         services.AddScoped<ICreatePurchaseOrderDBCommand, CreatePurchaseOrderDBCommand>();
         services.AddScoped<ICreatePurchaseOrderResponseMapper, CreatePurchaseOrderResponseMapper>();
-        services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>();
+        services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>(); 
+        services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckCustomerExistsValidator>();
+        services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckProductCountryValidator>();
 
         // Get Countries
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
@@ -143,6 +162,12 @@ public static class ServiceRegistrations
         return services;
     }
 
+    /// <summary>
+    /// Adds Data Integrity Evaluators, automatically, should a <see cref="DataIntegrityValidator{TRequest}"/> be registered,
+    /// per request type.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <returns>The application's service collection.</returns>
     private static IServiceCollection AddDataIntegrityEvaluators(this IServiceCollection services)
     {
         var requestTypes = services

@@ -43,8 +43,20 @@ public class CreateProductRequestPayloadValidator : AbstractValidator<CreateProd
         RuleFor(x => x.ProductCountries)
             .NotEmpty();
 
+        RuleFor(x => x.ProductCountries)
+            .Must(x => HaveUniqueProductCountries(x!))
+            .WithMessage("Requested Product Countries must have unique CountryIds.")
+            .When(x => x.ProductCountries is not null);
+
         RuleForEach(x => x.ProductCountries)
             .SetValidator(new CreateProductRequestProductCountriesValidator());
+    }
+
+    private static bool HaveUniqueProductCountries(ICollection<CreateProductRequestProductCountries> productCountries)
+    {
+        var distinctCount = productCountries.Select(x => x.CountryId).Distinct().Count();
+
+        return distinctCount == productCountries.Count;
     }
 }
 

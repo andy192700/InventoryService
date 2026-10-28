@@ -156,6 +156,72 @@ public class CreateProductRequestValidatorTests
     }
 
     [Theory]
+    [InlineAutoMoqData]
+    public void Validate_IsInValid_WhenProductCountriesIsNotSupplied(
+        CreateProductRequest request)
+    {
+        // Arrange
+        var testPayload = request.Payload;
+
+        testPayload.ProductCountries = null;
+
+        var testRequest = request with
+        {
+            Payload = testPayload!
+        };
+
+        var sut = new CreateProductRequestValidator();
+
+        // Act
+        var result = sut.Validate(testRequest);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().HaveCount(1);
+        result.Errors[0].ErrorMessage.Should().Be($"'Product Countries' must not be empty.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public void Validate_IsInValid_WhenCountryIdsAreDuplicated(
+        CreateProductRequest request)
+    {
+        // Arrange
+        var testPayload = request.Payload;
+
+        testPayload.ProductCountries = 
+        [
+            new CreateProductRequestProductCountries
+            {
+                UnitPrice = "2.3",
+                CountryId = "1"
+            },
+            new CreateProductRequestProductCountries
+            {
+                UnitPrice = "2.3",
+                CountryId = "1"
+            }
+        ];
+
+        var testRequest = request with
+        {
+            Payload = testPayload!
+        };
+
+        var sut = new CreateProductRequestValidator();
+
+        // Act
+        var result = sut.Validate(testRequest);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().HaveCount(1);
+        result.Errors[0].ErrorMessage.Should().Be($"Requested Product Countries must have unique CountryIds.");
+    }
+
+    [Theory]
     [InlineAutoMoqData(0.0)]
     [InlineAutoMoqData(-1.0)]
     public void Validate_IsInValid_WhenUnitPriceIsInValid(

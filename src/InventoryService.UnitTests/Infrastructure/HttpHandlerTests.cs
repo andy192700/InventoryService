@@ -64,6 +64,54 @@ public class HttpHandlerTests
 
     [Theory]
     [AutoMoqData]
+    public async Task HandleAsync_ReturnsDataValidationProblem_WhenValidationFails(
+        [Frozen] Mock<IServiceProvider> mockServiceProvider,
+        [Frozen] Mock<IDataIntegrityEvaluator<TestRequest>> mockDataEvaluator,
+        TestRequest request,
+        IRequestHandler<TestRequest, Result<TestResponse>> handler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
+        CancellationToken cancellation,
+        string failReason)
+    {
+        // Arrange
+        var dataValidationResult = new ValidationResult([
+            new ValidationFailure(nameof(TestRequest.Name), failReason)
+        ]);
+
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
+            .Returns((IValidator<TestRequest>?)null);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
+            .Returns(handler);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns(mockDataEvaluator.Object);
+
+        mockDataEvaluator.Setup(x => x.EvaluateAsync(request, cancellation))
+            .ReturnsAsync(dataValidationResult);
+
+        mockWriter.Setup(x => x.Write(dataValidationResult))
+            .Returns(Results.ValidationProblem([]));
+
+        // Act
+        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+            request,
+            mockServiceProvider.Object,
+            mockWriter.Object,
+            cancellation);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+    }
+
+    [Theory]
+    [AutoMoqData]
     public async Task HandleAsync_ReturnsOk_WhenMediatorReturnsOk(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,

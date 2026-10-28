@@ -70,4 +70,46 @@ public class CreateProductTests : IntegrationTestBase
 
         result.Detail.Should().Be("Missing Authorization Header");
     }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateProduct_ReturnsBadRequest_WhenProductAlreadyExists(CreateProductIntRequest request)
+    {
+        // Act
+        AddBasicAuthHeader();
+
+        request.ProductName = "Hammer";
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.AssertValidationErrorPresent("A Product with the requested Product Name already exists.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateProduct_ReturnsBadRequest_WhenCountryDoesNotExist(CreateProductIntRequest request)
+    {
+        // Act
+        AddBasicAuthHeader();
+
+        request.ProductCountries!.First().CountryId = "300";
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.AssertValidationErrorPresent("One or more of the requested Countries does not exist.");
+    }
 }
