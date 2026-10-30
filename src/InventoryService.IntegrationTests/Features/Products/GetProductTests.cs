@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Products.GetProduct;
+using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -111,13 +112,12 @@ public class GetProductTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<IGetProductDBQuery>();
+            services.RemoveAll<ISQLActivity>();
 
-            var repository = new Mock<IGetProductDBQuery>();
+            var repository = new Mock<ISQLActivity>();
 
             repository
-                .Setup(x => x.GetProductAsync(
-                    It.IsAny<GetProductDBParameters>(),
+                .Setup(x => x.ConnectAsync(
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

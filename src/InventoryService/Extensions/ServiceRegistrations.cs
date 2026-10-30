@@ -46,6 +46,8 @@ public static class ServiceRegistrations
     private static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
+        services.AddTransient<ISQLActivity, SQLActivity>();
+        services.AddTransient<ISQLTransactionActivity, SQLTransactionActivity>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddSingleton<IValidationProblemWriter, ValidationProblemWriter>();
         services.AddHttpContextAccessor();

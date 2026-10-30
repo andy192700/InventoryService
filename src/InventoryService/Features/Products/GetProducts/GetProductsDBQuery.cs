@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using System.Data;
 
 namespace InventoryService.Features.Products.GetProducts;
 
@@ -23,37 +23,37 @@ public interface IGetProductsDBQuery
 /// </summary>
 public class GetProductsDBQuery : IGetProductsDBQuery
 {
-    private readonly ISQLConnectionProvider _sqlConnectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public GetProductsDBQuery(ISQLConnectionProvider connectionProvider)
+    public GetProductsDBQuery(ISQLActivity activity)
     {
-        _sqlConnectionProvider = connectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc/>
     public async Task<GetProductsDBResponse> GetProductsAsync(GetProductsDBParameters dbParameters, CancellationToken cancellationToken)
     {
-        using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             "warehouse.usp_GetProducts",
-            parameters: new
+            cancellationToken,
+            new
             {
                 dbParameters.Filter
-            },
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            });
 
-        using var result = await conn.QueryMultipleAsync(cmd);
-
-        var products = (await result.ReadAsync<GetProductsDBProductsResponse>()).ToList(); 
-
-        var productCountries = (await result.ReadAsync<GetProductsDbProductCountriesResponse>()).ToList();
-
-        return new GetProductsDBResponse
+        return await _activity.CommenceAsync(async (cmd, connection) =>
         {
-            Products = products,
-            ProductCountries = productCountries
-        };
+            using var result = await connection.QueryMultipleAsync(cmd);
+
+            var products = (await result.ReadAsync<GetProductsDBProductsResponse>()).ToList();
+
+            var productCountries = (await result.ReadAsync<GetProductsDbProductCountriesResponse>()).ToList();
+
+            return new GetProductsDBResponse
+            {
+                Products = products,
+                ProductCountries = productCountries
+            };
+        });
     }
 }

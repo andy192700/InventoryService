@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using System.Data;
 
 namespace InventoryService.Features.Customers.GetCustomer;
 
@@ -24,29 +24,27 @@ public interface IGetCustomerDBQuery
 /// </summary>
 public class GetCustomerDBQuery : IGetCustomerDBQuery
 {
-    private readonly ISQLConnectionProvider _sqlConnectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public GetCustomerDBQuery(ISQLConnectionProvider sqlConnectionProvider)
+    public GetCustomerDBQuery(ISQLActivity activity)
     {
-        _sqlConnectionProvider = sqlConnectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc/>
     public async Task<GetCustomerDBResponse?> GetCustomerAsync(GetCustomerDBParameters dBParameters, CancellationToken cancellationToken)
     {
-        using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             "warehouse.usp_GetCustomer",
-            parameters: new
+            cancellationToken,
+            new
             {
                 dBParameters.CustomerId
-            },
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            });
 
-        using var result = await conn.QueryMultipleAsync(cmd);
-
-        return await result.ReadFirstOrDefaultAsync<GetCustomerDBResponse>();
+        return await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            return await connection.QueryFirstOrDefaultAsync<GetCustomerDBResponse?>(cmd);
+        });
     }
 }
