@@ -45,9 +45,9 @@ public static class ServiceRegistrations
     /// <returns>The application's service collection.</returns>
     private static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddTransient<ISQLActivity, SQLActivity>();
         services.AddTransient<ISQLTransactionActivity, SQLTransactionActivity>();
+        services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddSingleton<IValidationProblemWriter, ValidationProblemWriter>();
         services.AddHttpContextAccessor();
@@ -67,8 +67,8 @@ public static class ServiceRegistrations
             .ValidateOnStart();
         services.AddSingleton<IComputeHash, ComputeHash>();
         services.AddSingleton<IValidateOptions<HashOptions>, HashOptionsValidator>();
-        services.AddSingleton<IVerifyUserQuery, VerifyUserQuery>();
         services.AddSingleton<IAuthorizationHandler, AuthorizationHandler>();
+        services.AddTransient<IVerifyUserQuery, VerifyUserQuery>();
         services.AddAuthentication(AuthenticationConstants.AuthorizationScheme)
             .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.AuthorizationScheme, null);
         services.AddAuthorizationBuilder()

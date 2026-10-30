@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Customers.GetCustomers;
-using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -107,12 +106,13 @@ public class GetCustomersTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ISQLActivity>();
+            services.RemoveAll<IGetCustomersDBQuery>();
 
-            var repository = new Mock<ISQLActivity>();
+            var repository = new Mock<IGetCustomersDBQuery>();
 
             repository
-                .Setup(x => x.ConnectAsync(
+                .Setup(x => x.GetCustomersAsync(
+                    It.IsAny<GetCustomersDBParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

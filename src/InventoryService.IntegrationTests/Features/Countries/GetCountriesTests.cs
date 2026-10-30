@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Countries.GetCountries;
-using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -60,12 +59,12 @@ public class GetCountriesTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ISQLActivity>();
+            services.RemoveAll<IGetCountriesDBQuery>();
 
-            var repository = new Mock<ISQLActivity>();
+            var repository = new Mock<IGetCountriesDBQuery>();
 
             repository
-                .Setup(x => x.ConnectAsync(
+                .Setup(x => x.GetCountriesAsync(
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

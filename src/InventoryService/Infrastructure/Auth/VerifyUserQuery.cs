@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using System.Data;
+using InventoryService.Extensions;
 
 namespace InventoryService.Infrastructure.Auth;
 
@@ -23,28 +23,28 @@ public interface IVerifyUserQuery
 /// </summary>
 public class VerifyUserQuery : IVerifyUserQuery
 {
-    private readonly ISQLConnectionProvider _connectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public VerifyUserQuery(ISQLConnectionProvider connectionProvider)
+    public VerifyUserQuery(ISQLActivity activity)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc/>
     public async Task<bool> VerifyUserAsync(string userName, string passwordHash, CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             "governance.usp_VerifyCredentials",
-            parameters: new
+            cancellationToken,
+            new
             {
                 UserName = userName,
                 PasswordHash = passwordHash
-            },
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            });
 
-        return await conn.ExecuteScalarAsync<bool>(cmd);
+        return await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            return await connection.ExecuteScalarAsync<bool>(cmd);
+        });
     }
 }
