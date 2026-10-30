@@ -1,7 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace InventoryService.Features.Customers.CreateCustomer;
 
@@ -25,55 +24,36 @@ public interface ICreateCustomerDBCommand
 /// </summary>
 public class CreateCustomerDBCommand : ICreateCustomerDBCommand
 {
-    private readonly ISQLConnectionProvider _connectionProvider;
+    private readonly ISQLTransactionActivity _activity;
 
     private readonly ILogger<CreateCustomerDBCommand> _logger;
 
     public CreateCustomerDBCommand(
-        ISQLConnectionProvider connectionProvider,
+        ISQLTransactionActivity activity,
         ILogger<CreateCustomerDBCommand> logger)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
         _logger = logger;
     }
 
     /// <inheritdoc/>
     public async Task<CreateCustomerDBResponse> CreateCustomerAsync(CreateCustomerDBParameters dbParameters, CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        using var transaction = await conn.BeginTransactionAsync();
-
-        int customerId;
-
-        try
-        {
-            var cmd = new CommandDefinition(
-                "warehouse.usp_CreateCustomer",
-                transaction: transaction,
-                parameters: new
-                {
-                    dbParameters.FirstName,
-                    dbParameters.LastName
-                },
-                commandType: CommandType.StoredProcedure,
-                cancellationToken: cancellationToken);
-
-            customerId = await conn.ExecuteScalarAsync<int>(cmd);
-
-            await transaction.CommitAsync();
-        }
-        catch (Exception ex)
-        {
-            if (ex is SqlException sqlEx)
+        await _activity.ConnectAndEstablishAsync(
+            "warehouse.usp_CreateCustomer",
+            cancellationToken,
+            new
             {
-                _logger.LogError("Failed to create purchase order");
+                dbParameters.FirstName,
+                dbParameters.LastName
+            });
 
-                await transaction.RollbackAsync();
-            }
+        _activity.WhenCapturingSqlException(sqlEx => _logger.LogError("Failed to create customer."));
 
-            throw;
-        }
+        var customerId = await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            return await connection.ExecuteScalarAsync<int>(cmd);
+        });
 
         return new CreateCustomerDBResponse { CustomerId = customerId };
     }

@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using System.Data;
 
 namespace InventoryService.Features.Customers.GetCustomers;
 
@@ -23,32 +23,34 @@ public interface IGetCustomersDBQuery
 /// </summary>
 public class GetCustomersDBQuery : IGetCustomersDBQuery
 {
-    private readonly ISQLConnectionProvider _sqlConnectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public GetCustomersDBQuery(ISQLConnectionProvider sqlConnectionProvider)
+    public GetCustomersDBQuery(ISQLActivity activity)
     {
-        _sqlConnectionProvider = sqlConnectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc />
     public async Task<GetCustomersDBResponse> GetCustomersAsync(GetCustomersDBParameters dbParams, CancellationToken cancellationToken)
     {
-        using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             "warehouse.usp_GetCustomers",
-            parameters: new
+            cancellationToken,
+            new
             {
                 dbParams.Filter
-            },
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            });
 
-        using var result = await conn.QueryMultipleAsync(cmd);
+        var customers = await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            using var result = await connection.QueryMultipleAsync(cmd);
+
+            return (await result.ReadAsync<GetCustomersDBResponseItem>()).ToList();
+        });
 
         return new GetCustomersDBResponse
         {
-            Customers = (await result.ReadAsync<GetCustomersDBResponseItem>()).ToList()
+            Customers = customers
         };
     }
 }

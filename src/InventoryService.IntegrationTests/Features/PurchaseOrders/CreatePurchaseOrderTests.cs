@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
+using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -131,13 +132,12 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ICreatePurchaseOrderDBCommand>();
+            services.RemoveAll<ISQLTransactionActivity>();
 
-            var repository = new Mock<ICreatePurchaseOrderDBCommand>();
+            var repository = new Mock<ISQLTransactionActivity>();
 
             repository
-                .Setup(x => x.CreatePurchaseOrderAsync(
-                    It.IsAny<CreatePurchaseOrderDBParameters>(),
+                .Setup(x => x.ConnectAsync(
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

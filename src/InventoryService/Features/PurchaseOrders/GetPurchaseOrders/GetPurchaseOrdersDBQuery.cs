@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using System.Data;
 
 namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 
@@ -23,11 +23,11 @@ public interface IGetPurchaseOrdersDBQuery
 /// </summary>
 public class GetPurchaseOrdersDBQuery : IGetPurchaseOrdersDBQuery
 {
-    private readonly ISQLConnectionProvider _connectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public GetPurchaseOrdersDBQuery(ISQLConnectionProvider connectionProvider)
+    public GetPurchaseOrdersDBQuery(ISQLActivity activity)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc/>
@@ -35,29 +35,29 @@ public class GetPurchaseOrdersDBQuery : IGetPurchaseOrdersDBQuery
         GetPurchaseOrdersDBParameters dBParameters,
         CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             "warehouse.usp_GetPurchaseOrders",
-            parameters: new
+            cancellationToken,
+            new
             {
                 dBParameters.ProductId,
                 dBParameters.CountryId,
                 dBParameters.CustomerId
-            },
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            });
 
-        using var result = await conn.QueryMultipleAsync(cmd);
-
-        var headers = (await result.ReadAsync<GetPurchaseOrdersDBResponseHeader>()).ToList();
-
-        var lines = (await result.ReadAsync<GetPurchaseOrdersDBResponseLine>()).ToList();
-
-        return new GetPurchaseOrdersDBResponse
+        return await _activity.CommenceAsync(async (cmd, connection) =>
         {
-            Headers = headers,
-            Lines = lines
-        };
+            using var result = await connection.QueryMultipleAsync(cmd);
+
+            var headers = (await result.ReadAsync<GetPurchaseOrdersDBResponseHeader>()).ToList();
+
+            var lines = (await result.ReadAsync<GetPurchaseOrdersDBResponseLine>()).ToList();
+
+            return new GetPurchaseOrdersDBResponse
+            {
+                Headers = headers,
+                Lines = lines
+            };
+        });
     }
 }

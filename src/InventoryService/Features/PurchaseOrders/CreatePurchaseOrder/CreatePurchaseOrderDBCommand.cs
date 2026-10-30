@@ -1,7 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
@@ -24,56 +23,37 @@ public interface ICreatePurchaseOrderDBCommand
 /// </summary>
 public class CreatePurchaseOrderDBCommand : ICreatePurchaseOrderDBCommand
 {
-    private readonly ISQLConnectionProvider _connectionProvider;
+    private readonly ISQLTransactionActivity _activity;
 
     private readonly ILogger<CreatePurchaseOrderDBCommand> _logger;
 
     public CreatePurchaseOrderDBCommand(
-        ISQLConnectionProvider connectionProvider,
+        ISQLTransactionActivity activity,
         ILogger<CreatePurchaseOrderDBCommand> logger)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
         _logger = logger;
     }
 
     /// <inheritdoc/>
     public async Task<CreatePurchaseOrderDBResponse> CreatePurchaseOrderAsync(CreatePurchaseOrderDBParameters parameters, CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        using var transaction = await conn.BeginTransactionAsync();
-
-        int purchaseOrderId;
-
-        try
-        {
-            var cmd = new CommandDefinition(
-                "warehouse.usp_CreatePurchaseOrder",
-                transaction: transaction,
-                parameters: new
-                {
-                    parameters.CustomerId,
-                    parameters.CountryId,
-                    OrderLines = parameters.Lines
-                },
-                commandType: CommandType.StoredProcedure,
-                cancellationToken: cancellationToken);
-
-            purchaseOrderId = await conn.ExecuteScalarAsync<int>(cmd);
-
-            await transaction.CommitAsync();
-        }
-        catch (Exception ex)
-        {
-            if (ex is SqlException sqlEx)
+        await _activity.ConnectAndEstablishAsync(
+            "warehouse.usp_CreatePurchaseOrder", 
+            cancellationToken,
+            new
             {
-                _logger.LogError("Failed to create purchase order");
+                parameters.CustomerId,
+                parameters.CountryId,
+                OrderLines = parameters.Lines
+            });
 
-                await transaction.RollbackAsync();
-            }
+        _activity.WhenCapturingSqlException(sqlEx => _logger.LogError("Failed to create purchase order"));
 
-            throw;
-        }
+        var purchaseOrderId = await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            return await connection.ExecuteScalarAsync<int>(cmd);
+        });
 
         return new CreatePurchaseOrderDBResponse
         {

@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using InventoryService.Extensions;
 using InventoryService.Infrastructure;
-using System.Data;
 
 namespace InventoryService.Features.Countries.GetCountries;
 
@@ -23,26 +23,24 @@ public interface IGetCountriesDBQuery
 /// </summary>
 public class GetCountriesDBQuery : IGetCountriesDBQuery
 {
-    private ISQLConnectionProvider _connectionProvider;
+    private ISQLActivity _activity;
 
-    public GetCountriesDBQuery(ISQLConnectionProvider connectionProvider)
+    public GetCountriesDBQuery(ISQLActivity activity)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
     }
 
     /// <inheritdoc/>
     public async Task<GetCountriesDBResponse> GetCountriesAsync(CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
+        await _activity.ConnectAndEstablishAsync("warehouse.usp_GetCountries", cancellationToken);
 
-        var cmd = new CommandDefinition(
-            "warehouse.usp_GetCountries",
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+        var countries = await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            using var result = await connection.QueryMultipleAsync(cmd);
 
-        using var result = await conn.QueryMultipleAsync(cmd);
-
-        var countries = (await result.ReadAsync<GetCountriesDBCountriesResponse>()).ToList();
+            return (await result.ReadAsync<GetCountriesDBCountriesResponse>()).ToList();
+        });
 
         return new GetCountriesDBResponse
         {
