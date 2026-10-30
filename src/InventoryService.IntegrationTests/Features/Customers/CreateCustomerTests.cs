@@ -103,8 +103,6 @@ public class CreateCustomerTests : IntegrationTestBase
         Exception exception)
     {
         // Act
-        AddBasicAuthHeader();
-
         WebApplicationFactory.OverrideTestServices = services =>
         {
             services.RemoveAll<ICreateCustomerDBCommand>();
@@ -119,6 +117,8 @@ public class CreateCustomerTests : IntegrationTestBase
 
             services.AddScoped(_ => repository.Object);
         };
+
+        AddBasicAuthHeader();
 
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 

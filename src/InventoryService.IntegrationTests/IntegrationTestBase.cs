@@ -1,5 +1,4 @@
 ﻿using InventoryService.Infrastructure.Auth;
-using System.Text;
 
 namespace InventoryService.IntegrationTests;
 
@@ -11,15 +10,41 @@ public abstract class IntegrationTestBase : IAsyncDisposable
 {
     private const string BasicAuthHeaderValue = $"Basic YWRtaW46TXlQYXNzd29yZCE=";
 
-    protected readonly InventoryServiceWebApplicationFactory WebApplicationFactory;
-    
-    protected readonly HttpClient Client;
+    private InventoryServiceWebApplicationFactory? _webApplicationFactory;
+
+    protected InventoryServiceWebApplicationFactory WebApplicationFactory
+    {
+        get
+        {
+            if (_webApplicationFactory is null)
+            {
+                _webApplicationFactory = new InventoryServiceWebApplicationFactory(_sqlFixture);
+            }
+
+            return _webApplicationFactory;
+        }
+    }
+
+    private HttpClient? _client;
+
+    protected HttpClient Client
+    {
+        get
+        {
+            if (_client is null)
+            {
+                _client = WebApplicationFactory.CreateClient();
+            }
+
+            return _client;
+        }
+    }
+
+    private readonly IntegrationTestFixture _sqlFixture;
 
     protected IntegrationTestBase(IntegrationTestFixture sqlFixture)
     {
-        WebApplicationFactory = new InventoryServiceWebApplicationFactory(sqlFixture);
-
-        Client = WebApplicationFactory.CreateClient();
+        _sqlFixture = sqlFixture;
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
