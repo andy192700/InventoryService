@@ -12,6 +12,6 @@ public class GetPurchaseOrderRequestValidator : AbstractValidator<GetPurchaseOrd
     {
         RuleFor(x => x.PurchaseOrderId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("PurchaseOrderId must be a positive integer.");
+            .WithMessage($"{nameof(GetPurchaseOrderRequest.PurchaseOrderId)} must be a positive integer.");
     }
 }

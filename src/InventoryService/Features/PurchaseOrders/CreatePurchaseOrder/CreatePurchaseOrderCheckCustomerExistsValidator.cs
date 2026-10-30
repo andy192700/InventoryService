@@ -15,7 +15,7 @@ public class CreatePurchaseOrderCheckCustomerExistsValidator : DataIntegrityVali
     protected override string StoredProcedureName => "warehouse.usp_CheckCustomerExists";
 
     /// <inheritdoc/>
-    protected override string[] ApplicableProperties => ["CustomerId"];
+    protected override string[] ApplicableProperties => [nameof(CreatePurchaseOrderRequest.Payload.CustomerId)];
 
     public CreatePurchaseOrderCheckCustomerExistsValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
 

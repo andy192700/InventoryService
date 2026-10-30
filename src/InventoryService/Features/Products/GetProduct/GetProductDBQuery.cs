@@ -39,13 +39,16 @@ public class GetProductDBQuery : IGetProductDBQuery
     {
         using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        using var result = await conn.QueryMultipleAsync(
+        var cmd = new CommandDefinition(
             "warehouse.usp_GetProduct",
-            param: new
+            parameters: new
             {
                 dBParameters.ProductId
             },
-            commandType: CommandType.StoredProcedure);
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        using var result = await conn.QueryMultipleAsync(cmd);
 
         var product = await result.ReadFirstOrDefaultAsync<GetProductDBProductResponse>();
 

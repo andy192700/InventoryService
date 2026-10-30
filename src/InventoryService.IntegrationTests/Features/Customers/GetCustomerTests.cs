@@ -1,9 +1,10 @@
-﻿using Castle.Core.Resource;
-using FluentAssertions;
+﻿using FluentAssertions;
 using InventoryService.Features.Customers.GetCustomer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
-using static System.Net.WebRequestMethods;
 
 namespace InventoryService.IntegrationTests.Features.Customers;
 
@@ -75,15 +76,16 @@ public class GetCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"CustomerId must be a positive integer.");
+        result.AssertValidationErrorPresent("CustomerId", $"CustomerId must be a positive integer.");
     }
 
     [Fact]
     public async Task GetCustomer_ReturnsUnauthorized()
     {
-        // Act
+        // Arrange
         var customerId = 3;
 
+        // Act
         var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
 
         // Assert
@@ -94,5 +96,42 @@ public class GetCustomerTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Detail.Should().Be("Missing Authorization Header");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task GetCustomer_ReturnsInternalServerError(Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<IGetCustomerDBQuery>();
+
+            var repository = new Mock<IGetCustomerDBQuery>();
+
+            repository
+                .Setup(x => x.GetCustomerAsync(
+                    It.IsAny<GetCustomerDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        var customerId = 3;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

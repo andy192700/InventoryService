@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -16,9 +19,10 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsOk(CreatePurchaseOrderIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -37,11 +41,12 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsBadRequest(CreatePurchaseOrderIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.CustomerId = string.Empty;
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -51,7 +56,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"CustomerId must be a positive integer.");
+        result.AssertValidationErrorPresent("Payload.CustomerId", $"CustomerId must be a positive integer.");
     }
 
     [Theory]
@@ -75,11 +80,12 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenCustomerDoesNotExist(CreatePurchaseOrderIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.CustomerId = "300";
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -89,18 +95,19 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"A Customer with the requested CustomerId does not exist.");
+        result.AssertValidationErrorPresent("CustomerId", $"A Customer with the requested CustomerId does not exist.");
     }
 
     [Theory]
     [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenProductIdDoesNotMatchSuppliedCountry(CreatePurchaseOrderIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.lines!.First().ProductId = "300";
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -110,6 +117,45 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("One or more of the requested Product Countries does not exist.");
+        result.AssertValidationErrorPresent("CountryId", "One or more of the requested Product Countries does not exist.");
+        result.AssertValidationErrorPresent("ProductId", "One or more of the requested Product Countries does not exist.");
+    }
+
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreatePurchaseOrder_ReturnsInternalServerError(
+        CreatePurchaseOrderIntRequest request,
+        Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<ICreatePurchaseOrderDBCommand>();
+
+            var repository = new Mock<ICreatePurchaseOrderDBCommand>();
+
+            repository
+                .Setup(x => x.CreatePurchaseOrderAsync(
+                    It.IsAny<CreatePurchaseOrderDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

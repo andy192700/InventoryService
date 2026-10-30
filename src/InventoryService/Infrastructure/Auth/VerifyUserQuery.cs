@@ -35,13 +35,16 @@ public class VerifyUserQuery : IVerifyUserQuery
     {
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        return await conn.ExecuteScalarAsync<bool>(
+        var cmd = new CommandDefinition(
             "governance.usp_VerifyCredentials",
-            param: new
+            parameters: new
             {
                 UserName = userName,
                 PasswordHash = passwordHash
             },
-            commandType: CommandType.StoredProcedure);
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        return await conn.ExecuteScalarAsync<bool>(cmd);
     }
 }

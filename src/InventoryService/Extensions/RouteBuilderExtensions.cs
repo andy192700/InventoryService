@@ -10,7 +10,6 @@ using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
-using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryService.Extensions;
 

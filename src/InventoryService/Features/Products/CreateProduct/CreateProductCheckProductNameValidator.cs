@@ -15,7 +15,7 @@ public class CreateProductCheckProductNameValidator : DataIntegrityValidator<Cre
     protected override string StoredProcedureName => "warehouse.usp_CheckProductName";
 
     /// <inheritdoc/>
-    protected override string[] ApplicableProperties => [ "ProductName" ];
+    protected override string[] ApplicableProperties => [ nameof(CreateProductRequest.Payload.ProductName) ];
 
     public CreateProductCheckProductNameValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
 

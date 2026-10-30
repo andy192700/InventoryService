@@ -47,16 +47,19 @@ public class CreatePurchaseOrderDBCommand : ICreatePurchaseOrderDBCommand
 
         try
         {
-            purchaseOrderId = await conn.ExecuteScalarAsync<int>(
+            var cmd = new CommandDefinition(
                 "warehouse.usp_CreatePurchaseOrder",
                 transaction: transaction,
-                param: new
+                parameters: new
                 {
                     parameters.CustomerId,
                     parameters.CountryId,
                     OrderLines = parameters.Lines
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
+
+            purchaseOrderId = await conn.ExecuteScalarAsync<int>(cmd);
 
             await transaction.CommitAsync();
         }

@@ -35,9 +35,12 @@ public class GetCountriesDBQuery : IGetCountriesDBQuery
     {
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        using var result = await conn.QueryMultipleAsync(
+        var cmd = new CommandDefinition(
             "warehouse.usp_GetCountries",
-            commandType: CommandType.StoredProcedure);
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        using var result = await conn.QueryMultipleAsync(cmd);
 
         var countries = (await result.ReadAsync<GetCountriesDBCountriesResponse>()).ToList();
 

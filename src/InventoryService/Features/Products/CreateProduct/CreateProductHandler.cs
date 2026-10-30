@@ -17,16 +17,20 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result
 
     private readonly ILocationBuilder _locationBuilder;
 
+    private readonly ILogger<CreateProductHandler> _logger;
+
     public CreateProductHandler(
         ICreateProductDBParametersMapper dbParametersMapper,
         ICreateProductResponseMapper responseMapper,
         ICreateProductDBCommand createProductDBCommand,
-        ILocationBuilder locationBuilder)
+        ILocationBuilder locationBuilder,
+        ILogger<CreateProductHandler> logger)
     {
         _dbParametersMapper = dbParametersMapper;
         _responseMapper = responseMapper;
         _createProductDBCommand = createProductDBCommand;
         _locationBuilder = locationBuilder;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -35,6 +39,8 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result
         var dbParams = _dbParametersMapper.Map(request);
 
         var dbResponse = await _createProductDBCommand.CreateProductAsync(dbParams, cancellationToken);
+
+        _logger.LogInformation($"Created Product with ProductId = {dbResponse.ProductId}");
 
         var response = _responseMapper.Map(dbResponse);
 

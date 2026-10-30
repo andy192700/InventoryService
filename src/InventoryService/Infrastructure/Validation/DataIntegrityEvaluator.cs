@@ -42,10 +42,13 @@ public abstract class DataIntegrityValidator<TRequest>
     {
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        var result = await conn.ExecuteScalarAsync<bool>(
+        var cmd = new CommandDefinition(
             StoredProcedureName,
-            param: CreateParameters(request),
-            commandType: CommandType.StoredProcedure);
+            parameters: CreateParameters(request),
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        var result = await conn.ExecuteScalarAsync<bool>(cmd);
 
         if (result)
         {

@@ -3,6 +3,7 @@ using FluentAssertions;
 using InventoryService.Features.Customers.CreateCustomer;
 using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace InventoryService.UnitTests.Features.Customers.CreateCustomer;
@@ -16,6 +17,7 @@ public class CreateCustomerHandlerTests
         [Frozen] Mock<ICreateCustomerResponseMapper> mockResponseMapper,
         [Frozen] Mock<ICreateCustomerDBParametersMapper> mockParamsMapper,
         [Frozen] Mock<ILocationBuilder> mockLocationBuilder,
+        [Frozen] Mock<ILogger<CreateCustomerHandler>> mockLogger,
         CreateCustomerDBParameters dbParams,
         CreateCustomerRequest request,
         CreateCustomerResponse response,
@@ -40,7 +42,8 @@ public class CreateCustomerHandlerTests
             mockCommand.Object,
             mockResponseMapper.Object,
             mockParamsMapper.Object,
-            mockLocationBuilder.Object);
+            mockLocationBuilder.Object,
+            mockLogger.Object);
 
         // Act
         var result = await sut.Handle(request, cancellationToken);
@@ -60,5 +63,10 @@ public class CreateCustomerHandlerTests
         mockResponseMapper.Verify(x => x.Map(dbResponse), Times.Once);
         mockParamsMapper.Verify(x => x.Map(request), Times.Once);
         mockLocationBuilder.Verify(x => x.Build(It.IsAny<string>(), It.IsAny<QueryString>()), Times.Once);
+
+        mockLogger.VerifyLog(
+            LogLevel.Information,
+            $"Created Customer with CustomerId = {dbResponse.CustomerId}",
+            Times.Once());
     }
 }

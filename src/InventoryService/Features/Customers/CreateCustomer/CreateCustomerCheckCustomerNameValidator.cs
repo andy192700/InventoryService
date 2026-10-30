@@ -15,7 +15,7 @@ public class CreateCustomerCheckCustomerNameValidator : DataIntegrityValidator<C
     protected override string StoredProcedureName => "warehouse.usp_CheckCustomerName";
 
     /// <inheritdoc/>
-    protected override string[] ApplicableProperties => ["FirstName", "LastName"];
+    protected override string[] ApplicableProperties => [ nameof(CreateCustomerRequest.Payload.FirstName), nameof(CreateCustomerRequest.Payload.LastName) ];
 
     public CreateCustomerCheckCustomerNameValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
 
