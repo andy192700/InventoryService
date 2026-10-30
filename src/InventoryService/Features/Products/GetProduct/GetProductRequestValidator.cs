@@ -12,6 +12,6 @@ public class GetProductRequestValidator : AbstractValidator<GetProductRequest>
     {
         RuleFor(x => x.ProductId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("ProductId must be a positive integer.");
+            .WithMessage($"{nameof(GetProductRequest.ProductId)} must be a positive integer.");
     }
 }

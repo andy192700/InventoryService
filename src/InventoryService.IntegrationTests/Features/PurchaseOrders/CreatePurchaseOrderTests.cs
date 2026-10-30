@@ -51,7 +51,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"CustomerId must be a positive integer.");
+        result.AssertValidationErrorPresent("Payload.CustomerId", $"CustomerId must be a positive integer.");
     }
 
     [Theory]
@@ -89,7 +89,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"A Customer with the requested CustomerId does not exist.");
+        result.AssertValidationErrorPresent("CustomerId", $"A Customer with the requested CustomerId does not exist.");
     }
 
     [Theory]
@@ -110,6 +110,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("One or more of the requested Product Countries does not exist.");
+        result.AssertValidationErrorPresent("CountryId", "One or more of the requested Product Countries does not exist.");
+        result.AssertValidationErrorPresent("ProductId", "One or more of the requested Product Countries does not exist.");
     }
 }

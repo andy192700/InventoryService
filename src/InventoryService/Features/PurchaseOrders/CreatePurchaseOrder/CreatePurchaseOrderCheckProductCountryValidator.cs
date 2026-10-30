@@ -16,7 +16,7 @@ public class CreatePurchaseOrderCheckProductCountryValidator : DataIntegrityVali
     protected override string StoredProcedureName => "warehouse.usp_CheckPurchaseOrderProductCountry";
 
     /// <inheritdoc/>
-    protected override string[] ApplicableProperties => ["CountryId", "lines.ProductId"];
+    protected override string[] ApplicableProperties => [nameof(CreatePurchaseOrderRequest.Payload.CountryId), nameof(CreatePurchaseOrderPayloadLine.ProductId)];
 
     public CreatePurchaseOrderCheckProductCountryValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
 

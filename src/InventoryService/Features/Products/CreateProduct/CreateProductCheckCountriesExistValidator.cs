@@ -16,7 +16,7 @@ public class CreateProductCheckCountriesExistValidator : DataIntegrityValidator<
     protected override string StoredProcedureName => "warehouse.usp_CheckProductCountriesExist";
 
     /// <inheritdoc/>
-    protected override string[] ApplicableProperties => ["ProductCountries.CountryId"];
+    protected override string[] ApplicableProperties => [ nameof(CreateProductRequestProductCountries.CountryId)];
 
     public CreateProductCheckCountriesExistValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
 

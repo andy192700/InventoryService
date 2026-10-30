@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Customers.CreateCustomer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 using System.Net.Http.Json;
 using static InventoryService.IntegrationTests.Features.Customers.CustomerRequests;
@@ -51,7 +54,7 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("'First Name' must not be empty.");
+        result.AssertValidationErrorPresent("Payload.FirstName", "'First Name' must not be empty.");
     }
 
     [Theory]
@@ -89,6 +92,43 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("A Customer with the requested full name already exists.");
+        result.AssertValidationErrorPresent("FirstName", "A Customer with the requested full name already exists.");
+        result.AssertValidationErrorPresent("LastName", "A Customer with the requested full name already exists.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateCustomer_ReturnsInternalServerError(
+        CreateCustomerIntRequest request,
+        Exception exception)
+    {
+        // Act
+        AddBasicAuthHeader();
+
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<ICreateCustomerDBCommand>();
+
+            var repository = new Mock<ICreateCustomerDBCommand>();
+
+            repository
+                .Setup(x => x.CreateCustomerAsync(
+                    It.IsAny<CreateCustomerDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

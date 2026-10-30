@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using DotNet.Testcontainers.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InventoryService.IntegrationTests;
 
@@ -9,6 +12,11 @@ namespace InventoryService.IntegrationTests;
 /// </summary>
 public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactory<Program>
 {
+    /// <summary>
+    /// Override test services to ensure test specific behaviour can be achieved
+    /// </summary>
+    public Action<IServiceCollection>? OverrideTestServices { get; set; }
+
     private readonly IntegrationTestFixture _sqlFixture;
 
     public InventoryServiceWebApplicationFactory(IntegrationTestFixture sqlFixture)
@@ -29,5 +37,10 @@ public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactor
 
                 config.AddInMemoryCollection(settings);
             });
+
+        builder.ConfigureTestServices(x =>
+        {
+            OverrideTestServices?.Invoke(x);
+        });
     }
 }

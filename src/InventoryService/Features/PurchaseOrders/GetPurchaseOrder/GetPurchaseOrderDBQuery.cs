@@ -35,13 +35,16 @@ public class GetPurchaseOrderDBQuery : IGetPurchaseOrderDBQuery
     {
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        using var result = await conn.QueryMultipleAsync(
+        var cmd = new CommandDefinition(
             "warehouse.usp_GetPurchaseOrder",
-            param: new
+            parameters: new
             {
                 dbParameters.PurchaseOrderId
             },
-            commandType: CommandType.StoredProcedure);
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        using var result = await conn.QueryMultipleAsync(cmd);
 
         var header = await result.ReadFirstOrDefaultAsync<GetPurchaseOrderDBResponseHeader>();
 

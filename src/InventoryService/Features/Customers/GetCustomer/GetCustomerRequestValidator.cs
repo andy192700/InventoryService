@@ -12,6 +12,6 @@ public class GetCustomerRequestValidator : AbstractValidator<GetCustomerRequest>
     {
         RuleFor(x => x.CustomerId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("CustomerId must be a positive integer.");
+            .WithMessage($"{nameof(GetCustomerRequest.CustomerId)} must be a positive integer.");
     }
 }

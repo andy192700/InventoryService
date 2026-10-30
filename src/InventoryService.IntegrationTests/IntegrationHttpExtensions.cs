@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace InventoryService.IntegrationTests;
 
@@ -29,9 +30,17 @@ public static class IntegrationHttpExtensions
     /// </summary>
     /// <param name="problemDetails">The problem details.</param>
     /// <param name="errorMessage">The expected error message.</param>
-    public static void AssertValidationErrorPresent(this ProblemDetails problemDetails, string errorMessage)
+    public static void AssertValidationErrorPresent(this ProblemDetails problemDetails, string propertyName, string errorMessage)
     {
         problemDetails.Extensions["errors"].Should().NotBeNull();
+        var errors = (JsonElement)problemDetails.Extensions["errors"]!;
+
+        var purchaseOrderErrors = errors
+            .GetProperty(propertyName)
+            .EnumerateArray()
+            .Select(x => x.GetString())
+            .ToList();
+
         problemDetails.Extensions["errors"]!.ToString().Should().Contain(errorMessage);
     }
 }

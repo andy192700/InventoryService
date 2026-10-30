@@ -51,7 +51,7 @@ public class CreateProductTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("'Product Name' must not be empty.");
+        result.AssertValidationErrorPresent("Payload.ProductName", "'Product Name' must not be empty.");
     }
 
     [Theory]
@@ -89,7 +89,7 @@ public class CreateProductTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("A Product with the requested Product Name already exists.");
+        result.AssertValidationErrorPresent("ProductName", "A Product with the requested Product Name already exists.");
     }
 
     [Theory]
@@ -110,6 +110,6 @@ public class CreateProductTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent("One or more of the requested Countries does not exist.");
+        result.AssertValidationErrorPresent("CountryId", "One or more of the requested Countries does not exist.");
     }
 }

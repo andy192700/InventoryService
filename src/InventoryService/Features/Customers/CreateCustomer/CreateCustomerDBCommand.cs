@@ -40,7 +40,6 @@ public class CreateCustomerDBCommand : ICreateCustomerDBCommand
     /// <inheritdoc/>
     public async Task<CreateCustomerDBResponse> CreateCustomerAsync(CreateCustomerDBParameters dbParameters, CancellationToken cancellationToken)
     {
-
         using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
         using var transaction = await conn.BeginTransactionAsync();
@@ -49,15 +48,18 @@ public class CreateCustomerDBCommand : ICreateCustomerDBCommand
 
         try
         {
-            customerId = await conn.ExecuteScalarAsync<int>(
+            var cmd = new CommandDefinition(
                 "warehouse.usp_CreateCustomer",
                 transaction: transaction,
-                param: new
+                parameters: new
                 {
                     dbParameters.FirstName,
                     dbParameters.LastName
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
+
+            customerId = await conn.ExecuteScalarAsync<int>(cmd);
 
             await transaction.CommitAsync();
         }

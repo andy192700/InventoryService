@@ -49,16 +49,19 @@ public class CreateProductDBCommand : ICreateProductDBCommand
 
         try
         {
-            productId = await conn.ExecuteScalarAsync<int>(
+            var cmd = new CommandDefinition(
                 "warehouse.usp_CreateProduct",
                 transaction: transaction,
-                param: new
+                parameters: new
                 {
                     parameters.ProductName,
                     parameters.ProductDesc,
                     parameters.ProductCountries
                 },
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure,
+                cancellationToken: cancellationToken);
+
+            productId = await conn.ExecuteScalarAsync<int>(cmd);
 
             await transaction.CommitAsync();
         }

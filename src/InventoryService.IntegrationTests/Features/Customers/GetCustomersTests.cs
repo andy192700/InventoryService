@@ -77,7 +77,7 @@ public class GetCustomersTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.AssertValidationErrorPresent($"The length of 'Filter' must be 100 characters or fewer. You entered {filter.Length} characters.");
+        result.AssertValidationErrorPresent("Filter", $"The length of 'Filter' must be 100 characters or fewer. You entered {filter.Length} characters.");
     }
 
     [Fact]

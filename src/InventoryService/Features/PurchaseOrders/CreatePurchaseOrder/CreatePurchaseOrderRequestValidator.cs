@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using InventoryService.Features.Products.CreateProduct;
 using InventoryService.Infrastructure.Validation;
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
@@ -29,18 +28,18 @@ public class CreatePurchaseOrderPayloadValidator : AbstractValidator<CreatePurch
     {
         RuleFor(x => x.CustomerId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("CustomerId must be a positive integer.");
+            .WithMessage($"{nameof(CreatePurchaseOrderRequest.Payload.CustomerId)} must be a positive integer.");
 
         RuleFor(x => x.CountryId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("CountryId must be a positive integer.");
+            .WithMessage($"{nameof(CreatePurchaseOrderRequest.Payload.CountryId)} must be a positive integer.");
 
         RuleFor(x => x.lines)
             .NotEmpty();
 
         RuleFor(x => x.lines)
             .Must(x => HaveUniqueProductIds(x!))
-            .WithMessage("Requested Purchase Order Lines must have unique ProductIds.")
+            .WithMessage($"Requested Purchase Order Lines must have unique {nameof(CreatePurchaseOrderPayloadLine.ProductId)}s.")
             .When(x => x.lines is not null);
 
         RuleForEach(x => x.lines)
@@ -64,10 +63,10 @@ public class CreatePurchaseOrderPayloadLineValidator : AbstractValidator<CreateP
     {
         RuleFor(x => x.OrderQuantity)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("OrderQuantity must be a positive integer.");
+            .WithMessage($"{nameof(CreatePurchaseOrderPayloadLine.OrderQuantity)} must be a positive integer.");
 
         RuleFor(x => x.ProductId)
             .Must(x => ValidationHelpers.IsValidInteger(x))
-            .WithMessage("ProductId must be a positive integer.");
+            .WithMessage($"{nameof(CreatePurchaseOrderPayloadLine.ProductId)} must be a positive integer.");
     }
 }

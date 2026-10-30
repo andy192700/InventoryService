@@ -35,13 +35,16 @@ public class GetCustomersDBQuery : IGetCustomersDBQuery
     {
         using var conn = await _sqlConnectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
 
-        using var result = await conn.QueryMultipleAsync(
+        var cmd = new CommandDefinition(
             "warehouse.usp_GetCustomers",
-            param: new
+            parameters: new
             {
                 dbParams.Filter
             },
-            commandType: CommandType.StoredProcedure);
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        using var result = await conn.QueryMultipleAsync(cmd);
 
         return new GetCustomersDBResponse
         {
