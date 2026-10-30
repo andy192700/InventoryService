@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Products.CreateProduct;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -16,9 +19,10 @@ public class CreateProductTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateProduct_ReturnsOk(CreateProductIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -37,11 +41,12 @@ public class CreateProductTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateProduct_ReturnsBadRequest(CreateProductIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.ProductName = string.Empty;
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -75,11 +80,12 @@ public class CreateProductTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateProduct_ReturnsBadRequest_WhenProductAlreadyExists(CreateProductIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.ProductName = "Hammer";
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -96,11 +102,12 @@ public class CreateProductTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateProduct_ReturnsBadRequest_WhenCountryDoesNotExist(CreateProductIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
         request.ProductCountries!.First().CountryId = "300";
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -111,5 +118,42 @@ public class CreateProductTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertValidationErrorPresent("CountryId", "One or more of the requested Countries does not exist.");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task CreateProduct_ReturnsInternalServerError(
+        CreateProductIntRequest request,
+        Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<ICreateProductDBCommand>();
+
+            var repository = new Mock<ICreateProductDBCommand>();
+
+            repository
+                .Setup(x => x.CreateProductAsync(
+                    It.IsAny<CreateProductDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

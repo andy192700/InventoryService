@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Countries.GetCountries;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 
 namespace InventoryService.IntegrationTests.Features.Countries;
@@ -14,8 +17,10 @@ public class GetCountriesTests : IntegrationTestBase
     [Fact]
     public async Task GetCountries_ReturnsOk()
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
+
+        // Act
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -45,5 +50,39 @@ public class GetCountriesTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Detail.Should().Be("Missing Authorization Header");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task GetCountries_ReturnsInternalServerError(Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<IGetCountriesDBQuery>();
+
+            var repository = new Mock<IGetCountriesDBQuery>();
+
+            repository
+                .Setup(x => x.GetCountriesAsync(
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

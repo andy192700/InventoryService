@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 
 namespace InventoryService.IntegrationTests.Features.PurchaseOrders;
@@ -14,9 +17,10 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     [Fact]
     public async Task GetPurchaseOrders_ReturnsOk()
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
+        // Act
         var response = await Client.GetAsync(RequestURI);
 
         // Assert
@@ -183,5 +187,40 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Detail.Should().Be("Missing Authorization Header");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task GetPurchaseOrders_ReturnsInternalServerError(Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<IGetPurchaseOrdersDBQuery>();
+
+            var repository = new Mock<IGetPurchaseOrdersDBQuery>();
+
+            repository
+                .Setup(x => x.GetPurchaseOrdersAsync(
+                    It.IsAny<GetPurchaseOrdersDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }

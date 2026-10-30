@@ -20,9 +20,10 @@ public class CreateCustomerTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateCustomer_ReturnsOk(CreateCustomerIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -41,10 +42,11 @@ public class CreateCustomerTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateCustomer_ReturnsBadRequest(CreateCustomerIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
         request.FirstName = string.Empty;
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -78,11 +80,12 @@ public class CreateCustomerTests : IntegrationTestBase
     [InlineAutoMoqData]
     public async Task CreateCustomer_ReturnsBadRequest_WhenCustomerNameAlreadyExists(CreateCustomerIntRequest request)
     {
-        // Act
+        // Arrange
         AddBasicAuthHeader();
         request.FirstName = "John";
         request.LastName = "Smith";
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -102,7 +105,7 @@ public class CreateCustomerTests : IntegrationTestBase
         CreateCustomerIntRequest request,
         Exception exception)
     {
-        // Act
+        // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
             services.RemoveAll<ICreateCustomerDBCommand>();
@@ -120,6 +123,7 @@ public class CreateCustomerTests : IntegrationTestBase
 
         AddBasicAuthHeader();
 
+        // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert

@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.Products.GetProduct;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using System.Net;
 
 namespace InventoryService.IntegrationTests.Features.Products;
@@ -85,7 +88,7 @@ public class GetProductTests : IntegrationTestBase
     [Fact]
     public async Task GetProduct_ReturnsUnauthorized()
     {
-        // Act
+        // Arrange
         var productId = 4;
 
         // Act
@@ -99,5 +102,42 @@ public class GetProductTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Detail.Should().Be("Missing Authorization Header");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task GetProduct_ReturnsInternalServerError(Exception exception)
+    {
+        // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.RemoveAll<IGetProductDBQuery>();
+
+            var repository = new Mock<IGetProductDBQuery>();
+
+            repository
+                .Setup(x => x.GetProductAsync(
+                    It.IsAny<GetProductDBParameters>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(exception);
+
+            services.AddScoped(_ => repository.Object);
+        };
+
+        AddBasicAuthHeader();
+
+        var productId = 4;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?productId={productId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Internal Server Error");
     }
 }
