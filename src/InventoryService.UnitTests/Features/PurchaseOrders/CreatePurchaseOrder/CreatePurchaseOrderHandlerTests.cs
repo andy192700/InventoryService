@@ -3,6 +3,7 @@ using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace InventoryService.UnitTests.Features.PurchaseOrders.CreatePurchaseOrder;
@@ -16,6 +17,7 @@ public class CreatePurchaseOrderHandlerTests
         [Frozen] Mock<ICreatePurchaseOrderResponseMapper> mockResponseMapper,
         [Frozen] Mock<ICreatePurchaseOrderDBParametersMapper> mockParamsMapper,
         [Frozen] Mock<ILocationBuilder> mockLocationBuilder,
+        [Frozen] Mock<ILogger<CreatePurchaseOrderHandler>> mockLogger,
         CreatePurchaseOrderDBParameters dbParams,
         CreatePurchaseOrderRequest request,
         CreatePurchaseOrderResponse response,
@@ -40,7 +42,8 @@ public class CreatePurchaseOrderHandlerTests
             mockParamsMapper.Object,
             mockCommand.Object,
             mockResponseMapper.Object,
-            mockLocationBuilder.Object);
+            mockLocationBuilder.Object,
+            mockLogger.Object);
 
         // Act
         var result = await sut.Handle(request, cancellationToken);
@@ -60,5 +63,10 @@ public class CreatePurchaseOrderHandlerTests
         mockResponseMapper.Verify(x => x.Map(dbResponse), Times.Once);
         mockParamsMapper.Verify(x => x.Map(request), Times.Once);
         mockLocationBuilder.Verify(x => x.Build(It.IsAny<string>(), It.IsAny<QueryString>()), Times.Once);
+
+        mockLogger.VerifyLog(
+            LogLevel.Information,
+            $"Created Purhase Order with PurchaseOrderId = {dbResponse.PurchaseOrderId}",
+            Times.Once());
     }
 }

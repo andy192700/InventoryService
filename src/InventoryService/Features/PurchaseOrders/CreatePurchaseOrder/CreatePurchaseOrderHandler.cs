@@ -17,16 +17,20 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
 
     private readonly ILocationBuilder _locationBuilder;
 
+    private readonly ILogger<CreatePurchaseOrderHandler> _logger;
+
     public CreatePurchaseOrderHandler(
         ICreatePurchaseOrderDBParametersMapper parametersMapper,
         ICreatePurchaseOrderDBCommand dbCommand,
         ICreatePurchaseOrderResponseMapper responseMapper,
-        ILocationBuilder locationBuilder)
+        ILocationBuilder locationBuilder,
+        ILogger<CreatePurchaseOrderHandler> logger)
     {
         _parametersMapper = parametersMapper;
         _dbCommand = dbCommand;
         _responseMapper = responseMapper;
         _locationBuilder = locationBuilder;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -35,7 +39,9 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         var dbParams = _parametersMapper.Map(request);
 
         var dbResponse = await _dbCommand.CreatePurchaseOrderAsync(dbParams, cancellationToken);
-        
+
+        _logger.LogInformation($"Created Purhase Order with PurchaseOrderId = {dbResponse.PurchaseOrderId}");
+
         var response = _responseMapper.Map(dbResponse);
 
         var location = _locationBuilder.Build(

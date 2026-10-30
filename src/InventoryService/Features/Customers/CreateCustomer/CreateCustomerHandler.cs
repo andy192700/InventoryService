@@ -17,16 +17,20 @@ public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Resu
 
     private readonly ILocationBuilder _locationBuilder;
 
+    private readonly ILogger<CreateCustomerHandler> _logger;
+
     public CreateCustomerHandler(
         ICreateCustomerDBCommand dBCommand, 
         ICreateCustomerResponseMapper responseMapper, 
         ICreateCustomerDBParametersMapper parametersMapper,
-        ILocationBuilder locationBuilder)
+        ILocationBuilder locationBuilder,
+        ILogger<CreateCustomerHandler> logger)
     {
         _dBCommand = dBCommand;
         _responseMapper = responseMapper;
         _parametersMapper = parametersMapper;
         _locationBuilder = locationBuilder;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
@@ -35,6 +39,8 @@ public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Resu
         var dbParams = _parametersMapper.Map(request);
 
         var dbResponse = await _dBCommand.CreateCustomerAsync(dbParams, cancellationToken);
+
+        _logger.LogInformation($"Created Customer with CustomerId = {dbResponse.CustomerId}");
 
         var response = _responseMapper.Map(dbResponse);
 

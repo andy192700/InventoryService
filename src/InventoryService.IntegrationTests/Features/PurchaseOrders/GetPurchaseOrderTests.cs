@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
-using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
