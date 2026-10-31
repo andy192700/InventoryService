@@ -18,7 +18,7 @@ public class CreateProductCheckCountriesExistValidator : DataIntegrityValidator<
     /// <inheritdoc/>
     protected override string[] ApplicableProperties => [ nameof(CreateProductRequestProductCountries.CountryId)];
 
-    public CreateProductCheckCountriesExistValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+    public CreateProductCheckCountriesExistValidator(ISQLActivity activity) : base(activity) { }
 
     /// <inheritdoc/>
     protected override object CreateParameters(CreateProductRequest request)
