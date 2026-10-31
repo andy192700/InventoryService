@@ -5,10 +5,11 @@ INSERT INTO warehouse.Country
     CountryCode,
     CurrencyCode
 )
-VALUES
-('US', 'USD'),
-('GB', 'GBP'),
-('FR', 'EUR');
+VALUES ('US', 'USD'),
+       ('GB', 'GBP'),
+       ('FR', 'EUR');
+
+DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
 INSERT INTO warehouse.Product
 (
@@ -16,13 +17,21 @@ INSERT INTO warehouse.Product
     ProductName,
     ProductDesc
 )
-VALUES
-(SYSDATETIMEOFFSET(), 'Hammer', '16oz claw hammer'),
-(SYSDATETIMEOFFSET(), 'Drill', '18v cordless drill'),
-(SYSDATETIMEOFFSET(), 'Saw', 'Hand saw'),
-(SYSDATETIMEOFFSET(), 'Tape Measure', '5m tape measure'),
-(SYSDATETIMEOFFSET(), 'Screwdriver Set', '6 piece screwdriver set');
+VALUES (@Now, 'Hammer', '16oz claw hammer'),
+       (@Now, 'Drill', '18v cordless drill'),
+       (@Now, 'Saw', 'Hand saw'),
+       (@Now, 'Tape Measure', '5m tape measure'),
+       (@Now, 'Screwdriver Set', '6 piece screwdriver set');
 
+DECLARE @HammerProductId INT = (SELECT ProductId FROM warehouse.Product WHERE ProductName = 'Hammer')
+DECLARE @DrillProductId INT = (SELECT ProductId FROM warehouse.Product WHERE ProductName = 'Drill')
+DECLARE @SawProductId INT = (SELECT ProductId FROM warehouse.Product WHERE ProductName = 'Saw')
+DECLARE @TapeMeasureProductId INT = (SELECT ProductId FROM warehouse.Product WHERE ProductName = 'Tape Measure')
+DECLARE @ScrewdriverSetProductId INT = (SELECT ProductId FROM warehouse.Product WHERE ProductName = 'Screwdriver Set')
+
+DECLARE @USCountryId INT = (SELECT CountryId FROM warehouse.Country WHERE CountryCode = 'US')
+DECLARE @GBCountryId INT = (SELECT CountryId FROM warehouse.Country WHERE CountryCode = 'GB')
+DECLARE @FRCountryId INT = (SELECT CountryId FROM warehouse.Country WHERE CountryCode = 'FR')
 
 INSERT INTO warehouse.ProductCountry
 (
@@ -30,27 +39,21 @@ INSERT INTO warehouse.ProductCountry
     CountryId,
     UnitPrice
 )
-VALUES
--- US
-(1, 1, 19.99),
-(2, 1, 99.99),
-(3, 1, 24.99),
-(4, 1, 9.99),
-(5, 1, 14.99),
-
--- GB
-(1, 2, 15.99),
-(2, 2, 79.99),
-(3, 2, 19.99),
-(4, 2, 8.99),
-(5, 2, 11.99),
-
--- FR
-(1, 3, 17.99),
-(2, 3, 89.99),
-(3, 3, 22.99),
-(4, 3, 9.49),
-(5, 3, 13.49);
+VALUES (@HammerProductId, @USCountryId, 19.99),
+       (@DrillProductId, @USCountryId, 99.99),
+       (@SawProductId, @USCountryId, 24.99),
+       (@TapeMeasureProductId, @USCountryId, 9.99),
+       (@ScrewdriverSetProductId, @USCountryId, 14.99),
+       (@HammerProductId, @GBCountryId, 15.99),
+       (@DrillProductId, @GBCountryId, 79.99),
+       (@SawProductId, @GBCountryId, 19.99),
+       (@TapeMeasureProductId, @GBCountryId, 8.99),
+       (@ScrewdriverSetProductId, @GBCountryId, 11.99),
+       (@HammerProductId, @FRCountryId, 17.99),
+       (@DrillProductId, @FRCountryId, 89.99),
+       (@SawProductId, @FRCountryId, 22.99),
+       (@TapeMeasureProductId, @FRCountryId, 9.49),
+       (@ScrewdriverSetProductId, @FRCountryId, 13.49);
 
 INSERT INTO warehouse.Customer
 (
@@ -58,12 +61,17 @@ INSERT INTO warehouse.Customer
     FirstName,
     LastName
 )
-VALUES
-(SYSDATETIMEOFFSET(), 'John', 'Smith'),
-(SYSDATETIMEOFFSET(), 'Jane', 'Jones'),
-(SYSDATETIMEOFFSET(), 'Pierre', 'Dubois'),
-(SYSDATETIMEOFFSET(), 'Mary', 'Taylor'),
-(SYSDATETIMEOFFSET(), 'Tom', 'Walker');
+VALUES (@Now, 'John', 'Smith'),
+       (@Now, 'Jane', 'Jones'),
+       (@Now, 'Pierre', 'Dubois'),
+       (@Now, 'Mary', 'Taylor'),
+       (@Now, 'Tom', 'Walker');
+
+DECLARE @JohnSmithCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'John' AND LastName = 'Smith')
+DECLARE @JaneJonesCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Jane' AND LastName = 'Jones')
+DECLARE @PierreDuboisCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Pierre' AND LastName = 'Dubois')
+DECLARE @MaryTaylorCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Mary' AND LastName = 'Taylor')
+DECLARE @TomWalkerCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Tom' AND LastName = 'Walker')
 
 INSERT INTO warehouse.PurchaseOrder
 (
@@ -71,12 +79,28 @@ INSERT INTO warehouse.PurchaseOrder
     CountryId,
     CustomerId
 )
-VALUES
-(DATEADD(DAY, -10, SYSDATETIMEOFFSET()), 2, 1),
-(DATEADD(DAY, -8, SYSDATETIMEOFFSET()), 2, 2),
-(DATEADD(DAY, -6, SYSDATETIMEOFFSET()), 1, 4),
-(DATEADD(DAY, -4, SYSDATETIMEOFFSET()), 3, 3),
-(DATEADD(DAY, -2, SYSDATETIMEOFFSET()), 2, 5);
+VALUES (DATEADD(DAY, -10, @Now), @GBCountryId, @JohnSmithCustomerId),
+       (DATEADD(DAY, -8, @Now), @GBCountryId, @JaneJonesCustomerId),
+       (DATEADD(DAY, -6, @Now), @USCountryId, @MaryTaylorCustomerId),
+       (DATEADD(DAY, -4, @Now), @FRCountryId, @PierreDuboisCustomerId),
+       (DATEADD(DAY, -2, @Now), @GBCountryId, @TomWalkerCustomerId);
+
+DECLARE @PurchaseOrderIdOne INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @JohnSmithCustomerId)
+DECLARE @PurchaseOrderIdTwo INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @JaneJonesCustomerId)
+DECLARE @PurchaseOrderIdThree INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @MaryTaylorCustomerId)
+DECLARE @PurchaseOrderIdFour INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @PierreDuboisCustomerId)
+DECLARE @PurchaseOrderIdFive INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @TomWalkerCustomerId)
+
+DECLARE @HammerGBProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @GBCountryId AND ProductId = @HammerProductId)
+DECLARE @DrillGBProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @GBCountryId AND ProductId = @DrillProductId)
+DECLARE @ScrewdriverSetGBProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @GBCountryId AND ProductId = @ScrewdriverSetProductId)
+DECLARE @SawGBProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @GBCountryId AND ProductId = @SawProductId)
+
+DECLARE @DrillUSProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @USCountryId AND ProductId = @DrillProductId)
+DECLARE @TapeMeasureUSProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @USCountryId AND ProductId = @TapeMeasureProductId)
+
+DECLARE @HammerFRProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @FRCountryId AND ProductId = @HammerProductId)
+DECLARE @DrillFRProductCountryId INT = (SELECT ProductCountryId FROM warehouse.ProductCountry WHERE CountryId = @FRCountryId AND ProductId = @DrillProductId)
 
 INSERT INTO warehouse.PurchaseOrderLine
 (
@@ -84,26 +108,16 @@ INSERT INTO warehouse.PurchaseOrderLine
     ProductCountryId,
     OrderQuantity
 )
-VALUES
--- Order 1 (GB)
-(1, 6, 5),   -- Hammer
-(1, 7, 2),   -- Drill
-
--- Order 2 (GB)
-(2, 6, 3),   -- Hammer
-(2, 10, 4),  -- Screwdriver Set
-
--- Order 3 (US)
-(3, 2, 10),  -- Drill
-(3, 4, 5),   -- Tape Measure
-
--- Order 4 (FR)
-(4, 11, 1),  -- Hammer
-(4, 12, 3),  -- Drill
-
--- Order 5 (GB)
-(5, 6, 7),   -- Hammer
-(5, 8, 2);   -- Saw
+VALUES (@PurchaseOrderIdOne, @HammerGBProductCountryId, 5),
+       (@PurchaseOrderIdOne, @DrillGBProductCountryId, 2),
+       (@PurchaseOrderIdTwo, @HammerGBProductCountryId, 3),
+       (@PurchaseOrderIdTwo, @ScrewdriverSetGBProductCountryId, 4),
+       (@PurchaseOrderIdThree, @DrillUSProductCountryId, 10),
+       (@PurchaseOrderIdThree, @TapeMeasureUSProductCountryId, 5),
+       (@PurchaseOrderIdFour, @HammerFRProductCountryId, 1),
+       (@PurchaseOrderIdFour, @DrillFRProductCountryId, 3),
+       (@PurchaseOrderIdFive, @HammerGBProductCountryId, 7),
+       (@PurchaseOrderIdFive, @SawGBProductCountryId, 2);
 
 INSERT INTO governance.UserCredential
 (UserName, PasswordHash)

@@ -12,20 +12,11 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder RegisterMiddleware(this IApplicationBuilder applicationBuilder)
     {
         return applicationBuilder
+            .UseMiddleware<ProblemDetailsMiddleware>()
             .UseExceptionHandler(e => e.Run(async context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    context.Response.ContentType = "application/problem+json";
-
-                    var problemDetails = new
-                    {
-                        type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
-                        title = "Internal Server Error",
-                        status = StatusCodes.Status500InternalServerError
-                    };
-
-                    await context.Response.WriteAsJsonAsync(problemDetails);
-                }))
+            {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            }))
             .UseMiddleware<RequestLoggingMiddleware>()
             .UseRouting()
             .UseAuthentication()

@@ -12,8 +12,6 @@ namespace InventoryService.Infrastructure.Auth;
 /// </summary>
 public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private string? _failureMessage;
-
     private readonly IComputeHash _computeHash;
 
     private readonly IVerifyUserQuery _verifyUserQuery;
@@ -61,7 +59,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             var passwordHash = _computeHash.Compute(credentials[1]);
 
-            var validCredentials = await _verifyUserQuery.VerifyUserAsync(username, passwordHash, CancellationToken.None);
+            var validCredentials = await _verifyUserQuery.VerifyUserAsync(username, passwordHash, Context.RequestAborted);
 
             if (!validCredentials)
             {
@@ -84,27 +82,8 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         }
     }
 
-    /// <inheritdoc/>
-    protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
-    {
-        Response.StatusCode = StatusCodes.Status401Unauthorized;
-        Response.ContentType = "application/problem+json";
-
-        var problemDetails = new
-        {
-            type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-            title = "Unauthorized",
-            detail = _failureMessage ?? "Valid credentials are required to access this resource.",
-            status = StatusCodes.Status401Unauthorized
-        };
-
-        await Response.WriteAsJsonAsync(problemDetails);
-    }
-
     private AuthenticateResult Fail(string reason)
     {
-        _failureMessage = reason;
-
-        return AuthenticateResult.Fail(_failureMessage);
+        return AuthenticateResult.Fail(new AuthenticationFailureException(reason));
     }
 }

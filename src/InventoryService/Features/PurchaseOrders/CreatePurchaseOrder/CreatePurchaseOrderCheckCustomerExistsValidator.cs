@@ -17,7 +17,7 @@ public class CreatePurchaseOrderCheckCustomerExistsValidator : DataIntegrityVali
     /// <inheritdoc/>
     protected override string[] ApplicableProperties => [nameof(CreatePurchaseOrderRequest.Payload.CustomerId)];
 
-    public CreatePurchaseOrderCheckCustomerExistsValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+    public CreatePurchaseOrderCheckCustomerExistsValidator(ISQLActivity activity) : base(activity) { }
 
     /// <inheritdoc/>
     protected override object CreateParameters(CreatePurchaseOrderRequest request)

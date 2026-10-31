@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using FluentValidation.Results;
-using System.Data;
+using InventoryService.Extensions;
 
 namespace InventoryService.Infrastructure.Validation;
 
@@ -25,11 +25,11 @@ public abstract class DataIntegrityValidator<TRequest>
     /// </summary>
     protected abstract string[] ApplicableProperties { get; }
 
-    private readonly ISQLConnectionProvider _connectionProvider;
+    private readonly ISQLActivity _activity;
 
-    public DataIntegrityValidator(ISQLConnectionProvider connectionProvider)
+    public DataIntegrityValidator(ISQLActivity activity)
     {
-        _connectionProvider = connectionProvider;
+        _activity = activity;
     }
 
     /// <summary>
@@ -40,15 +40,15 @@ public abstract class DataIntegrityValidator<TRequest>
     /// <returns>The collection of validation failures.</returns>
     public async Task<ICollection<ValidationFailure>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
     {
-        using var conn = await _connectionProvider.GetSqlConnectionAsync("Inventory", cancellationToken);
-
-        var cmd = new CommandDefinition(
+        await _activity.ConnectAndEstablishAsync(
             StoredProcedureName,
-            parameters: CreateParameters(request),
-            commandType: CommandType.StoredProcedure,
-            cancellationToken: cancellationToken);
+            cancellationToken,
+            CreateParameters(request));
 
-        var result = await conn.ExecuteScalarAsync<bool>(cmd);
+        var result = await _activity.CommenceAsync(async (cmd, connection) =>
+        {
+            return await connection.ExecuteScalarAsync<bool>(cmd);
+        });
 
         if (result)
         {

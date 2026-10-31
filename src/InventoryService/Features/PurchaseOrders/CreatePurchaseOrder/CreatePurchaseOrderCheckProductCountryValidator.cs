@@ -18,7 +18,7 @@ public class CreatePurchaseOrderCheckProductCountryValidator : DataIntegrityVali
     /// <inheritdoc/>
     protected override string[] ApplicableProperties => [nameof(CreatePurchaseOrderRequest.Payload.CountryId), nameof(CreatePurchaseOrderPayloadLine.ProductId)];
 
-    public CreatePurchaseOrderCheckProductCountryValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+    public CreatePurchaseOrderCheckProductCountryValidator(ISQLActivity activity) : base(activity) { }
 
     /// <inheritdoc/>
     protected override object CreateParameters(CreatePurchaseOrderRequest request)

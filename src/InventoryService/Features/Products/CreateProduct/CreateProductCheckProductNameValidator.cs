@@ -17,7 +17,7 @@ public class CreateProductCheckProductNameValidator : DataIntegrityValidator<Cre
     /// <inheritdoc/>
     protected override string[] ApplicableProperties => [ nameof(CreateProductRequest.Payload.ProductName) ];
 
-    public CreateProductCheckProductNameValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+    public CreateProductCheckProductNameValidator(ISQLActivity activity) : base(activity) { }
 
     /// <inheritdoc/>
     protected override object CreateParameters(CreateProductRequest request)

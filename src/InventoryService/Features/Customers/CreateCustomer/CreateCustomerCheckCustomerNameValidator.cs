@@ -17,7 +17,7 @@ public class CreateCustomerCheckCustomerNameValidator : DataIntegrityValidator<C
     /// <inheritdoc/>
     protected override string[] ApplicableProperties => [ nameof(CreateCustomerRequest.Payload.FirstName), nameof(CreateCustomerRequest.Payload.LastName) ];
 
-    public CreateCustomerCheckCustomerNameValidator(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+    public CreateCustomerCheckCustomerNameValidator(ISQLActivity activity) : base(activity) { }
 
     /// <inheritdoc/>
     protected override object CreateParameters(CreateCustomerRequest request)

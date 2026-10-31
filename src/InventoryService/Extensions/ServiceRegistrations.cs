@@ -51,6 +51,7 @@ public static class ServiceRegistrations
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddSingleton<IValidationProblemWriter, ValidationProblemWriter>();
         services.AddHttpContextAccessor();
+        services.AddProblemDetails();
 
         return services;
     }
