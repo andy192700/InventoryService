@@ -74,7 +74,7 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.Detail.Should().Be("Missing Authorization Header");
+        result.Title.Should().Be("Unauthorized");
     }
 
     [Theory]
