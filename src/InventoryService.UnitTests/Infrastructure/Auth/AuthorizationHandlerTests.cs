@@ -15,6 +15,8 @@ public class AuthorizationHandlerTests
     {
         // Arrange
         var identity = new ClaimsIdentity(authenticationType: authType);
+        identity.AddClaim(new Claim(ClaimTypes.Role, requirement.RequiredRole.ToString()));
+
         var principal = new ClaimsPrincipal(identity);
         var context = new AuthorizationHandlerContext([requirement], principal, null);
 

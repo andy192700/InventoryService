@@ -9,6 +9,13 @@ namespace InventoryService.Infrastructure.Auth;
 public class AuthorizationHandlerRequirement : IAuthorizationRequirement
 {
     public string RequiredAuthenticationType { get; } = AuthenticationConstants.Scheme;
+
+    public UserPermission RequiredRole { get; private set; }
+
+    public AuthorizationHandlerRequirement(UserPermission requiredRole)
+    {
+        RequiredRole = requiredRole;
+    }
 }
 
 /// <summary>
@@ -23,8 +30,10 @@ public class AuthorizationHandler : AuthorizationHandler<AuthorizationHandlerReq
     {
         var identity = context.User.Identity as ClaimsIdentity;
 
-        if (identity != null &&
-            identity.AuthenticationType == requirement.RequiredAuthenticationType)
+        if (identity != null
+            && identity.IsAuthenticated
+            && identity.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == requirement.RequiredRole.ToString())
+            && identity.AuthenticationType == requirement.RequiredAuthenticationType)
         {
             context.Succeed(requirement);
         }

@@ -18,7 +18,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
 
 namespace InventoryService.Extensions;
 
@@ -79,13 +78,11 @@ public static class ServiceRegistrations
         services.AddAuthorizationBuilder()
             .AddPolicy(AuthenticationConstants.WritingAuthorizationPolicy, policy =>
             {
-                policy.RequireRole([UserPermission.Write.ToString()]);
-                policy.AddRequirements(new AuthorizationHandlerRequirement());
+                policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Write));
             })
             .AddPolicy(AuthenticationConstants.ReadingAuthorizationPolicy, policy =>
             {
-                policy.RequireRole([UserPermission.Read.ToString()]);
-                policy.AddRequirements(new AuthorizationHandlerRequirement());
+                policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Read));
             });
 
         return services;
