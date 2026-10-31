@@ -17,7 +17,7 @@ public class BasicAuthenticationHandlerTests
     [InlineAutoMoqData]
     public async Task HandleAuthenticateAsync_ReturnsFail_WhenHeaderMissing(
         [Frozen] Mock<IComputeHash> computeHashMock,
-        [Frozen] Mock<IVerifyUserQuery> mockVerifyUserQuery,
+        [Frozen] Mock<IGetUserPermissionsDBQuery> mockVerifyUserQuery,
         [Frozen] Mock<IOptionsMonitor<AuthenticationSchemeOptions>> mockOptionsMonitor)
     {
         // Arrange
@@ -35,7 +35,7 @@ public class BasicAuthenticationHandlerTests
             computeHashMock.Object,
             mockVerifyUserQuery.Object);
 
-        var scheme = new AuthenticationScheme(AuthenticationConstants.AuthenticationType, AuthenticationConstants.AuthenticationType, typeof(BasicAuthenticationHandler));
+        var scheme = new AuthenticationScheme(AuthenticationConstants.Scheme, AuthenticationConstants.Scheme, typeof(BasicAuthenticationHandler));
         
         await sut.InitializeAsync(scheme, context);
 
@@ -59,7 +59,7 @@ public class BasicAuthenticationHandlerTests
         string headerVal,
         string expectedFailReason,
         [Frozen] Mock<IComputeHash> computeHashMock,
-        [Frozen] Mock<IVerifyUserQuery> mockVerifyUserQuery,
+        [Frozen] Mock<IGetUserPermissionsDBQuery> mockVerifyUserQuery,
         [Frozen] Mock<IOptionsMonitor<AuthenticationSchemeOptions>> mockOptionsMonitor)
     {
         // Arrange
@@ -79,7 +79,7 @@ public class BasicAuthenticationHandlerTests
             computeHashMock.Object,
             mockVerifyUserQuery.Object);
 
-        var scheme = new AuthenticationScheme(AuthenticationConstants.AuthenticationType, AuthenticationConstants.AuthenticationType, typeof(BasicAuthenticationHandler));
+        var scheme = new AuthenticationScheme(AuthenticationConstants.Scheme, AuthenticationConstants.Scheme, typeof(BasicAuthenticationHandler));
 
         await sut.InitializeAsync(scheme, context);
 
@@ -96,7 +96,7 @@ public class BasicAuthenticationHandlerTests
     [InlineAutoMoqData]
     public async Task HandleAuthenticateAsync_ReturnsFail_WhenHeaderIsSuppliedButEmptyString(
         [Frozen] Mock<IComputeHash> computeHashMock,
-        [Frozen] Mock<IVerifyUserQuery> mockVerifyUserQuery,
+        [Frozen] Mock<IGetUserPermissionsDBQuery> mockVerifyUserQuery,
         [Frozen] Mock<IOptionsMonitor<AuthenticationSchemeOptions>> mockOptionsMonitor)
     {
         // Arrange
@@ -116,7 +116,7 @@ public class BasicAuthenticationHandlerTests
             computeHashMock.Object,
             mockVerifyUserQuery.Object);
 
-        var scheme = new AuthenticationScheme(AuthenticationConstants.AuthenticationType, AuthenticationConstants.AuthenticationType, typeof(BasicAuthenticationHandler));
+        var scheme = new AuthenticationScheme(AuthenticationConstants.Scheme, AuthenticationConstants.Scheme, typeof(BasicAuthenticationHandler));
 
         await sut.InitializeAsync(scheme, context);
 
@@ -133,7 +133,7 @@ public class BasicAuthenticationHandlerTests
     [InlineAutoMoqData]
     public async Task HandleAuthenticateAsync_ReturnsFail_WhenHeaderIsSuppliedButCannotAuthenticate(
         [Frozen] Mock<IComputeHash> computeHashMock,
-        [Frozen] Mock<IVerifyUserQuery> mockVerifyUserQuery,
+        [Frozen] Mock<IGetUserPermissionsDBQuery> mockVerifyUserQuery,
         [Frozen] Mock<IOptionsMonitor<AuthenticationSchemeOptions>> mockOptionsMonitor,
         string userName,
         string password)
@@ -145,8 +145,8 @@ public class BasicAuthenticationHandlerTests
 
         mockOptionsMonitor.Setup(x => x.CurrentValue).Returns(new AuthenticationSchemeOptions());
 
-        mockVerifyUserQuery.Setup(x => x.VerifyUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        mockVerifyUserQuery.Setup(x => x.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserPermissions());
 
         var loggerFactory = NullLoggerFactory.Instance;
         var encoder = System.Text.Encodings.Web.UrlEncoder.Default;
@@ -158,7 +158,7 @@ public class BasicAuthenticationHandlerTests
             computeHashMock.Object,
             mockVerifyUserQuery.Object);
 
-        var scheme = new AuthenticationScheme(AuthenticationConstants.AuthenticationType, AuthenticationConstants.AuthenticationType, typeof(BasicAuthenticationHandler));
+        var scheme = new AuthenticationScheme(AuthenticationConstants.Scheme, AuthenticationConstants.Scheme, typeof(BasicAuthenticationHandler));
 
         await sut.InitializeAsync(scheme, context);
 
@@ -175,10 +175,11 @@ public class BasicAuthenticationHandlerTests
     [InlineAutoMoqData]
     public async Task HandleAuthenticateAsync_ReturnsSuccess(
         [Frozen] Mock<IComputeHash> computeHashMock,
-        [Frozen] Mock<IVerifyUserQuery> mockVerifyUserQuery,
+        [Frozen] Mock<IGetUserPermissionsDBQuery> mockVerifyUserQuery,
         [Frozen] Mock<IOptionsMonitor<AuthenticationSchemeOptions>> mockOptionsMonitor,
         string userName,
-        string password)
+        string password,
+        List<string> permissions)
     {
         // Arrange
         var context = new DefaultHttpContext();
@@ -187,8 +188,12 @@ public class BasicAuthenticationHandlerTests
 
         mockOptionsMonitor.Setup(x => x.CurrentValue).Returns(new AuthenticationSchemeOptions());
 
-        mockVerifyUserQuery.Setup(x => x.VerifyUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        mockVerifyUserQuery.Setup(x => x.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserPermissions
+            {
+                UserName = userName,
+                Permissions = permissions
+            });
 
         var loggerFactory = NullLoggerFactory.Instance;
         var encoder = System.Text.Encodings.Web.UrlEncoder.Default;
@@ -200,7 +205,7 @@ public class BasicAuthenticationHandlerTests
             computeHashMock.Object,
             mockVerifyUserQuery.Object);
 
-        var scheme = new AuthenticationScheme(AuthenticationConstants.AuthenticationType, AuthenticationConstants.AuthenticationType, typeof(BasicAuthenticationHandler));
+        var scheme = new AuthenticationScheme(AuthenticationConstants.Scheme, AuthenticationConstants.Scheme, typeof(BasicAuthenticationHandler));
 
         await sut.InitializeAsync(scheme, context);
 
@@ -210,7 +215,7 @@ public class BasicAuthenticationHandlerTests
         // Assert
         result.Succeeded.Should().BeTrue();
         result.Ticket.Should().NotBeNull();
-        result.Ticket.AuthenticationScheme.Should().Be(AuthenticationConstants.AuthorizationScheme);
+        result.Ticket.AuthenticationScheme.Should().Be(AuthenticationConstants.Scheme);
         result.Ticket.Principal.Should().NotBeNull();
         result.Ticket.Principal.Identities.Should().HaveCount(1);
         result.Ticket.Principal.Identity.Should().NotBeNull();
@@ -218,9 +223,8 @@ public class BasicAuthenticationHandlerTests
 
         var asClaimsIdentity = result.Ticket.Principal.Identity as ClaimsIdentity;
         asClaimsIdentity.Should().NotBeNull();
-        asClaimsIdentity.AuthenticationType.Should().Be(AuthenticationConstants.AuthenticationType);
-        asClaimsIdentity.Claims.Should().HaveCount(1);
-        asClaimsIdentity.Claims.First().Type.Should().Be(ClaimTypes.Name);
-        asClaimsIdentity.Claims.First().Value.Should().Be(userName);
+        asClaimsIdentity.AuthenticationType.Should().Be(AuthenticationConstants.Scheme);
+        asClaimsIdentity.Claims.Should().HaveCount(permissions.Count);
+        asClaimsIdentity.Claims.All(x => permissions.Contains(x.Value) && x.Type == ClaimTypes.Role).Should().BeTrue();
     }
 }

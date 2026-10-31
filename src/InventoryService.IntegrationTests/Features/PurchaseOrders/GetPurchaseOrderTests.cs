@@ -18,7 +18,38 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        var purchaseOrderId = 2;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<GetPurchaseOrderResponse>();
+
+        result.Should().NotBeNull();
+
+        result.PurchaseOrderId.Should().Be(purchaseOrderId);
+        result.OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
+        result.CustomerId.Should().Be(2);
+        result.CountryId.Should().Be(2);
+
+        result.PurchaseOrderLines.Should().HaveCount(2);
+
+        result.PurchaseOrderLines.First().PurchaseOrderLineId.Should().Be(3);
+        result.PurchaseOrderLines.First().ProductId.Should().Be(1);
+        result.PurchaseOrderLines.First().OrderQuantity.Should().Be(3);
+        result.PurchaseOrderLines.First().RowNo.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetPurchaseOrder_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         var purchaseOrderId = 2;
 
@@ -49,7 +80,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsNotFound()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var purchaseOrderId = 200;
 
@@ -70,7 +101,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
     public async Task GetPurchaseOrder_ReturnsBadRequest()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var purchaseOrderId = -2;
 
@@ -106,6 +137,27 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetPurchaseOrder_ReturnsForbidden()
+    {
+        // Arrange
+        var purchaseOrderId = 2;
+
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetPurchaseOrder_ReturnsInternalServerError(Exception exception)
@@ -126,7 +178,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var purchaseOrderId = 2;
 

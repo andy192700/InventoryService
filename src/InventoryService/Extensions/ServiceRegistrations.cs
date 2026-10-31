@@ -18,7 +18,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
 
 namespace InventoryService.Extensions;
 
@@ -73,14 +72,17 @@ public static class ServiceRegistrations
         services.AddSingleton<IComputeHash, ComputeHash>();
         services.AddSingleton<IValidateOptions<HashOptions>, HashOptionsValidator>();
         services.AddSingleton<IAuthorizationHandler, AuthorizationHandler>();
-        services.AddTransient<IVerifyUserQuery, VerifyUserQuery>();
-        services.AddAuthentication(AuthenticationConstants.AuthorizationScheme)
-            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.AuthorizationScheme, null);
+        services.AddTransient<IGetUserPermissionsDBQuery, GetUserPermissionsDBQuery>();
+        services.AddAuthentication(AuthenticationConstants.Scheme)
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.Scheme, null);
         services.AddAuthorizationBuilder()
-            .AddPolicy(AuthenticationConstants.AuthorizationPolicy, policy =>
+            .AddPolicy(AuthenticationConstants.WritingAuthorizationPolicy, policy =>
             {
-                policy.RequireClaim(ClaimTypes.Name);
-                policy.AddRequirements(new AuthorizationHandlerRequirement());
+                policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Write));
+            })
+            .AddPolicy(AuthenticationConstants.ReadingAuthorizationPolicy, policy =>
+            {
+                policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Read));
             });
 
         return services;

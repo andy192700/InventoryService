@@ -1,8 +1,6 @@
-﻿using Docker.DotNet.Models;
-using FluentAssertions;
+﻿using FluentAssertions;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Health;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -18,27 +16,8 @@ public class HealthCheckTests : IntegrationTestBase
     public HealthCheckTests(IntegrationTestFixture fixture) : base(fixture) { }
 
     [Fact]
-    public async Task GetHealth_ReturnsUnauthorized()
-    {
-        // Act
-        var response = await Client.GetAsync(RequestURI);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-
-        var result = await response.Read<ProblemDetails>();
-
-        result.Should().NotBeNull();
-
-        result.Title.Should().Be("Unauthorized");
-    }
-
-    [Fact]
     public async Task GetHealth_ReturnsHealthy()
     {
-        // Arrange
-        AddBasicAuthHeader();
-
         // Act
         var response = await Client.GetAsync(RequestURI);
 
@@ -74,7 +53,6 @@ public class HealthCheckTests : IntegrationTestBase
 
             services.AddScoped(_ => repository.Object);
         };
-        AddBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);

@@ -124,3 +124,8 @@ To create a new API login, run the following:
 ```PowerShell
 doing exec -target CreateCredential -username MyUser -password MyPassword
 ```
+
+To add a role to an API login, run the following (allowed permissions are `Read` and `Write`):
+```PowerShell
+doing exec -target AddPermission -username something -permission Write
+```

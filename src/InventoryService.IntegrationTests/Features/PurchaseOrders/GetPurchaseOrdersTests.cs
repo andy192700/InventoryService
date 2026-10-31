@@ -18,7 +18,37 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetPurchaseOrdersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(5);
+
+        result.First().PurchaseOrderId.Should().Be(1);
+        result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
+        result.First().CustomerId.Should().Be(1);
+        result.First().CountryId.Should().Be(2);
+
+        result.First().PurchaseOrderLines.Should().HaveCount(2);
+
+        result.First().PurchaseOrderLines.First().PurchaseOrderLineId.Should().Be(1);
+        result.First().PurchaseOrderLines.First().ProductId.Should().Be(1);
+        result.First().PurchaseOrderLines.First().OrderQuantity.Should().Be(5);
+        result.First().PurchaseOrderLines.First().RowNo.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetPurchaseOrders_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);
@@ -48,7 +78,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductId_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var productId = 1;
 
@@ -82,7 +112,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductIdAndCountryId_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var productId = 1;
         var countryId = 2;
@@ -118,7 +148,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     public async Task GetPurchaseOrders_WithProductIdAndCountryIdAndCustomerId_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var productId = 1;
         var countryId = 2;
@@ -153,10 +183,32 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task GetPurchaseOrders_WithProductIdAndCountryIdAndCustomerId_ReturnsOkWIthNoResults()
+    {
+        // Arrange
+        AddAdminBasicAuthHeader();
+
+        var productId = 1;
+        var countryId = 2;
+        var customerId = 3;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?productId={productId}&countryId={countryId}&customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetPurchaseOrdersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(0);
+    }
+
+    [Fact]
     public async Task GetPurchaseOrders_WithProductId_ReturnsBadRequest()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var productId = -1;
 
@@ -189,6 +241,25 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetPurchaseOrders_ReturnsForbidden()
+    {
+        // Arrange
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetPurchaseOrders_ReturnsInternalServerError(Exception exception)
@@ -209,7 +280,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);

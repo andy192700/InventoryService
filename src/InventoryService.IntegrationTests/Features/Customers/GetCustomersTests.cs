@@ -18,7 +18,30 @@ public class GetCustomersTests : IntegrationTestBase
     public async Task GetCustomers_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetCustomersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(5);
+
+        result.First().CustomerId.Should().Be(1);
+        result.First().CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(30));
+        result.First().FirstName.Should().Be("John");
+        result.First().LastName.Should().Be("Smith");
+    }
+
+    [Fact]
+    public async Task GetCustomers_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);
@@ -41,7 +64,7 @@ public class GetCustomersTests : IntegrationTestBase
     public async Task GetCustomers_WithFilter_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
         var filter = "jo";
 
         // Act
@@ -64,10 +87,29 @@ public class GetCustomersTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task GetCustomers_WithFilter_ReturnsOkWithNoResults()
+    {
+        // Arrange
+        AddAdminBasicAuthHeader();
+        var filter = "WILLNOTEXIST";
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?filter={filter}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetCustomersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(0);
+    }
+
+    [Fact]
     public async Task GetCustomers_WithFilter_ReturnsBadRequest()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
         var filter = new string('A', 101);
 
         // Act
@@ -99,6 +141,25 @@ public class GetCustomersTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetCustomers_ReturnsForbidden()
+    {
+        // Arrange
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetCustomers_ReturnsInternalServerError(Exception exception)
@@ -119,7 +180,7 @@ public class GetCustomersTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);

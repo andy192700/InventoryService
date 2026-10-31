@@ -119,6 +119,27 @@ VALUES (@PurchaseOrderIdOne, @HammerGBProductCountryId, 5),
        (@PurchaseOrderIdFive, @HammerGBProductCountryId, 7),
        (@PurchaseOrderIdFive, @SawGBProductCountryId, 2);
 
+INSERT INTO governance.UserPermission
+(PermissionName)
+VALUES ('Read'),
+       ('Write')
+
 INSERT INTO governance.UserCredential
 (UserName, PasswordHash)
-VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B')
+VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B'),
+       ('user', '9880FDD674494830D0BCE6CC0A01E89C37206B7411D32417D72CD7C52D9060DB'),
+       ('noneuser', '7670DEF712C4D544F8D77BB7786F659B4C612F562676B62F228CC498D12C7D1F');
+
+DECLARE @AdminUserId INT = (SELECT UserCredentialId FROM governance.UserCredential WHERE UserName = 'admin')
+DECLARE @UsersUserId INT = (SELECT UserCredentialId FROM governance.UserCredential WHERE UserName = 'user')
+
+INSERT INTO governance.UserCredentialPermission
+(UserCredentialId, UserPermissionId)
+SELECT @AdminUserId,
+       UserPermissionId
+FROM governance.UserPermission
+UNION
+SELECT @UsersUserId,
+       UserPermissionId
+FROM governance.UserPermission
+WHERE PermissionName = 'Read'
