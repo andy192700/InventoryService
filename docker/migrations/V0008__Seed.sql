@@ -39,27 +39,21 @@ INSERT INTO warehouse.ProductCountry
     CountryId,
     UnitPrice
 )
-VALUES
--- US
-(@HammerProductId, @USCountryId, 19.99),
-(@DrillProductId, @USCountryId, 99.99),
-(@SawProductId, @USCountryId, 24.99),
-(@TapeMeasureProductId, @USCountryId, 9.99),
-(@ScrewdriverSetProductId, @USCountryId, 14.99),
-
--- GB
-(@HammerProductId, @GBCountryId, 15.99),
-(@DrillProductId, @GBCountryId, 79.99),
-(@SawProductId, @GBCountryId, 19.99),
-(@TapeMeasureProductId, @GBCountryId, 8.99),
-(@ScrewdriverSetProductId, @GBCountryId, 11.99),
-
--- FR
-(@HammerProductId, @FRCountryId, 17.99),
-(@DrillProductId, @FRCountryId, 89.99),
-(@SawProductId, @FRCountryId, 22.99),
-(@TapeMeasureProductId, @FRCountryId, 9.49),
-(@ScrewdriverSetProductId, @FRCountryId, 13.49);
+VALUES (@HammerProductId, @USCountryId, 19.99),
+       (@DrillProductId, @USCountryId, 99.99),
+       (@SawProductId, @USCountryId, 24.99),
+       (@TapeMeasureProductId, @USCountryId, 9.99),
+       (@ScrewdriverSetProductId, @USCountryId, 14.99),
+       (@HammerProductId, @GBCountryId, 15.99),
+       (@DrillProductId, @GBCountryId, 79.99),
+       (@SawProductId, @GBCountryId, 19.99),
+       (@TapeMeasureProductId, @GBCountryId, 8.99),
+       (@ScrewdriverSetProductId, @GBCountryId, 11.99),
+       (@HammerProductId, @FRCountryId, 17.99),
+       (@DrillProductId, @FRCountryId, 89.99),
+       (@SawProductId, @FRCountryId, 22.99),
+       (@TapeMeasureProductId, @FRCountryId, 9.49),
+       (@ScrewdriverSetProductId, @FRCountryId, 13.49);
 
 INSERT INTO warehouse.Customer
 (
