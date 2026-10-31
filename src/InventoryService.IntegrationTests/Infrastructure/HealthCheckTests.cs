@@ -49,11 +49,11 @@ public class HealthCheckTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.Status.Should().Be(HealthStatus.Healthy);
+        result.Status.Should().Be(HealthStatus.Healthy.ToString());
         result.Checks.Should().HaveCount(1);
         result.Checks.First().Key.Should().Be(nameof(DatabaseHealthCheck));
         result.Checks.First().Description.Should().Be("Service is healthy.");
-        result.Checks.First().Value.Should().Be(HealthStatus.Healthy);
+        result.Checks.First().Value.Should().Be(HealthStatus.Healthy.ToString());
     }
 
     [Theory]
@@ -86,10 +86,10 @@ public class HealthCheckTests : IntegrationTestBase
 
         result.Should().NotBeNull();
 
-        result.Status.Should().Be(HealthStatus.Unhealthy);
+        result.Status.Should().Be(HealthStatus.Unhealthy.ToString());
         result.Checks.Should().HaveCount(1);
         result.Checks.First().Key.Should().Be(nameof(DatabaseHealthCheck));
         result.Checks.First().Description.Should().Be("Service is unhealthy.");
-        result.Checks.First().Value.Should().Be(HealthStatus.Unhealthy);
+        result.Checks.First().Value.Should().Be(HealthStatus.Unhealthy.ToString());
     }
 }

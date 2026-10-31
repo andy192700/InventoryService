@@ -10,7 +10,7 @@ public class HealthCheckResponse
     /// <summary>
     /// The overall health check status.
     /// </summary>
-    public required HealthStatus Status { get; set; }
+    public required string Status { get; set; }
 
     /// <summary>
     /// A collection of individual health check results.
@@ -36,5 +36,5 @@ public class HealthCheckResponseCheck
     /// <summary>
     /// This health check's status.
     /// </summary>
-    public required HealthStatus Value { get; set; }
+    public required string Value { get; set; }
 }

@@ -28,12 +28,12 @@ public static class HealthCheckResponseWriter
         {
             Key = e.Key,
             Description = e.Value.Description,
-            Value = e.Value.Status
+            Value = e.Value.Status.ToString()
         }).ToList();
 
         return new HealthCheckResponse
         {
-            Status = report.Status,
+            Status = report.Status.ToString(),
             Checks = checks
         };
     }
