@@ -18,7 +18,31 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        var customerId = 3;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<GetCustomerResponse>();
+
+        result.Should().NotBeNull();
+
+        result.CustomerId.Should().Be(customerId);
+        result.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(30));
+        result.FirstName.Should().Be("Pierre");
+        result.LastName.Should().Be("Dubois");
+    }
+
+    [Fact]
+    public async Task GetCustomer_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         var customerId = 3;
 
@@ -42,7 +66,7 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsNotFound()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var customerId = 300;
 
@@ -63,7 +87,7 @@ public class GetCustomerTests : IntegrationTestBase
     public async Task GetCustomer_ReturnsBadRequest()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
         var customerId = -3;
 
         // Act
@@ -118,7 +142,7 @@ public class GetCustomerTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var customerId = 3;
 

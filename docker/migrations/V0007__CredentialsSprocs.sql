@@ -13,7 +13,7 @@ BEGIN
     SELECT up.PermissionName
     FROM governance.UserCredential uc
     JOIN governance.UserCredentialPermission ucp
-    ON ucp.UserCredentialId = ucp.UserCredentialId
+    ON ucp.UserCredentialId = uc.UserCredentialId
     JOIN governance.UserPermission up
     ON up.UserPermissionId = ucp.UserPermissionId
     WHERE uc.UserName = @UserName

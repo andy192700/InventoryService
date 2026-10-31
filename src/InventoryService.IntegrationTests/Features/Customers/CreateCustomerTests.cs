@@ -22,7 +22,7 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsOk(CreateCustomerIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
@@ -44,7 +44,7 @@ public class CreateCustomerTests : IntegrationTestBase
     public async Task CreateCustomer_ReturnsBadRequest(CreateCustomerIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
         request.FirstName = string.Empty;
 
         // Act
@@ -79,10 +79,30 @@ public class CreateCustomerTests : IntegrationTestBase
 
     [Theory]
     [InlineAutoMoqData]
+    public async Task CreateCustomer_ReturnsForbidden_WhenReadOnlyUserCalls(CreateCustomerIntRequest request)
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
+
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
     public async Task CreateCustomer_ReturnsBadRequest_WhenCustomerNameAlreadyExists(CreateCustomerIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
         request.FirstName = "John";
         request.LastName = "Smith";
 
@@ -121,7 +141,7 @@ public class CreateCustomerTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

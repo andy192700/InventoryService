@@ -8,7 +8,7 @@ public class AuthenticationConstants
     /// <summary>
     /// The applications Authorization Scheme.
     /// </summary>
-    public const string AuthorizationScheme = "Basic";
+    public const string Scheme = "Basic";
 
     /// <summary>
     /// The applications expected Authorization header key.
@@ -16,12 +16,12 @@ public class AuthenticationConstants
     public const string AuthorizationHeader = "Authorization";
 
     /// <summary>
-    /// The applications Authentication type.
+    /// The name of the application authentication policy for writing endpoints.
     /// </summary>
-    public const string AuthenticationType = "Basic";
+    public const string WritingAuthorizationPolicy = "Writing";
 
     /// <summary>
-    /// The name of the application authentication policy, required for access to all endpoints.
+    /// The name of the application authentication policy for reading endpoints.
     /// </summary>
-    public const string AuthorizationPolicy = "AccessPolicy";
+    public const string ReadingAuthorizationPolicy = "Reading";
 }

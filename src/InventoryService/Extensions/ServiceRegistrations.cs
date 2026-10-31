@@ -74,12 +74,17 @@ public static class ServiceRegistrations
         services.AddSingleton<IValidateOptions<HashOptions>, HashOptionsValidator>();
         services.AddSingleton<IAuthorizationHandler, AuthorizationHandler>();
         services.AddTransient<IGetUserPermissionsDBQuery, GetUserPermissionsDBQuery>();
-        services.AddAuthentication(AuthenticationConstants.AuthorizationScheme)
-            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.AuthorizationScheme, null);
+        services.AddAuthentication(AuthenticationConstants.Scheme)
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.Scheme, null);
         services.AddAuthorizationBuilder()
-            .AddPolicy(AuthenticationConstants.AuthorizationPolicy, policy =>
+            .AddPolicy(AuthenticationConstants.WritingAuthorizationPolicy, policy =>
             {
-                policy.RequireClaim(ClaimTypes.Name);
+                policy.RequireRole([UserPermission.Write.ToString()]);
+                policy.AddRequirements(new AuthorizationHandlerRequirement());
+            })
+            .AddPolicy(AuthenticationConstants.ReadingAuthorizationPolicy, policy =>
+            {
+                policy.RequireRole([UserPermission.Read.ToString()]);
                 policy.AddRequirements(new AuthorizationHandlerRequirement());
             });
 

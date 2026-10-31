@@ -21,7 +21,7 @@ public class CreateProductTests : IntegrationTestBase
     public async Task CreateProduct_ReturnsOk(CreateProductIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
@@ -43,7 +43,7 @@ public class CreateProductTests : IntegrationTestBase
     public async Task CreateProduct_ReturnsBadRequest(CreateProductIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.ProductName = string.Empty;
 
@@ -79,10 +79,30 @@ public class CreateProductTests : IntegrationTestBase
 
     [Theory]
     [InlineAutoMoqData]
+    public async Task CreateProduct_ReturnsForbidden_WhenReadOnlyUserCalls(CreateProductIntRequest request)
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
+
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
     public async Task CreateProduct_ReturnsBadRequest_WhenProductAlreadyExists(CreateProductIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.ProductName = "Hammer";
 
@@ -104,7 +124,7 @@ public class CreateProductTests : IntegrationTestBase
     public async Task CreateProduct_ReturnsBadRequest_WhenCountryDoesNotExist(CreateProductIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.ProductCountries!.First().CountryId = "300";
 
@@ -142,7 +162,7 @@ public class CreateProductTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

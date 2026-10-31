@@ -8,7 +8,7 @@ namespace InventoryService.Infrastructure.Auth;
 /// </summary>
 public class AuthorizationHandlerRequirement : IAuthorizationRequirement
 {
-    public string RequiredAuthenticationType { get; } = AuthenticationConstants.AuthorizationScheme;
+    public string RequiredAuthenticationType { get; } = AuthenticationConstants.Scheme;
 }
 
 /// <summary>

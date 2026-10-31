@@ -18,7 +18,29 @@ public class GetCountriesTests : IntegrationTestBase
     public async Task GetCountries_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetCountriesResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(3);
+
+        result.First().CountryId.Should().Be(1);
+        result.First().CountryCode.Should().Be("US");
+        result.First().CurrencyCode.Should().Be("USD");
+    }
+
+    [Fact]
+    public async Task GetCountries_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);
@@ -71,7 +93,7 @@ public class GetCountriesTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);

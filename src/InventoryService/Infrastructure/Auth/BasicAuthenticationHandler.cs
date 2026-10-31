@@ -40,7 +40,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         {
             var header = AuthenticationHeaderValue.Parse(authHeader!);
 
-            if (!string.Equals(header.Scheme, AuthenticationConstants.AuthenticationType, StringComparison.OrdinalIgnoreCase)
+            if (!string.Equals(header.Scheme, AuthenticationConstants.Scheme, StringComparison.OrdinalIgnoreCase)
              || string.IsNullOrWhiteSpace(header.Parameter))
             {
                 return Fail("Invalid Authorization Scheme");
@@ -59,14 +59,14 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             var passwordHash = _computeHash.Compute(credentials[1]);
 
-            var validCredentials = await _verifyUserQuery.GetPermissionsAsync(username, passwordHash, Context.RequestAborted);
+            var userPermissions = await _verifyUserQuery.GetPermissionsAsync(username, passwordHash, Context.RequestAborted);
 
-            if (string.IsNullOrWhiteSpace(validCredentials.UserName))
+            if (string.IsNullOrWhiteSpace(userPermissions.UserName))
             {
                 return Fail("Invalid Username or Password");
             }
-            
-            var claims = new[] { new Claim(ClaimTypes.Name, username) };
+
+            var claims = userPermissions.Permissions.Select(x => new Claim(ClaimTypes.Role, x)).ToArray();
             
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             

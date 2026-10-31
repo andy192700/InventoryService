@@ -25,23 +25,31 @@ public static class RouteBuilderExtensions
     {
         routeBuilder.MapHealthChecks("/health", new DatabaseHealthCheckOptions());
 
-        var group = routeBuilder
-            .MapGroup("/v1/inventory")
-            .RequireAuthorization(AuthenticationConstants.AuthorizationPolicy);
+        var group = routeBuilder.MapGroup("/v1/inventory");
 
-        group.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>);
-        group.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>);
-        group.MapPost("/product", HttpHandler.HandleAsync<CreateProductRequest, CreateProductResponse>);
+        group.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapPost("/product", HttpHandler.HandleAsync<CreateProductRequest, CreateProductResponse>)
+            .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>);
-        group.MapGet("/customer", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>);
-        group.MapPost("/customer", HttpHandler.HandleAsync<CreateCustomerRequest, CreateCustomerResponse>);
+        group.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapGet("/customer", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapPost("/customer", HttpHandler.HandleAsync<CreateCustomerRequest, CreateCustomerResponse>)
+            .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>);
-        group.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>);
-        group.MapPost("/purchase-order", HttpHandler.HandleAsync<CreatePurchaseOrderRequest, CreatePurchaseOrderResponse>);
+        group.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
+        group.MapPost("/purchase-order", HttpHandler.HandleAsync<CreatePurchaseOrderRequest, CreatePurchaseOrderResponse>)
+            .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/countries", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>);
+        group.MapGet("/countries", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>)
+            .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
 
         return routeBuilder;
     }

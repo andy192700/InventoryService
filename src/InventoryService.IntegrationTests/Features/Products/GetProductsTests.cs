@@ -18,7 +18,35 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetProductsResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(5);
+
+        result.First().ProductId.Should().Be(1);
+        result.First().CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(30));
+        result.First().ProductName.Should().Be("Hammer");
+        result.First().ProductDesc.Should().Be("16oz claw hammer");
+
+        result.First().ProductCountries.Should().HaveCount(3);
+
+        result.First().ProductCountries.First().CountryId.Should().Be(1);
+        result.First().ProductCountries.First().UnitPrice.Should().Be(19.99);
+    }
+
+    [Fact]
+    public async Task GetProducts_ReturnsOk_WhenReadOnlyUserCalls()
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);
@@ -46,7 +74,7 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsOk()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var filter = "ha";
 
@@ -78,7 +106,7 @@ public class GetProductsTests : IntegrationTestBase
     public async Task GetProducts_WithFilter_ReturnsBadRequest()
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         var filter = new string('A', 101);
 
@@ -131,7 +159,7 @@ public class GetProductsTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.GetAsync(RequestURI);

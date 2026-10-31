@@ -8,10 +8,15 @@ namespace InventoryService.IntegrationTests;
 [Collection(nameof(IntegrationTestCollection))]
 public abstract class IntegrationTestBase : IAsyncDisposable
 {
-    private const string BasicAuthHeaderValue = $"Basic YWRtaW46TXlQYXNzd29yZCE=";
+    private const string BasicAuthAdminHeaderValue = $"Basic YWRtaW46TXlQYXNzd29yZCE=";
+
+    private const string BasicAuthReadOnlyHeaderValue = $"Basic dXNlcjpNeVBhc3N3b3JkITEy";
 
     private InventoryServiceWebApplicationFactory? _webApplicationFactory;
 
+    /// <summary>
+    /// Get the test isntance's web application factory, which consumes program.cs.
+    /// </summary>
     protected InventoryServiceWebApplicationFactory WebApplicationFactory
     {
         get
@@ -27,6 +32,9 @@ public abstract class IntegrationTestBase : IAsyncDisposable
 
     private HttpClient? _client;
 
+    /// <summary>
+    /// Get an HttpClient capable of calling "real" endpoints, derived from the web application factory.
+    /// </summary>
     protected HttpClient Client
     {
         get
@@ -56,9 +64,20 @@ public abstract class IntegrationTestBase : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected void AddBasicAuthHeader()
+    /// <summary>
+    /// Adds the admin user to the current <see cref="HttpClient"/>.
+    /// </summary>
+    protected void AddAdminBasicAuthHeader()
     {
-        Client.DefaultRequestHeaders.Add(AuthenticationConstants.AuthorizationHeader, BasicAuthHeaderValue);
+        Client.DefaultRequestHeaders.Add(AuthenticationConstants.AuthorizationHeader, BasicAuthAdminHeaderValue);
+    }
+
+    /// <summary>
+    /// Adds a read only user to the current <see cref="HttpClient"/>.
+    /// </summary>
+    protected void AddReadOnlyBasicAuthHeader()
+    {
+        Client.DefaultRequestHeaders.Add(AuthenticationConstants.AuthorizationHeader, BasicAuthReadOnlyHeaderValue);
     }
 
 }

@@ -21,7 +21,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsOk(CreatePurchaseOrderIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
@@ -43,7 +43,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsBadRequest(CreatePurchaseOrderIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.CustomerId = string.Empty;
 
@@ -79,10 +79,30 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
     [Theory]
     [InlineAutoMoqData]
+    public async Task CreatePurchaseOrder_ReturnsForbidden_WhenReadOnlyUserCalls(CreatePurchaseOrderIntRequest request)
+    {
+        // Arrange
+        AddReadOnlyBasicAuthHeader();
+
+        // Act
+        var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenCustomerDoesNotExist(CreatePurchaseOrderIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.CustomerId = "300";
 
@@ -104,7 +124,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
     public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenProductIdDoesNotMatchSuppliedCountry(CreatePurchaseOrderIntRequest request)
     {
         // Arrange
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         request.lines!.First().ProductId = "300";
 
@@ -144,7 +164,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
             services.AddScoped(_ => repository.Object);
         };
 
-        AddBasicAuthHeader();
+        AddAdminBasicAuthHeader();
 
         // Act
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);

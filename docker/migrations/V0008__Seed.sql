@@ -126,12 +126,19 @@ VALUES ('Read'),
 
 INSERT INTO governance.UserCredential
 (UserName, PasswordHash)
-VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B');
+VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B'),
+       ('user', '9880FDD674494830D0BCE6CC0A01E89C37206B7411D32417D72CD7C52D9060DB');
 
-DECLARE @UserCredentialId INT = SCOPE_IDENTITY()
+DECLARE @AdminUserId INT = (SELECT UserCredentialId FROM governance.UserCredential WHERE UserName = 'admin')
+DECLARE @UsersUserId INT = (SELECT UserCredentialId FROM governance.UserCredential WHERE UserName = 'user')
 
 INSERT INTO governance.UserCredentialPermission
 (UserCredentialId, UserPermissionId)
-SELECT @UserCredentialId,
+SELECT @AdminUserId,
        UserPermissionId
 FROM governance.UserPermission
+UNION
+SELECT @UsersUserId,
+       UserPermissionId
+FROM governance.UserPermission
+WHERE PermissionName = 'Read'
