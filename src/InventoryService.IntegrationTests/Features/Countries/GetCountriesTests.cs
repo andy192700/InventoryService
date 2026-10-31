@@ -74,6 +74,25 @@ public class GetCountriesTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetCountries_ReturnsForbidden()
+    {
+        // Arrange
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync(RequestURI);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetCountries_ReturnsInternalServerError(Exception exception)

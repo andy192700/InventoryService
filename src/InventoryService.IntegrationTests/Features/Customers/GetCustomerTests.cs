@@ -122,6 +122,27 @@ public class GetCustomerTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetCustomer_ReturnsForbidden()
+    {
+        // Arrange
+        var customerId = 3;
+
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetCustomer_ReturnsInternalServerError(Exception exception)

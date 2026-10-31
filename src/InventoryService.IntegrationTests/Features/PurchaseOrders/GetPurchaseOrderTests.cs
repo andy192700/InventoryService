@@ -137,6 +137,27 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         result.Title.Should().Be("Unauthorized");
     }
 
+    [Fact]
+    public async Task GetPurchaseOrder_ReturnsForbidden()
+    {
+        // Arrange
+        var purchaseOrderId = 2;
+
+        AddNoPermissionBasicAuthHeader();
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var result = await response.Read<ProblemDetails>();
+
+        result.Should().NotBeNull();
+
+        result.Title.Should().Be("Forbidden");
+    }
+
     [Theory]
     [InlineAutoMoqData]
     public async Task GetPurchaseOrder_ReturnsInternalServerError(Exception exception)

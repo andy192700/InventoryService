@@ -12,6 +12,8 @@ public abstract class IntegrationTestBase : IAsyncDisposable
 
     private const string BasicAuthReadOnlyHeaderValue = $"Basic dXNlcjpNeVBhc3N3b3JkITEy";
 
+    private const string BasicAuthNoPermissionsHeaderValue = $"Basic bm9uZXVzZXI6TXlQYXNzd29yZDEyMyE=";
+
     private InventoryServiceWebApplicationFactory? _webApplicationFactory;
 
     /// <summary>
@@ -80,4 +82,11 @@ public abstract class IntegrationTestBase : IAsyncDisposable
         Client.DefaultRequestHeaders.Add(AuthenticationConstants.AuthorizationHeader, BasicAuthReadOnlyHeaderValue);
     }
 
+    /// <summary>
+    /// Adds a read only user to the current <see cref="HttpClient"/>.
+    /// </summary>
+    protected void AddNoPermissionBasicAuthHeader()
+    {
+        Client.DefaultRequestHeaders.Add(AuthenticationConstants.AuthorizationHeader, BasicAuthNoPermissionsHeaderValue);
+    }
 }
