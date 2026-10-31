@@ -87,6 +87,25 @@ public class GetCustomersTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task GetCustomers_WithFilter_ReturnsOkWithNoResults()
+    {
+        // Arrange
+        AddAdminBasicAuthHeader();
+        var filter = "WILLNOTEXIST";
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?filter={filter}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetCustomersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(0);
+    }
+
+    [Fact]
     public async Task GetCustomers_WithFilter_ReturnsBadRequest()
     {
         // Arrange

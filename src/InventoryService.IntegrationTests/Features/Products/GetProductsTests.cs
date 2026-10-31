@@ -102,6 +102,27 @@ public class GetProductsTests : IntegrationTestBase
         result.All(x => string.Concat(x.ProductName, x.ProductDesc).Contains(filter, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
     }
 
+
+    [Fact]
+    public async Task GetProducts_WithFilter_ReturnsOkWhenNoResultsReturned()
+    {
+        // Arrange
+        AddAdminBasicAuthHeader();
+
+        var filter = "WILLNOTEXIST";
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?filter={filter}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetProductsResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(0);
+    }
+
     [Fact]
     public async Task GetProducts_WithFilter_ReturnsBadRequest()
     {

@@ -183,6 +183,28 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task GetPurchaseOrders_WithProductIdAndCountryIdAndCustomerId_ReturnsOkWIthNoResults()
+    {
+        // Arrange
+        AddAdminBasicAuthHeader();
+
+        var productId = 1;
+        var countryId = 2;
+        var customerId = 3;
+
+        // Act
+        var response = await Client.GetAsync($"{RequestURI}?productId={productId}&countryId={countryId}&customerId={customerId}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Read<ICollection<GetPurchaseOrdersResponse>>();
+
+        result.Should().NotBeNull();
+        result.Should().HaveCount(0);
+    }
+
+    [Fact]
     public async Task GetPurchaseOrders_WithProductId_ReturnsBadRequest()
     {
         // Arrange
