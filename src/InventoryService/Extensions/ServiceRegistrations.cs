@@ -12,6 +12,7 @@ using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
+using InventoryService.Infrastructure.Health;
 using InventoryService.Infrastructure.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -47,11 +48,14 @@ public static class ServiceRegistrations
     {
         services.AddTransient<ISQLActivity, SQLActivity>();
         services.AddTransient<ISQLTransactionActivity, SQLTransactionActivity>();
+        services.AddTransient<ISQLPrimativeActivity, SQLPrimativeActivity>();
         services.AddSingleton<ISQLConnectionProvider, SQLConnectionProvider>();
         services.AddSingleton<ILocationBuilder, LocationBuilder>();
         services.AddSingleton<IValidationProblemWriter, ValidationProblemWriter>();
         services.AddHttpContextAccessor();
         services.AddProblemDetails();
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>(nameof(DatabaseHealthCheck), tags: [nameof(DatabaseHealthCheck)]);
 
         return services;
     }

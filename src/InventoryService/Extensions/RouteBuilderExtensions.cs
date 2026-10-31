@@ -10,6 +10,8 @@ using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
+using InventoryService.Infrastructure.Health;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace InventoryService.Extensions;
 
@@ -22,6 +24,9 @@ public static class RouteBuilderExtensions
     /// <returns>The builder.</returns>
     public static IEndpointRouteBuilder RegisterEndpoints(this IEndpointRouteBuilder routeBuilder)
     {
+        routeBuilder.MapHealthChecks("/health", new DatabaseHealthCheckOptions())
+            .RequireAuthorization(AuthenticationConstants.AuthorizationPolicy);
+
         var group = routeBuilder
             .MapGroup("/v1/inventory")
             .RequireAuthorization(AuthenticationConstants.AuthorizationPolicy);

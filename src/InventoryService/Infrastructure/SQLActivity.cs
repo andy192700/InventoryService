@@ -51,6 +51,12 @@ public interface ISQLTransactionActivity : ISQLActivity
 }
 
 /// <summary>
+/// Primative wrapper for the base interface <see cref="ISQLActivity"/>,
+/// used for DI purposes.
+/// </summary>
+public interface ISQLPrimativeActivity : ISQLActivity { }
+
+/// <summary>
 /// Abstract basis for facade for managing database access.
 /// </summary>
 public abstract class SQLActivityBase : IAsyncDisposable
@@ -262,6 +268,42 @@ public sealed class SQLActivity : SQLActivityBase, ISQLActivity, IAsyncDisposabl
             command,
             parameters: parameters,
             commandType: CommandType.StoredProcedure,
+            cancellationToken: cancellationToken);
+
+        return this;
+    }
+
+    /// <inheritdoc/>
+    public override async Task<TOut> CommenceAsync<TOut>(Func<CommandDefinition, DbConnection, Task<TOut>> operation)
+    {
+        return await operation(Cmd, Connection);
+    }
+
+    /// <inheritdoc/>
+    public new async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+    }
+}
+
+
+/// <summary>
+/// Concrete for facade for managing database contact.
+/// </summary>
+public sealed class SQLPrimativeActivity : SQLActivityBase, ISQLPrimativeActivity, IAsyncDisposable
+{
+    public SQLPrimativeActivity(ISQLConnectionProvider connectionProvider) : base(connectionProvider) { }
+
+    /// <inheritdoc/>
+    public override async Task<ISQLActivity> EstablishAsync(
+        string commandText,
+        CancellationToken cancellationToken,
+        object? parameters = default)
+    {
+        Cmd = new CommandDefinition(
+            commandText,
+            parameters: parameters,
+            commandType: CommandType.Text,
             cancellationToken: cancellationToken);
 
         return this;
