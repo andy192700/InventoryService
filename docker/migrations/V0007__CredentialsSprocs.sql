@@ -2,19 +2,19 @@ USE Inventory
 
 GO
 
-CREATE PROC governance.usp_VerifyCredentials @UserName VARCHAR(50), @PasswordHash NVARCHAR(255)
+CREATE PROC governance.usp_GetCredentials @UserName VARCHAR(50), @PasswordHash NVARCHAR(255)
 AS
-BEGIN
-    IF EXISTS 
-    (
-        SELECT 1
-        FROM governance.UserCredential
-        WHERE UserName = @UserName
-        AND PasswordHash = @PasswordHash
-    )
-    BEGIN
-        SELECT 1
-    END
+BEGIN   
+    SELECT uc.UserName
+    FROM governance.UserCredential uc
+    WHERE uc.UserName = @UserName
+    AND uc.PasswordHash = @PasswordHash
 
-    SELECT 0
+    SELECT up.PermissionName
+    FROM governance.UserCredential uc
+    JOIN governance.UserCredentialPermission ucp
+    ON ucp.UserCredentialId = ucp.UserCredentialId
+    JOIN governance.UserPermission up
+    ON up.UserPermissionId = ucp.UserPermissionId
+    WHERE uc.UserName = @UserName
 END

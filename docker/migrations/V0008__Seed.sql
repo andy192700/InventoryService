@@ -119,6 +119,19 @@ VALUES (@PurchaseOrderIdOne, @HammerGBProductCountryId, 5),
        (@PurchaseOrderIdFive, @HammerGBProductCountryId, 7),
        (@PurchaseOrderIdFive, @SawGBProductCountryId, 2);
 
+INSERT INTO governance.UserPermission
+(PermissionName)
+VALUES ('Read'),
+       ('Write')
+
 INSERT INTO governance.UserCredential
 (UserName, PasswordHash)
-VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B')
+VALUES ('admin', '7520E7AF019B59F4A4E79A85C5C42A53238B8A40DD4280EC0357B1CD61ED792B');
+
+DECLARE @UserCredentialId INT = SCOPE_IDENTITY()
+
+INSERT INTO governance.UserCredentialPermission
+(UserCredentialId, UserPermissionId)
+SELECT @UserCredentialId,
+       UserPermissionId
+FROM governance.UserPermission

@@ -73,7 +73,7 @@ public static class ServiceRegistrations
         services.AddSingleton<IComputeHash, ComputeHash>();
         services.AddSingleton<IValidateOptions<HashOptions>, HashOptionsValidator>();
         services.AddSingleton<IAuthorizationHandler, AuthorizationHandler>();
-        services.AddTransient<IVerifyUserQuery, VerifyUserQuery>();
+        services.AddTransient<IGetUserPermissionsDBQuery, GetUserPermissionsDBQuery>();
         services.AddAuthentication(AuthenticationConstants.AuthorizationScheme)
             .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationConstants.AuthorizationScheme, null);
         services.AddAuthorizationBuilder()

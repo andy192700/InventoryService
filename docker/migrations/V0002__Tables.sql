@@ -35,7 +35,7 @@ ALTER TABLE warehouse.Product
 ADD CONSTRAINT PK_Product
 PRIMARY KEY (ProductId)
 
-CREATE UNIQUE INDEX UX_Product_ProductName
+CREATE UNIQUE NONCLUSTERED INDEX UX_Product_ProductName
 ON warehouse.Product (ProductName)
 
 GO
@@ -60,7 +60,7 @@ ALTER TABLE warehouse.ProductCountry
 ADD CONSTRAINT FK_ProductCountry_Country
 FOREIGN KEY (CountryId) REFERENCES warehouse.Country(CountryId)
 
-CREATE UNIQUE INDEX UX_ProductCountry_ProductId_CountryId
+CREATE UNIQUE NONCLUSTERED INDEX UX_ProductCountry_ProductId_CountryId
 ON warehouse.ProductCountry (ProductId, CountryId)
 
 GO
@@ -77,7 +77,7 @@ ALTER TABLE warehouse.Customer
 ADD CONSTRAINT PK_Customer
 PRIMARY KEY (CustomerId)
 
-CREATE UNIQUE INDEX UX_Customer_FirstName_LastName
+CREATE UNIQUE NONCLUSTERED INDEX UX_Customer_FirstName_LastName
 ON warehouse.Customer (FirstName, LastName)
 
 GO
@@ -154,8 +154,23 @@ ALTER TABLE warehouse.PurchaseOrderLine
 ADD CONSTRAINT CK_PurchaseOrderLine_CountryMatch
 CHECK (warehouse.udf_PurchaseOrderCountryMatch(PurchaseOrderId, ProductCountryId) = 1)
 
-CREATE UNIQUE INDEX UX_PurchaseOrderLine_PurchaseOrderId_ProductCountryId
+CREATE UNIQUE NONCLUSTERED INDEX UX_PurchaseOrderLine_PurchaseOrderId_ProductCountryId
 ON warehouse.PurchaseOrderLine (PurchaseOrderId, ProductCountryId)
+
+GO
+
+CREATE TABLE governance.UserPermission
+(
+    UserPermissionId INT IDENTITY(1,1) NOT NULL,
+    PermissionName VARCHAR(30) NOT NULL
+)
+
+ALTER TABLE governance.UserPermission
+ADD CONSTRAINT PK_UserPermission
+PRIMARY KEY (UserPermissionId)
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_UserPermission_PermissionName
+ON governance.UserPermission (PermissionName)
 
 GO
 
@@ -170,5 +185,29 @@ ALTER TABLE governance.UserCredential
 ADD CONSTRAINT PK_UserCredential
 PRIMARY KEY (UserCredentialId)
 
-CREATE UNIQUE INDEX UX_UserCredential_UserCredentialId
+CREATE UNIQUE NONCLUSTERED INDEX UX_UserCredential_UserCredentialId
 ON governance.UserCredential (UserName)
+
+GO
+
+CREATE TABLE governance.UserCredentialPermission
+(
+    UserCredentialPermissionId INT IDENTITY(1,1) NOT NULL,
+    UserCredentialId INT NOT NULL,
+    UserPermissionId INT NOT NULL
+)
+
+ALTER TABLE governance.UserCredentialPermission
+ADD CONSTRAINT PK_UserCredentialPermission
+PRIMARY KEY (UserCredentialPermissionId)
+
+ALTER TABLE governance.UserCredentialPermission
+ADD CONSTRAINT FK_UserCredentialPermission_UserCredential
+FOREIGN KEY (UserCredentialId) REFERENCES governance.UserCredential(UserCredentialId)
+
+ALTER TABLE governance.UserCredentialPermission
+ADD CONSTRAINT FK_UserCredentialPermission_UserPermission
+FOREIGN KEY (UserPermissionId) REFERENCES governance.UserPermission(UserPermissionId)
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_UserCredentialPermission_UserCredentialId_UserPermissionId
+ON governance.UserCredentialPermission(UserCredentialId, UserPermissionId)

@@ -41,7 +41,7 @@ Target CreateCredential {
     [string] $passwordHash = [Convert]::ToHexString($hashBytes);
 
     [string] $sql = @"
-INSERT INTO dbo.[UserCredential]
+INSERT INTO governance.[UserCredential]
 (
     Username,
     PasswordHash
@@ -61,4 +61,47 @@ VALUES
     Write-Host "Created credential $username";
     Write-Host "Passwordhash: $passwordHash";
     Write-Host "Basic auth header value: $base64";
+}
+
+Target AddPermission {
+    if ([string]::IsNullOrWhiteSpace($username)) {
+        Write-Host "username has not been supplied." -ForegroundColor Red;
+
+        return;
+    }
+    
+    if ([string]::IsNullOrWhiteSpace($permission)) {
+        Write-Host "permission has not been supplied." -ForegroundColor Red;
+
+        return;
+    }
+    
+    if ($permission -ne "Write" -and $permission -ne "Read") {
+        Write-Host "permission supplied is invalid." -ForegroundColor Red;
+
+        return;
+    }
+
+        [string] $sql = @"
+DECLARE @UserPermissionId INT
+
+SELECT @UserPermissionId = UserPermissionId 
+FROM governance.UserPermission
+WHERE PermissionName = '$permission'
+
+DECLARE @UserCredentialId INT
+
+SELECT @UserCredentialId = UserCredentialId
+FROM governance.UserCredential
+WHERE UserName = '$username'
+
+INSERT INTO governance.UserCredentialPermission
+(UserCredentialId, UserPermissionId)
+VALUES (@UserCredentialId, @UserPermissionId)
+
+"@;
+
+    Invoke-Sqlcmd -ServerInstance $sqlServerInstance -Database $databaseName -Username $sqlLoginName -Password $sqlPass -TrustServerCertificate -Query $sql;
+
+    Write-Host "Granted $username $permission";
 }

@@ -14,14 +14,14 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 {
     private readonly IComputeHash _computeHash;
 
-    private readonly IVerifyUserQuery _verifyUserQuery;
+    private readonly IGetUserPermissionsDBQuery _verifyUserQuery;
 
     public BasicAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
         IComputeHash computeHash,
-        IVerifyUserQuery verifyUserQuery)
+        IGetUserPermissionsDBQuery verifyUserQuery)
         : base(options, logger, encoder) 
     {
         _computeHash = computeHash;
@@ -59,9 +59,9 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             var passwordHash = _computeHash.Compute(credentials[1]);
 
-            var validCredentials = await _verifyUserQuery.VerifyUserAsync(username, passwordHash, Context.RequestAborted);
+            var validCredentials = await _verifyUserQuery.GetPermissionsAsync(username, passwordHash, Context.RequestAborted);
 
-            if (!validCredentials)
+            if (string.IsNullOrWhiteSpace(validCredentials.UserName))
             {
                 return Fail("Invalid Username or Password");
             }
