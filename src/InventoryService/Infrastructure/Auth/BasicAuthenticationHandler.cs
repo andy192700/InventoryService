@@ -59,7 +59,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
 
             var passwordHash = _computeHash.Compute(credentials[1]);
 
-            var validCredentials = await _verifyUserQuery.VerifyUserAsync(username, passwordHash, CancellationToken.None);
+            var validCredentials = await _verifyUserQuery.VerifyUserAsync(username, passwordHash, Context.RequestAborted);
 
             if (!validCredentials)
             {
