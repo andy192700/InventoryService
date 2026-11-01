@@ -10,6 +10,7 @@ using InventoryService.Features.Products.GetProducts;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
+using InventoryService.Features.User.WhoAmI;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
 using InventoryService.Infrastructure.Health;
@@ -83,7 +84,11 @@ public static class ServiceRegistrations
             .AddPolicy(AuthenticationConstants.ReadingAuthorizationPolicy, policy =>
             {
                 policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Read));
-            });
+            })
+            .AddPolicy(AuthenticationConstants.NoAuthorizationPolicy, policy =>
+             {
+                 policy.AddRequirements(new AuthorizationHandlerRequirement());
+             });
 
         return services;
     }
@@ -167,6 +172,9 @@ public static class ServiceRegistrations
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
         services.AddScoped<IGetCountriesResponseMapper, GetCountriesResponseMapper>();
         services.AddScoped<IRequestHandler<GetCountriesRequest, Result<ICollection<GetCountriesResponse>>>, GetCountriesHandler>();
+
+        // Who Am I
+        services.AddScoped<IRequestHandler<WhoAmIRequest, Result<WhoAmIResponse>>, WhoAmIHandler>();
 
         return services;
     }

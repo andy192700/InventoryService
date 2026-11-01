@@ -10,7 +10,9 @@ public class AuthorizationHandlerRequirement : IAuthorizationRequirement
 {
     public string RequiredAuthenticationType { get; } = AuthenticationConstants.Scheme;
 
-    public UserPermission RequiredRole { get; private set; }
+    public UserPermission? RequiredRole { get; private set; }
+
+    public AuthorizationHandlerRequirement() { }
 
     public AuthorizationHandlerRequirement(UserPermission requiredRole)
     {
@@ -30,9 +32,9 @@ public class AuthorizationHandler : AuthorizationHandler<AuthorizationHandlerReq
     {
         var identity = context.User.Identity as ClaimsIdentity;
 
-        if (identity != null
+        if (identity is not null
             && identity.IsAuthenticated
-            && identity.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == requirement.RequiredRole.ToString())
+            && VerifyClaims(identity, requirement)
             && identity.AuthenticationType == requirement.RequiredAuthenticationType)
         {
             context.Succeed(requirement);
@@ -43,5 +45,17 @@ public class AuthorizationHandler : AuthorizationHandler<AuthorizationHandlerReq
         }
 
         return Task.CompletedTask;
+    }
+
+    private bool VerifyClaims(
+        ClaimsIdentity identity,
+        AuthorizationHandlerRequirement requirement)
+    {
+        if (requirement.RequiredRole is null)
+        {
+            return true;
+        }
+
+        return identity.Claims.Any(x => x.Type == ClaimTypes.Role && x.Value == requirement.RequiredRole.ToString());
     }
 }

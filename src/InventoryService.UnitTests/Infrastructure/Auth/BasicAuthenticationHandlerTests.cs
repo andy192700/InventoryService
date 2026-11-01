@@ -224,7 +224,8 @@ public class BasicAuthenticationHandlerTests
         var asClaimsIdentity = result.Ticket.Principal.Identity as ClaimsIdentity;
         asClaimsIdentity.Should().NotBeNull();
         asClaimsIdentity.AuthenticationType.Should().Be(AuthenticationConstants.Scheme);
-        asClaimsIdentity.Claims.Should().HaveCount(permissions.Count);
-        asClaimsIdentity.Claims.All(x => permissions.Contains(x.Value) && x.Type == ClaimTypes.Role).Should().BeTrue();
+        asClaimsIdentity.Claims.Should().HaveCount(permissions.Count + 1);
+        asClaimsIdentity.Claims.Count(x => x.Type == ClaimTypes.Role).Should().Be(permissions.Count);
+        asClaimsIdentity.Claims.Count(x => x.Type == ClaimTypes.Name).Should().Be(1);
     }
 }

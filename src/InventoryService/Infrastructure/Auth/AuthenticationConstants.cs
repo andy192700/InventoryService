@@ -16,12 +16,17 @@ public class AuthenticationConstants
     public const string AuthorizationHeader = "Authorization";
 
     /// <summary>
-    /// The name of the application authentication policy for writing endpoints.
+    /// The name of the application authorization policy for writing endpoints.
     /// </summary>
     public const string WritingAuthorizationPolicy = "Writing";
 
     /// <summary>
-    /// The name of the application authentication policy for reading endpoints.
+    /// The name of the application authorization policy for reading endpoints.
     /// </summary>
     public const string ReadingAuthorizationPolicy = "Reading";
+
+    /// <summary>
+    /// The name of the application authorization policy, requiring no roles.
+    /// </summary>
+    public const string NoAuthorizationPolicy = "None";
 }

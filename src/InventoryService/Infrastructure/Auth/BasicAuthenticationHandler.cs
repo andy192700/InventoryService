@@ -66,8 +66,10 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
                 return Fail("Invalid Username or Password");
             }
 
-            var claims = userPermissions.Permissions.Select(x => new Claim(ClaimTypes.Role, x)).ToArray();
-            
+            var claims = userPermissions.Permissions.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
+
+            claims.Add(new Claim(ClaimTypes.Name, userPermissions.UserName));
+
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             
             var principal = new ClaimsPrincipal(identity);

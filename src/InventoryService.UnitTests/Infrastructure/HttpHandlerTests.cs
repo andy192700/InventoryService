@@ -394,6 +394,45 @@ public class HttpHandlerTests
 
     [Theory]
     [AutoMoqData]
+    public async Task HandleAsync_Returns401_WhenUnAuthorizedErrorReturned(
+        [Frozen] Mock<IServiceProvider> mockServiceProvider,
+        TestRequest request,
+        Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
+        [Frozen] Mock<IValidationProblemWriter> mockWriter,
+        CancellationToken cancellation)
+    {
+        // Arrange
+        mockServiceProvider
+            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
+            .Returns((object?)null);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
+            .Returns(mockHandler.Object);
+
+        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
+            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+
+        mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(HttpResponses.UnauthorizedError());
+
+        // Act
+        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+            request,
+            mockServiceProvider.Object,
+            mockWriter.Object,
+            cancellation);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeAssignableTo<ProblemHttpResult>();
+
+        var problemDetails = result as ProblemHttpResult;
+        problemDetails.Should().NotBeNull();
+        problemDetails.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+    }
+
+    [Theory]
+    [AutoMoqData]
     public async Task HandleAsync_Returns500_WhenUnknownErrorReturned(
         [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,

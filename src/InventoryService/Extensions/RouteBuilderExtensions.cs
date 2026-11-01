@@ -8,6 +8,7 @@ using InventoryService.Features.Products.GetProducts;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
+using InventoryService.Features.User.WhoAmI;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
 using InventoryService.Infrastructure.Health;
@@ -25,30 +26,37 @@ public static class RouteBuilderExtensions
     {
         routeBuilder.MapHealthChecks("/health", new DatabaseHealthCheckOptions());
 
-        var group = routeBuilder.MapGroup("/v1/inventory");
+        var group = routeBuilder.MapGroup("/v1");
 
-        group.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
+        var userGroup = group.MapGroup("/user");
+
+        userGroup.MapGet("/whoami", HttpHandler.HandleAsync<WhoAmIRequest, WhoAmIResponse>)
+            .RequireAuthorization(AuthenticationConstants.NoAuthorizationPolicy);
+
+        var inventoryGroup = group.MapGroup("/inventory");
+
+        inventoryGroup.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
+        inventoryGroup.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapPost("/product", HttpHandler.HandleAsync<CreateProductRequest, CreateProductResponse>)
+        inventoryGroup.MapPost("/product", HttpHandler.HandleAsync<CreateProductRequest, CreateProductResponse>)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
+        inventoryGroup.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapGet("/customer", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
+        inventoryGroup.MapGet("/customer", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapPost("/customer", HttpHandler.HandleAsync<CreateCustomerRequest, CreateCustomerResponse>)
+        inventoryGroup.MapPost("/customer", HttpHandler.HandleAsync<CreateCustomerRequest, CreateCustomerResponse>)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
+        inventoryGroup.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
+        inventoryGroup.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        group.MapPost("/purchase-order", HttpHandler.HandleAsync<CreatePurchaseOrderRequest, CreatePurchaseOrderResponse>)
+        inventoryGroup.MapPost("/purchase-order", HttpHandler.HandleAsync<CreatePurchaseOrderRequest, CreatePurchaseOrderResponse>)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        group.MapGet("/countries", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>)
+        inventoryGroup.MapGet("/countries", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
 
         return routeBuilder;
