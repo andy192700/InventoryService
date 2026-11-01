@@ -73,6 +73,7 @@ public static class HttpHandler
         {
             NotFoundError e => Results.Problem(e.Message, statusCode: StatusCodes.Status404NotFound),
             InternalServerError e => Results.Problem(e.Message, statusCode: StatusCodes.Status500InternalServerError),
+            UnauthorizedError e => Results.Problem(statusCode: StatusCodes.Status401Unauthorized),
             _ => Results.Problem(statusCode: StatusCodes.Status500InternalServerError)
         };
     }

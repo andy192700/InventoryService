@@ -37,6 +37,9 @@ public static class HttpResponses
     /// <returns>A <see cref="Result"/> instance.</returns>
     public static Result InternalServerError(string message)
         => Result.Fail(new InternalServerError(message));
+
+    public static Result UnauthorizedError()
+        => Result.Fail(new UnauthorizedError());
 }
 
 /// <summary>
@@ -93,3 +96,8 @@ public sealed class NotFoundError(string message) : Error(message) { }
 /// </summary>
 /// <param name="message">A message detailing the problem particulars.</param>
 public sealed class InternalServerError(string message) : Error(message) { }
+
+/// <summary>
+/// A Unauthorized response.
+/// </summary>
+public sealed class UnauthorizedError() : Error() { }
