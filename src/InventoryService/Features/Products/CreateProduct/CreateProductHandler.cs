@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using InventoryService.Features.Products.GetProduct;
 using InventoryService.Infrastructure;
 using MediatR;
 
@@ -45,8 +46,8 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result
         var response = _responseMapper.Map(dbResponse);
 
         var location = _locationBuilder.Build(
-            "/v1/inventory/product",
-            QueryString.Create("productId", response.ProductId.ToString()));
+            EndpointNames.GetProduct,
+            new GetProductRequest(response.ProductId.ToString()));
 
         return HttpResponses.Created(response, location);
     }

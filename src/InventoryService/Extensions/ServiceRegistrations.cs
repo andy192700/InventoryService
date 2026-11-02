@@ -56,6 +56,7 @@ public static class ServiceRegistrations
         services.AddProblemDetails();
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>(nameof(DatabaseHealthCheck), tags: [nameof(DatabaseHealthCheck)]);
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
         return services;
     }
@@ -85,7 +86,7 @@ public static class ServiceRegistrations
             {
                 policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Read));
             })
-            .AddPolicy(AuthenticationConstants.NoAuthorizationPolicy, policy =>
+            .AddPolicy(AuthenticationConstants.NoRequiredRolesAuthorizationPolicy, policy =>
             {
                 policy.AddRequirements(new AuthorizationHandlerRequirement());
             });
@@ -105,21 +106,18 @@ public static class ServiceRegistrations
         services.AddScoped<IGetProductsResponseMapper, GetProductsResponseMapper>();
         services.AddScoped<IValidator<GetProductsRequest>, GetProductsRequestValidator>();
         services.AddScoped<IGetProductsDBParametersMapper, GetProductsDBParametersMapper>();
-        services.AddScoped<IRequestHandler<GetProductsRequest, Result<ICollection<GetProductsResponse>>>, GetProductsHandler>();
 
         // Get Product
         services.AddScoped<IGetProductDBParametersMapper, GetProductDBParametersMapper>();
         services.AddScoped<IValidator<GetProductRequest>, GetProductRequestValidator>();
         services.AddScoped<IGetProductDBQuery, GetProductDBQuery>();
         services.AddScoped<IGetProductResponseMapper, GetProductResponseMapper>();
-        services.AddScoped<IRequestHandler<GetProductRequest, Result<GetProductResponse>>, GetProductHandler>();
 
         // Create Product
         services.AddScoped<ICreateProductDBParametersMapper, CreateProductDBParametersMapper>();
         services.AddScoped<IValidator<CreateProductRequest>, CreateProductRequestValidator>();
         services.AddScoped<ICreateProductDBCommand, CreateProductDBCommand>();
         services.AddScoped<ICreateProductResponseMapper, CreateProductResponseMapper>();
-        services.AddScoped<IRequestHandler<CreateProductRequest, Result<CreateProductResponse>>, CreateProductHandler>(); 
         services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductCheckProductNameValidator>();
         services.AddScoped<DataIntegrityValidator<CreateProductRequest>, CreateProductCheckCountriesExistValidator>();
 
@@ -128,21 +126,18 @@ public static class ServiceRegistrations
         services.AddScoped<IGetCustomersResponseMapper, GetCustomersResponseMapper>();
         services.AddScoped<IGetCustomersDBParametersMapper, GetCustomersDBParametersMapper>();
         services.AddScoped<IValidator<GetCustomersRequest>, GetCustomersRequestValidator>();
-        services.AddScoped<IRequestHandler<GetCustomersRequest, Result<ICollection<GetCustomersResponse>>>, GetCustomersHandler>();
 
         // Get Customer
         services.AddScoped<IGetCustomerDBParametersMapper, GetCustomerDBParametersMapper>();
         services.AddScoped<IValidator<GetCustomerRequest>, GetCustomerRequestValidator>();
         services.AddScoped<IGetCustomerDBQuery, GetCustomerDBQuery>();
         services.AddScoped<IGetCustomerResponseMapper, GetCustomerResponseMapper>();
-        services.AddScoped<IRequestHandler<GetCustomerRequest, Result<GetCustomerResponse>>, GetCustomerHandler>();
 
         // Create Customer
         services.AddScoped<ICreateCustomerDBParametersMapper, CreateCustomerDBParametersMapper>();
         services.AddScoped<IValidator<CreateCustomerRequest>, CreateCustomerRequestValidator>();
         services.AddScoped<ICreateCustomerDBCommand, CreateCustomerDBCommand>();
         services.AddScoped<ICreateCustomerResponseMapper, CreateCustomerResponseMapper>();
-        services.AddScoped<IRequestHandler<CreateCustomerRequest, Result<CreateCustomerResponse>>, CreateCustomerHandler>();
         services.AddScoped<DataIntegrityValidator<CreateCustomerRequest>, CreateCustomerCheckCustomerNameValidator>();
 
         // Get Purchase Orders
@@ -150,31 +145,24 @@ public static class ServiceRegistrations
         services.AddScoped<IGetPurchaseOrdersDBQuery, GetPurchaseOrdersDBQuery>();
         services.AddScoped<IGetPurchaseOrdersDBParametersMapper, GetPurchaseOrdersDBParametersMapper>();
         services.AddScoped<IValidator<GetPurchaseOrdersRequest>, GetPurchaseOrdersRequestValidator>();
-        services.AddScoped<IRequestHandler<GetPurchaseOrdersRequest, Result<ICollection<GetPurchaseOrdersResponse>>>, GetPurchaseOrdersHandler>();
 
         // Get Purchase Order
         services.AddScoped<IGetPurchaseOrderDBParametersMapper, GetPurchaseOrderDBParametersMapper>();
         services.AddScoped<IValidator<GetPurchaseOrderRequest>, GetPurchaseOrderRequestValidator>();
         services.AddScoped<IGetPurchaseOrderDBQuery, GetPurchaseOrderDBQuery>();
         services.AddScoped<IGetPurchaseOrderResponseMapper, GetPurchaseOrderResponseMapper>();
-        services.AddScoped<IRequestHandler<GetPurchaseOrderRequest, Result<GetPurchaseOrderResponse>>, GetPurchaseOrderHandler>();
 
         // Create Purchase Order
         services.AddScoped<ICreatePurchaseOrderDBParametersMapper, CreatePurchaseOrderDBParametersMapper>();
         services.AddScoped<IValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderRequestValidator>();
         services.AddScoped<ICreatePurchaseOrderDBCommand, CreatePurchaseOrderDBCommand>();
         services.AddScoped<ICreatePurchaseOrderResponseMapper, CreatePurchaseOrderResponseMapper>();
-        services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>(); 
         services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckCustomerExistsValidator>();
         services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckProductCountryValidator>();
 
         // Get Countries
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
         services.AddScoped<IGetCountriesResponseMapper, GetCountriesResponseMapper>();
-        services.AddScoped<IRequestHandler<GetCountriesRequest, Result<ICollection<GetCountriesResponse>>>, GetCountriesHandler>();
-
-        // Who Am I
-        services.AddScoped<IRequestHandler<WhoAmIRequest, Result<WhoAmIResponse>>, WhoAmIHandler>();
 
         return services;
     }

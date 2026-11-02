@@ -10,7 +10,7 @@ namespace InventoryService.IntegrationTests.Features.Products;
 
 public class GetProductsTests : IntegrationTestBase
 {
-    private const string RequestURI = "/v1/inventory/products";
+    private const string RequestURI = "/v1/inventory/product";
 
     public GetProductsTests(IntegrationTestFixture fixture) : base(fixture) { }
 

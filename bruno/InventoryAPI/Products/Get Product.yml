@@ -5,11 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{API_URL}}/v1/inventory/product?productId=4"
-  params:
-    - name: productId
-      value: "4"
-      type: query
+  url: "{{API_URL}}/v1/inventory/product/4"
   auth: inherit
 
 settings:

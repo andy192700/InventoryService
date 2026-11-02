@@ -2,6 +2,7 @@
 using FluentAssertions;
 using InventoryService.Infrastructure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 
 namespace InventoryService.UnitTests.Infrastructure;
@@ -13,50 +14,87 @@ public class LocationBuilderTests
     public void Build_CreatesURIString(
         [Frozen] Mock<IHttpContextAccessor> mockHttpAccessor,
         [Frozen] Mock<HttpContext> mockHttpContext,
-        [Frozen] Mock<HttpRequest> mockHttpRequest,
-        string basePath,
-        QueryString queryString,
-        string scheme,
-        HostString hostString)
+        [Frozen] Mock<LinkGenerator> mockLinkGenerator,
+        string endPointName,
+        object requestObject,
+        string location)
     {
         // Arrange
         mockHttpAccessor.Setup(x => x.HttpContext)
             .Returns(mockHttpContext.Object);
 
-        mockHttpContext.Setup(x => x.Request)
-            .Returns(mockHttpRequest.Object);
+        mockLinkGenerator.Setup(x => x.GetUriByAddress(
+            mockHttpContext.Object,
+            endPointName,
+            It.IsAny<RouteValueDictionary>(),
+            default,
+            default,
+            default,
+            default,
+            default,
+            It.IsAny<LinkOptions>()))
+            .Returns(location);
 
-        mockHttpRequest.Setup(x => x.Scheme)
-            .Returns(scheme);
-
-        mockHttpRequest.Setup(x => x.Host)
-            .Returns(hostString);
-
-        var sut = new LocationBuilder(mockHttpAccessor.Object);
+        var sut = new LocationBuilder(mockHttpAccessor.Object, mockLinkGenerator.Object);
 
         // Act
-        var result = sut.Build($"/{basePath}", queryString);
+        var result = sut.Build(endPointName, requestObject);
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().Be($"{scheme}://{hostString}/{basePath}{queryString}");
+        result.Should().Be(location);
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public void Build_Throws_WhenContructedUriIsNUll(
+        [Frozen] Mock<IHttpContextAccessor> mockHttpAccessor,
+        [Frozen] Mock<HttpContext> mockHttpContext,
+        [Frozen] Mock<LinkGenerator> mockLinkGenerator,
+        string endPointName,
+        object requestObject)
+    {
+        // Arrange
+        mockHttpAccessor.Setup(x => x.HttpContext)
+            .Returns(mockHttpContext.Object);
+
+        mockLinkGenerator.Setup(x => x.GetUriByAddress(
+            mockHttpContext.Object,
+            endPointName,
+            It.IsAny<RouteValueDictionary>(),
+            default,
+            default,
+            default,
+            default,
+            default,
+            It.IsAny<LinkOptions>()))
+            .Returns((string?)null);
+
+        var sut = new LocationBuilder(mockHttpAccessor.Object, mockLinkGenerator.Object);
+
+        // Act
+        var func = () => sut.Build(endPointName, requestObject);
+
+        // Assert
+        func.Should().Throw<InvalidOperationException>($"Endpoint '{endPointName}' could not be resolved into a URI.");
     }
 
     [Theory]
     [InlineAutoMoqData]
     public void Build_Throws_WhenHttpContextIsNull(
         [Frozen] Mock<IHttpContextAccessor> mockHttpAccessor,
-        string basePath,
-        QueryString queryString)
+        [Frozen] Mock<LinkGenerator> mockLinkGenerator,
+        string endPointName,
+        object requestObject)
     {
         // Arrange
         mockHttpAccessor.Setup(x => x.HttpContext)
             .Returns((HttpContext?)null);
 
-        var sut = new LocationBuilder(mockHttpAccessor.Object);
+        var sut = new LocationBuilder(mockHttpAccessor.Object, mockLinkGenerator.Object);
 
         // Act
-        var func = () => sut.Build($"/{basePath}", queryString);
+        var func = () => sut.Build(endPointName, requestObject);
 
         // Assert
         func.Should().Throw<InvalidOperationException>().WithMessage("No HttpContext available.");

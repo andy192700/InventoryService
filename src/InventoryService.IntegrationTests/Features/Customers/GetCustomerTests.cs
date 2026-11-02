@@ -10,7 +10,7 @@ namespace InventoryService.IntegrationTests.Features.Customers;
 
 public class GetCustomerTests : IntegrationTestBase
 {
-    private const string RequestURI = "/v1/inventory/customer";
+    private const string RequestURI = "/v1/inventory/customer/{0}";
 
     public GetCustomerTests(IntegrationTestFixture fixture) : base(fixture) { }
 
@@ -23,7 +23,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = 3;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -47,7 +47,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = 3;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -71,7 +71,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = 300;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -91,7 +91,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = -3;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -110,7 +110,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = 3;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -131,7 +131,7 @@ public class GetCustomerTests : IntegrationTestBase
         AddNoPermissionBasicAuthHeader();
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -168,7 +168,7 @@ public class GetCustomerTests : IntegrationTestBase
         var customerId = 3;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?customerId={customerId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, customerId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);

@@ -8,5 +8,5 @@ namespace InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 /// The Purchase Order request.
 /// </summary>
 /// <param name="PurchaseOrderId">The Purchase Order Id.</param>
-public record GetPurchaseOrderRequest([FromQuery(Name = "purchaseOrderId")] string? PurchaseOrderId)
+public record GetPurchaseOrderRequest([FromRoute(Name = "purchaseOrderId")] string PurchaseOrderId)
     : IRequest<Result<GetPurchaseOrderResponse>>;

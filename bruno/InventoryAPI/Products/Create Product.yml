@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "productName": "something",
+        "productName": "somet2hing",
         "productDesc": "somethingElse",
         "productCountries": [
           {

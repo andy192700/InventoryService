@@ -36,7 +36,7 @@ public class CreateCustomerTests : IntegrationTestBase
 
         result.CustomerId.Should().BeGreaterThan(0);
 
-        response.AssertHeader("location", $"{RequestURI}?customerId={result.CustomerId}");
+        response.AssertHeader("location", $"{RequestURI}/{result.CustomerId}");
     }
 
     [Theory]

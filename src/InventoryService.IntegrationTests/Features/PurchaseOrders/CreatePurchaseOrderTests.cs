@@ -35,7 +35,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.PurchaseOrderId.Should().BeGreaterThan(0);
 
-        response.AssertHeader("location", $"{RequestURI}?purchaseOrderId={result.PurchaseOrderId}");
+        response.AssertHeader("location", $"{RequestURI}/{result.PurchaseOrderId}");
     }
 
     [Theory]

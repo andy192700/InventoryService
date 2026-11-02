@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Infrastructure;
 using MediatR;
 
@@ -45,8 +46,8 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         var response = _responseMapper.Map(dbResponse);
 
         var location = _locationBuilder.Build(
-            "/v1/inventory/purchase-order",
-            QueryString.Create("purchaseOrderId", response.PurchaseOrderId.ToString()));
+            EndpointNames.GetPurchaseOrder,
+            new GetPurchaseOrderRequest(response.PurchaseOrderId.ToString()));
 
         return HttpResponses.Created(response, location);
     }

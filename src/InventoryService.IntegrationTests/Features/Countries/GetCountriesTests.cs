@@ -10,7 +10,7 @@ namespace InventoryService.IntegrationTests.Features.Countries;
 
 public class GetCountriesTests : IntegrationTestBase
 {
-    private const string RequestURI = "/v1/inventory/countries";
+    private const string RequestURI = "/v1/inventory/country";
 
     public GetCountriesTests(IntegrationTestFixture fixture) : base(fixture) { }
 

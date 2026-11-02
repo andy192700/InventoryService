@@ -10,7 +10,7 @@ namespace InventoryService.IntegrationTests.Features.PurchaseOrders;
 
 public class GetPurchaseOrdersTests : IntegrationTestBase
 {
-    private const string RequestURI = "/v1/inventory/purchase-orders";
+    private const string RequestURI = "/v1/inventory/purchase-order";
 
     public GetPurchaseOrdersTests(IntegrationTestFixture fixture) : base(fixture) { }
 
