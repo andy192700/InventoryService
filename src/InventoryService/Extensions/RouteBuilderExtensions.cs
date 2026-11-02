@@ -36,7 +36,7 @@ public static class RouteBuilderExtensions
 
         var inventoryGroup = group.MapGroup("/inventory");
 
-        inventoryGroup.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
+        inventoryGroup.MapGet("/product", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
             .WithName(EndpointNames.GetProducts)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapGet("/product/{ProductId}", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
@@ -46,7 +46,7 @@ public static class RouteBuilderExtensions
             .WithName(EndpointNames.CreateProduct)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        inventoryGroup.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
+        inventoryGroup.MapGet("/customer", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
             .WithName(EndpointNames.GetCustomers)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapGet("/customer/{customerId}", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
@@ -56,7 +56,7 @@ public static class RouteBuilderExtensions
             .WithName(EndpointNames.CreateCustomer)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        inventoryGroup.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
+        inventoryGroup.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
             .WithName(EndpointNames.GetPurchaseOrders)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapGet("/purchase-order/{purchaseOrderId}", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
@@ -66,7 +66,7 @@ public static class RouteBuilderExtensions
             .WithName(EndpointNames.CreatePurchaseOrder)
             .RequireAuthorization(AuthenticationConstants.WritingAuthorizationPolicy);
 
-        inventoryGroup.MapGet("/countries", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>)
+        inventoryGroup.MapGet("/country", HttpHandler.HandleAsync<GetCountriesRequest, ICollection<GetCountriesResponse>>)
             .WithName(EndpointNames.GetCountries)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
 

@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{API_URL}}/v1/inventory/purchase-orders"
+  url: "{{API_URL}}/v1/inventory/purchase-order"
   params:
     - name: productId
       value: "1"

@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{API_URL}}/v1/inventory/products?filter=ha"
+  url: "{{API_URL}}/v1/inventory/product?filter=ha"
   params:
     - name: filter
       value: ha
