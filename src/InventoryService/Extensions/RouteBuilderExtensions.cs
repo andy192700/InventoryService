@@ -39,7 +39,7 @@ public static class RouteBuilderExtensions
         inventoryGroup.MapGet("/products", HttpHandler.HandleAsync<GetProductsRequest, ICollection<GetProductsResponse>>)
             .WithName(EndpointNames.GetProducts)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        inventoryGroup.MapGet("/product", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
+        inventoryGroup.MapGet("/product/{ProductId}", HttpHandler.HandleAsync<GetProductRequest, GetProductResponse>)
             .WithName(EndpointNames.GetProduct)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapPost("/product", HttpHandler.HandleAsync<CreateProductRequest, CreateProductResponse>)
@@ -49,7 +49,7 @@ public static class RouteBuilderExtensions
         inventoryGroup.MapGet("/customers", HttpHandler.HandleAsync<GetCustomersRequest, ICollection<GetCustomersResponse>>)
             .WithName(EndpointNames.GetCustomers)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        inventoryGroup.MapGet("/customer", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
+        inventoryGroup.MapGet("/customer/{customerId}", HttpHandler.HandleAsync<GetCustomerRequest, GetCustomerResponse>)
             .WithName(EndpointNames.GetCustomer)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapPost("/customer", HttpHandler.HandleAsync<CreateCustomerRequest, CreateCustomerResponse>)
@@ -59,7 +59,7 @@ public static class RouteBuilderExtensions
         inventoryGroup.MapGet("/purchase-orders", HttpHandler.HandleAsync<GetPurchaseOrdersRequest, ICollection<GetPurchaseOrdersResponse>>)
             .WithName(EndpointNames.GetPurchaseOrders)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
-        inventoryGroup.MapGet("/purchase-order", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
+        inventoryGroup.MapGet("/purchase-order/{purchaseOrderId}", HttpHandler.HandleAsync<GetPurchaseOrderRequest, GetPurchaseOrderResponse>)
             .WithName(EndpointNames.GetPurchaseOrder)
             .RequireAuthorization(AuthenticationConstants.ReadingAuthorizationPolicy);
         inventoryGroup.MapPost("/purchase-order", HttpHandler.HandleAsync<CreatePurchaseOrderRequest, CreatePurchaseOrderResponse>)

@@ -35,7 +35,7 @@ public class CreateProductTests : IntegrationTestBase
 
         result.ProductId.Should().BeGreaterThan(0);
 
-        response.AssertHeader("location", $"{RequestURI}?productid={result.ProductId}");
+        response.AssertHeader("location", $"{RequestURI}/{result.ProductId}");
     }
 
     [Theory]

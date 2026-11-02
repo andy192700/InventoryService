@@ -10,7 +10,7 @@ namespace InventoryService.IntegrationTests.Features.PurchaseOrders;
 
 public class GetPurchaseOrderTests : IntegrationTestBase
 {
-    private const string RequestURI = "/v1/inventory/purchase-order";
+    private const string RequestURI = "/v1/inventory/purchase-order/{0}";
 
     public GetPurchaseOrderTests(IntegrationTestFixture fixture) : base(fixture) { }
 
@@ -23,7 +23,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = 2;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -54,7 +54,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = 2;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -85,7 +85,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = 200;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -106,7 +106,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = -2;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -125,7 +125,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = 2;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -146,7 +146,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         AddNoPermissionBasicAuthHeader();
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -183,7 +183,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         var purchaseOrderId = 2;
 
         // Act
-        var response = await Client.GetAsync($"{RequestURI}?purchaseOrderId={purchaseOrderId}");
+        var response = await Client.GetAsync(string.Format(RequestURI, purchaseOrderId));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);

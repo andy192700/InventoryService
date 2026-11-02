@@ -8,4 +8,4 @@ namespace InventoryService.Features.Products.GetProduct;
 /// A request to retrieve a product.
 /// </summary>
 /// <param name="ProductId">The Product Id.</param>
-public record GetProductRequest([FromQuery(Name = "productId")] string? ProductId) : IRequest<Result<GetProductResponse>>;
+public record GetProductRequest([FromRoute(Name = "productId")] string ProductId) : IRequest<Result<GetProductResponse>>;
