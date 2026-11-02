@@ -28,5 +28,5 @@ public class AuthenticationConstants
     /// <summary>
     /// The name of the application authorization policy, requiring no roles.
     /// </summary>
-    public const string NoAuthorizationPolicy = "None";
+    public const string NoRequiredRolesAuthorizationPolicy = "None";
 }

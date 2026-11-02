@@ -32,7 +32,7 @@ public static class RouteBuilderExtensions
 
         userGroup.MapGet("/whoami", HttpHandler.HandleAsync<WhoAmIRequest, WhoAmIResponse>)
             .WithName(EndpointNames.WhoAmI)
-            .RequireAuthorization(AuthenticationConstants.NoAuthorizationPolicy);
+            .RequireAuthorization(AuthenticationConstants.NoRequiredRolesAuthorizationPolicy);
 
         var inventoryGroup = group.MapGroup("/inventory");
 

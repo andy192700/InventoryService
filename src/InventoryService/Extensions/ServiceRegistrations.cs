@@ -86,7 +86,7 @@ public static class ServiceRegistrations
             {
                 policy.AddRequirements(new AuthorizationHandlerRequirement(UserPermission.Read));
             })
-            .AddPolicy(AuthenticationConstants.NoAuthorizationPolicy, policy =>
+            .AddPolicy(AuthenticationConstants.NoRequiredRolesAuthorizationPolicy, policy =>
             {
                 policy.AddRequirements(new AuthorizationHandlerRequirement());
             });
