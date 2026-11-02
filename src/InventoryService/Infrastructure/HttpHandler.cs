@@ -14,11 +14,13 @@ public static class HttpHandler
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>
     /// <param name="input">An instance of the request.</param>
+    /// <param name="mediator">A <see cref="IMediator"/>, injected by DI.</param>
     /// <param name="serviceProvider">A <see cref="IServiceProvider"/>, injected by DI.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns></returns>
+    /// <returns>The handler's result, encapsualted by a task.</returns>
     public static async Task<IResult> HandleAsync<TRequest, TResponse>(
         [AsParameters] TRequest input,
+        [FromServices] IMediator mediator,
         [FromServices] IServiceProvider serviceProvider,
         [FromServices] IValidationProblemWriter validationProblemWriter,
         CancellationToken cancellationToken)
@@ -48,17 +50,15 @@ public static class HttpHandler
             }
         }
 
-        var handler = serviceProvider.GetService<IRequestHandler<TRequest, Result<TResponse>>>();
-
-        if (handler is null)
-        {
-            return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-        }
-
-        var result = await handler!.Handle(input, cancellationToken);
+        var result = await mediator.Send(input, cancellationToken);
 
         if (result.IsSuccess)
         {
+            if (result.Value is null)
+            {
+                return Results.Problem(statusCode: StatusCodes.Status404NotFound);
+            }
+
             return result switch
             {
                 IOk => Results.Ok(result.Value),

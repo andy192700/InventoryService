@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using InventoryService.Features.Customers.GetCustomer;
 using InventoryService.Infrastructure;
 using MediatR;
 
@@ -45,9 +46,9 @@ public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Resu
         var response = _responseMapper.Map(dbResponse);
 
         var location = _locationBuilder.Build(
-            "/v1/inventory/customer",
-            QueryString.Create("customerId", response.CustomerId.ToString()));
+            EndpointNames.GetCustomer,
+            new GetCustomerRequest(response.CustomerId.ToString()));
 
-        return HttpResponses.Created(response, location);
+        return HttpResponses.Created(response, location ?? string.Empty);
     }
 }
