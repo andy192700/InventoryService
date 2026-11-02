@@ -14,7 +14,6 @@ public class LocationBuilderTests
     public void Build_CreatesURIString(
         [Frozen] Mock<IHttpContextAccessor> mockHttpAccessor,
         [Frozen] Mock<HttpContext> mockHttpContext,
-        [Frozen] Mock<HttpRequest> mockHttpRequest,
         [Frozen] Mock<LinkGenerator> mockLinkGenerator,
         string endPointName,
         object requestObject,
@@ -44,6 +43,40 @@ public class LocationBuilderTests
         // Assert
         result.Should().NotBeNull();
         result.Should().Be(location);
+    }
+
+    [Theory]
+    [InlineAutoMoqData]
+    public void Build_Throws_WhenContructedUriIsNUll(
+        [Frozen] Mock<IHttpContextAccessor> mockHttpAccessor,
+        [Frozen] Mock<HttpContext> mockHttpContext,
+        [Frozen] Mock<LinkGenerator> mockLinkGenerator,
+        string endPointName,
+        object requestObject)
+    {
+        // Arrange
+        mockHttpAccessor.Setup(x => x.HttpContext)
+            .Returns(mockHttpContext.Object);
+
+        mockLinkGenerator.Setup(x => x.GetUriByAddress(
+            mockHttpContext.Object,
+            endPointName,
+            It.IsAny<RouteValueDictionary>(),
+            default,
+            default,
+            default,
+            default,
+            default,
+            It.IsAny<LinkOptions>()))
+            .Returns((string?)null);
+
+        var sut = new LocationBuilder(mockHttpAccessor.Object, mockLinkGenerator.Object);
+
+        // Act
+        var func = () => sut.Build(endPointName, requestObject);
+
+        // Assert
+        func.Should().Throw<InvalidOperationException>($"Endpoint '{endPointName}' could not be resolved into a URI.");
     }
 
     [Theory]

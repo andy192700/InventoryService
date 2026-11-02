@@ -49,6 +49,6 @@ public class CreateCustomerHandler : IRequestHandler<CreateCustomerRequest, Resu
             EndpointNames.GetCustomer,
             new GetCustomerRequest(response.CustomerId.ToString()));
 
-        return HttpResponses.Created(response, location ?? string.Empty);
+        return HttpResponses.Created(response, location);
     }
 }

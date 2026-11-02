@@ -11,7 +11,7 @@ public interface ILocationBuilder
     /// <param name="endpointName">The endpoint's name.</param>
     /// <param name="requestobject">The request object.</param>
     /// <returns>The URI.</returns>
-    string? Build(string endpointName, object requestobject);
+    string Build(string endpointName, object requestobject);
 }
 
 /// <summary>
@@ -32,7 +32,7 @@ public class LocationBuilder : ILocationBuilder
     }
 
     /// <inheritdoc/>
-    public string? Build(string endpointName, object requestobject)
+    public string Build(string endpointName, object requestobject)
     {
         var httpContext = _httpContextAccessor.HttpContext
             ?? throw new InvalidOperationException("No HttpContext available.");
@@ -45,6 +45,6 @@ public class LocationBuilder : ILocationBuilder
             {
                 LowercaseQueryStrings = true,
                 LowercaseUrls = true
-            });
+            }) ?? throw new InvalidOperationException($"Endpoint '{endpointName}' could not be resolved into a URI.");
     }
 }

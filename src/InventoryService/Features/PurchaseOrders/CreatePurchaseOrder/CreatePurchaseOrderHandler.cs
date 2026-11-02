@@ -49,6 +49,6 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
             EndpointNames.GetPurchaseOrder,
             new GetPurchaseOrderRequest(response.PurchaseOrderId.ToString()));
 
-        return HttpResponses.Created(response, location ?? string.Empty);
+        return HttpResponses.Created(response, location);
     }
 }
