@@ -15,22 +15,22 @@ public static class HttpHandler
     /// <typeparam name="TResponse">The response type.</typeparam>
     /// <param name="input">An instance of the request.</param>
     /// <param name="mediator">A <see cref="IMediator"/>, injected by DI.</param>
-    /// <param name="serviceProvider">A <see cref="IServiceProvider"/>, injected by DI.</param>
+    /// <param name="requestValidator">An optional <see cref="IValidator{TRequest}"/>, injected by DI.</param>
+    /// <param name="dataIntegrityEvaluator">An optional <see cref="IDataIntegrityEvaluator{TRequest}"/>, injected by DI.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The handler's result, encapsualted by a task.</returns>
     public static async Task<IResult> HandleAsync<TRequest, TResponse>(
         [AsParameters] TRequest input,
         [FromServices] IMediator mediator,
-        [FromServices] IServiceProvider serviceProvider,
+        [FromServices] IValidator<TRequest>? requestValidator,
+        [FromServices] IDataIntegrityEvaluator<TRequest>? dataIntegrityEvaluator,
         [FromServices] IValidationProblemWriter validationProblemWriter,
         CancellationToken cancellationToken)
         where TRequest : IRequest<Result<TResponse>>
     {
-        var validator = serviceProvider.GetService<IValidator<TRequest>>();
-
-        if (validator is not null)
+        if (requestValidator is not null)
         {
-            var validationResult = await validator.ValidateAsync(input, cancellationToken);
+            var validationResult = await requestValidator.ValidateAsync(input, cancellationToken);
 
             if (!validationResult.IsValid)
             {
@@ -38,11 +38,9 @@ public static class HttpHandler
             }
         }
 
-        var evaluator = serviceProvider.GetService<IDataIntegrityEvaluator<TRequest>>();
-
-        if (evaluator is not null)
+        if (dataIntegrityEvaluator is not null)
         {
-            var evaluationResult = await evaluator.EvaluateAsync(input, cancellationToken);
+            var evaluationResult = await dataIntegrityEvaluator.EvaluateAsync(input, cancellationToken);
 
             if (!evaluationResult.IsValid)
             {
