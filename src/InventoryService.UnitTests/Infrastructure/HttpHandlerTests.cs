@@ -18,10 +18,8 @@ public class HttpHandlerTests
     [AutoMoqData]
     public async Task HandleAsync_ReturnsValidationProblem_WhenValidationFails(
         [Frozen] Mock<IValidator<TestRequest>> mockValidator,
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler, 
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
         string failReason)
@@ -31,27 +29,18 @@ public class HttpHandlerTests
             new ValidationFailure(nameof(TestRequest.Name), failReason)
         ]);
 
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns(mockValidator.Object);
-
         mockValidator.Setup(x => x.ValidateAsync(request, cancellation))
             .ReturnsAsync(validationResult);
 
         mockWriter.Setup(x => x.Write(validationResult))
             .Returns(Results.ValidationProblem([]));
 
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            mockValidator.Object,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -67,11 +56,9 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_ReturnsDataValidationProblem_WhenValidationFails(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IDataIntegrityEvaluator<TestRequest>> mockDataEvaluator,
         [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
-        IRequestHandler<TestRequest, Result<TestResponse>> handler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
         string failReason)
@@ -80,16 +67,6 @@ public class HttpHandlerTests
         var dataValidationResult = new ValidationResult([
             new ValidationFailure(nameof(TestRequest.Name), failReason)
         ]);
-
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((IValidator<TestRequest>?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(handler);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns(mockDataEvaluator.Object);
 
         mockDataEvaluator.Setup(x => x.EvaluateAsync(request, cancellation))
             .ReturnsAsync(dataValidationResult);
@@ -101,7 +78,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            mockDataEvaluator.Object,
             mockWriter.Object,
             cancellation);
 
@@ -117,7 +95,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_ReturnsOk_WhenMediatorReturnsOk(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         [Frozen] Mock<IMediator> mockMediator,
@@ -126,16 +103,6 @@ public class HttpHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
 
@@ -146,7 +113,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -162,7 +130,6 @@ public class HttpHandlerTests
     [AutoMoqData]
     public async Task HandleAsync_ReturnsOk_WhenValidationSucceeds(
         [Frozen] Mock<IValidator<TestRequest>> mockValidator,
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         [Frozen] Mock<IMediator> mockMediator,
@@ -171,19 +138,9 @@ public class HttpHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns(mockValidator.Object);
-
         mockValidator
             .Setup(x => x.ValidateAsync(request, cancellation))
             .ReturnsAsync(new ValidationResult());
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
@@ -195,7 +152,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            mockValidator.Object,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -210,7 +168,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_ReturnsCreated_WhenMediatorReturnsCreated(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         [Frozen] Mock<IMediator> mockMediator,
@@ -220,16 +177,6 @@ public class HttpHandlerTests
         string location)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         var responseValue = HttpResponses.Created(response, location);
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
@@ -242,7 +189,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -257,28 +205,17 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_ReturnsNotFound_WhenHandlerNotRegistered(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         CancellationToken cancellation)
     {
-        // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns((IRequestHandler<TestRequest, Result<TestResponse>>)null!);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -294,7 +231,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_Returns200_WhenSuccessResultIsUnknownType(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
@@ -304,15 +240,8 @@ public class HttpHandlerTests
         // Arrange
         var response = new TestResult(new TestResponse(""));
 
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
+        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
+            .Returns(mockHandler.Object.Handle(request, cancellation));
 
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
@@ -324,7 +253,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -340,7 +270,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_Returns404_WhenNotFoundErrorReturned(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
@@ -349,16 +278,6 @@ public class HttpHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.Notfound(message));
 
@@ -369,7 +288,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -386,7 +306,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_Returns500_WhenInternalServerErrorReturned(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
@@ -395,16 +314,6 @@ public class HttpHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.InternalServerError(message));
 
@@ -415,7 +324,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -432,7 +342,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_Returns401_WhenUnAuthorizedErrorReturned(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
@@ -440,16 +349,6 @@ public class HttpHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.UnauthorizedError());
 
@@ -460,7 +359,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 
@@ -476,7 +376,6 @@ public class HttpHandlerTests
     [Theory]
     [AutoMoqData]
     public async Task HandleAsync_Returns500_WhenUnknownErrorReturned(
-        [Frozen] Mock<IServiceProvider> mockServiceProvider,
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
@@ -485,16 +384,6 @@ public class HttpHandlerTests
         IError error)
     {
         // Arrange
-        mockServiceProvider
-            .Setup(x => x.GetService(typeof(IValidator<TestRequest>)))
-            .Returns((object?)null);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IRequestHandler<TestRequest, Result<TestResponse>>)))
-            .Returns(mockHandler.Object);
-
-        mockServiceProvider.Setup(x => x.GetService(typeof(IDataIntegrityEvaluator<TestRequest>)))
-            .Returns((IDataIntegrityEvaluator<TestRequest>?)null);
-
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Fail(error));
 
@@ -505,7 +394,8 @@ public class HttpHandlerTests
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockMediator.Object,
-            mockServiceProvider.Object,
+            default,
+            default,
             mockWriter.Object,
             cancellation);
 

@@ -47,7 +47,7 @@ public interface ISQLTransactionActivity : ISQLActivity
     /// Specify an action which allows the capture and per basis usage of a SQL Exception, should one arise.
     /// </summary>
     /// <param name="onSqlException"></param>
-    void WhenCapturingSqlException(Action<SqlException> onSqlException);
+    void WhenCapturingSqlException(Action<Exception> onSqlException);
 }
 
 /// <summary>
@@ -169,12 +169,12 @@ public sealed class SQLTransactionActivity : SQLActivityBase, ISQLTransactionAct
         }
     }
 
-    private Action<SqlException>? _onSqlException;
+    private Action<Exception>? _onSqlException;
 
     /// <summary>
     /// Invoked when a <see cref="SqlException"/> manifests.
     /// </summary>
-    private Action<SqlException> OnSqlException
+    private Action<Exception> OnSqlException
     {
         get
         {
@@ -210,7 +210,7 @@ public sealed class SQLTransactionActivity : SQLActivityBase, ISQLTransactionAct
     }
 
     /// <inheritdoc/>
-    public void WhenCapturingSqlException(Action<SqlException> onSqlException)
+    public void WhenCapturingSqlException(Action<Exception> onSqlException)
         => OnSqlException = onSqlException;
 
     /// <inheritdoc/>
@@ -226,12 +226,9 @@ public sealed class SQLTransactionActivity : SQLActivityBase, ISQLTransactionAct
         }
         catch (Exception ex)
         {
-            if (ex is SqlException sqlEx)
-            {
-                OnSqlException.Invoke(sqlEx);
+            OnSqlException.Invoke(ex);
 
-                await Transaction.RollbackAsync();
-            }
+            await Transaction.RollbackAsync();
 
             throw;
         }

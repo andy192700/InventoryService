@@ -14,7 +14,7 @@ public static class SQLActivityExtensions
     /// <returns>A task of the facade type in which the operation will complete.</returns>
     public static async Task<ISQLActivity> WhenCapturingSqlException(
         this ISQLTransactionActivity activity,
-        Action<SqlException> OnSqlException)
+        Action<Exception> OnSqlException)
     {
         activity.WhenCapturingSqlException(OnSqlException);
 
