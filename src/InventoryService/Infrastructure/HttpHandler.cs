@@ -52,11 +52,6 @@ public static class HttpHandler
 
         if (result.IsSuccess)
         {
-            if (result.Value is null)
-            {
-                return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-            }
-
             return result switch
             {
                 IOk => Results.Ok(result.Value),
