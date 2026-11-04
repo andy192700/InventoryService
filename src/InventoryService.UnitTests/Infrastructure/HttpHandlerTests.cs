@@ -18,7 +18,6 @@ public class HttpHandlerTests
     [AutoMoqData]
     public async Task HandleAsync_ReturnsValidationProblem_WhenValidationFails(
         [Frozen] Mock<IValidator<TestRequest>> mockValidator,
-        [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
@@ -38,7 +37,7 @@ public class HttpHandlerTests
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            default!,
             mockValidator.Object,
             default,
             mockWriter.Object,
@@ -57,7 +56,6 @@ public class HttpHandlerTests
     [AutoMoqData]
     public async Task HandleAsync_ReturnsDataValidationProblem_WhenValidationFails(
         [Frozen] Mock<IDataIntegrityEvaluator<TestRequest>> mockDataEvaluator,
-        [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
         CancellationToken cancellation,
@@ -77,7 +75,7 @@ public class HttpHandlerTests
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            default!,
             default,
             mockDataEvaluator.Object,
             mockWriter.Object,
@@ -97,7 +95,6 @@ public class HttpHandlerTests
     public async Task HandleAsync_ReturnsOk_WhenMediatorReturnsOk(
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation)
@@ -106,13 +103,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -132,7 +126,6 @@ public class HttpHandlerTests
         [Frozen] Mock<IValidator<TestRequest>> mockValidator,
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation)
@@ -145,13 +138,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(HttpResponses.Ok(response));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             mockValidator.Object,
             default,
             mockWriter.Object,
@@ -170,7 +160,6 @@ public class HttpHandlerTests
     public async Task HandleAsync_ReturnsCreated_WhenMediatorReturnsCreated(
         [Frozen] Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         TestRequest request,
         TestResponse response,
         CancellationToken cancellation,
@@ -182,13 +171,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(responseValue);
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -204,55 +190,22 @@ public class HttpHandlerTests
 
     [Theory]
     [AutoMoqData]
-    public async Task HandleAsync_ReturnsNotFound_WhenHandlerNotRegistered(
-        [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
-        TestRequest request,
-        CancellationToken cancellation)
-    {
-        // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
-            request,
-            mockMediator.Object,
-            default,
-            default,
-            mockWriter.Object,
-            cancellation);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeAssignableTo<ProblemHttpResult>();
-
-        var problemDetails = result as ProblemHttpResult;
-        problemDetails.Should().NotBeNull();
-        problemDetails.StatusCode.Should().Be(StatusCodes.Status404NotFound);
-    }
-
-    [Theory]
-    [AutoMoqData]
     public async Task HandleAsync_Returns200_WhenSuccessResultIsUnknownType(
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         CancellationToken cancellation)
     {
         // Arrange
         var response = new TestResult(new TestResponse(""));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
-
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
 
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -273,7 +226,6 @@ public class HttpHandlerTests
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         string message,
         CancellationToken cancellation)
     {
@@ -281,13 +233,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.Notfound(message));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -309,7 +258,6 @@ public class HttpHandlerTests
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         string message,
         CancellationToken cancellation)
     {
@@ -317,13 +265,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.InternalServerError(message));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -345,20 +290,16 @@ public class HttpHandlerTests
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         CancellationToken cancellation)
     {
         // Arrange
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HttpResponses.UnauthorizedError());
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,
@@ -379,7 +320,6 @@ public class HttpHandlerTests
         TestRequest request,
         Mock<IRequestHandler<TestRequest, Result<TestResponse>>> mockHandler,
         [Frozen] Mock<IValidationProblemWriter> mockWriter,
-        [Frozen] Mock<IMediator> mockMediator,
         CancellationToken cancellation,
         IError error)
     {
@@ -387,13 +327,10 @@ public class HttpHandlerTests
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Fail(error));
 
-        mockMediator.Setup(x => x.Send(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .Returns(mockHandler.Object.Handle(request, cancellation));
-
         // Act
         var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
             request,
-            mockMediator.Object,
+            mockHandler.Object,
             default,
             default,
             mockWriter.Object,

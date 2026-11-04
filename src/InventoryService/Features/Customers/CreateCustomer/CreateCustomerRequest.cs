@@ -13,15 +13,6 @@ public record CreateCustomerRequest([FromBody] CreateCustomerRequestPayload Payl
 /// <summary>
 /// The request payload for retrieving Countries.
 /// </summary>
-public class CreateCustomerRequestPayload
-{
-    /// <summary>
-    /// The Customer's first name.
-    /// </summary>
-    public string? FirstName { get; set; }
-
-    /// <summary>
-    /// The Customer's last name.
-    /// </summary>
-    public string? LastName { get; set; }
-}
+/// <param name="FirstName">The Customer's first name.</param>
+/// <param name="LastName">The Customer's last name.</param>
+public record CreateCustomerRequestPayload(string? FirstName, string? LastName);

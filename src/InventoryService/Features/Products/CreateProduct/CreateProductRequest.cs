@@ -1,7 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace InventoryService.Features.Products.CreateProduct;
 
@@ -15,36 +14,17 @@ public record CreateProductRequest([FromBody] CreateProductRequestPayload Payloa
 /// <summary>
 /// The payload for a create product request.
 /// </summary>
-public class CreateProductRequestPayload
-{
-    /// <summary>
-    /// The product name.
-    /// </summary>
-    public string? ProductName { get; set; }
-
-    /// <summary>
-    /// The product description.
-    /// </summary>
-    public string? ProductDesc { get; set; }
-
-    /// <summary>
-    /// The countries associated with the product.
-    /// </summary>
-    public ICollection<CreateProductRequestProductCountries>? ProductCountries { get; set; }
-}
+/// <param name="ProductName">The product name.</param>
+/// <param name="ProductDesc">The product description.</param>
+/// <param name="ProductCountries">The countries associated with the product.</param>
+public record CreateProductRequestPayload(
+    string? ProductName,
+    string? ProductDesc,
+    ICollection<CreateProductRequestProductCountry>? ProductCountries);
 
 /// <summary>
 /// A country associated with the product.
 /// </summary>
-public class CreateProductRequestProductCountries
-{
-    /// <summary>
-    /// The Country's Id.
-    /// </summary>
-    public string? CountryId { get; set; }
-
-    /// <summary>
-    /// The unit price for the country.
-    /// </summary>
-    public string? UnitPrice { get; set; }
-}
+/// <param name="CountryId">The Country's Id.</param>
+/// <param name="UnitPrice">The unit price for the country.</param>
+public record CreateProductRequestProductCountry(string? CountryId, string? UnitPrice);

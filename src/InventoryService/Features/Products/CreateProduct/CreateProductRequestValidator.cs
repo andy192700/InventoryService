@@ -52,7 +52,7 @@ public class CreateProductRequestPayloadValidator : AbstractValidator<CreateProd
             .SetValidator(new CreateProductRequestProductCountriesValidator());
     }
 
-    private static bool HaveUniqueProductCountries(ICollection<CreateProductRequestProductCountries> productCountries)
+    private static bool HaveUniqueProductCountries(ICollection<CreateProductRequestProductCountry> productCountries)
     {
         var distinctCount = productCountries.Select(x => x.CountryId).Distinct().Count();
 
@@ -63,7 +63,7 @@ public class CreateProductRequestPayloadValidator : AbstractValidator<CreateProd
 /// <summary>
 /// A validator for a <see cref="CreateProductRequestProductCountries"/>
 /// </summary>
-public class CreateProductRequestProductCountriesValidator : AbstractValidator<CreateProductRequestProductCountries>
+public class CreateProductRequestProductCountriesValidator : AbstractValidator<CreateProductRequestProductCountry>
 {
     public CreateProductRequestProductCountriesValidator()
     {

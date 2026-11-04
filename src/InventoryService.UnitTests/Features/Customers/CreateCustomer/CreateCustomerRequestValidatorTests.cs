@@ -54,10 +54,10 @@ public class CreateCustomerRequestValidatorTests
         var testRequest = request with
         {
             Payload = new CreateCustomerRequestPayload
-            {
-                FirstName = firstName!,
-                LastName = request.Payload.LastName
-            }
+            (
+                FirstName: firstName!,
+                LastName: request.Payload.LastName
+            )
         };
 
         var sut = new CreateCustomerRequestValidator();
@@ -83,10 +83,10 @@ public class CreateCustomerRequestValidatorTests
         var testRequest = request with
         {
             Payload = new CreateCustomerRequestPayload
-            {
-                FirstName = firstName,
-                LastName = request.Payload.LastName
-            }
+            (
+                FirstName: firstName,
+                LastName: request.Payload.LastName
+            )
         };
 
         var sut = new CreateCustomerRequestValidator();
@@ -112,10 +112,10 @@ public class CreateCustomerRequestValidatorTests
         var testRequest = request with
         {
             Payload = new CreateCustomerRequestPayload
-            {
-                FirstName = request.Payload.FirstName,
-                LastName = lastName!
-            }
+            (
+                FirstName: request.Payload.FirstName,
+                LastName: lastName
+            )
         };
 
         var sut = new CreateCustomerRequestValidator();
@@ -141,10 +141,10 @@ public class CreateCustomerRequestValidatorTests
         var testRequest = request with
         {
             Payload = new CreateCustomerRequestPayload
-            {
-                FirstName = request.Payload.FirstName,
-                LastName = lastName
-            }
+            (
+                FirstName: request.Payload.FirstName,
+                LastName: lastName
+            )
         };
 
         var sut = new CreateCustomerRequestValidator();

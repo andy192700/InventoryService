@@ -14,14 +14,14 @@ public static class HttpHandler
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>
     /// <param name="input">An instance of the request.</param>
-    /// <param name="mediator">A <see cref="IMediator"/>, injected by DI.</param>
+    /// <param name="IRequestHandler">A <see cref="IRequestHandler"/>, injected by DI.</param>
     /// <param name="requestValidator">An optional <see cref="IValidator{TRequest}"/>, injected by DI.</param>
     /// <param name="dataIntegrityEvaluator">An optional <see cref="IDataIntegrityEvaluator{TRequest}"/>, injected by DI.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The handler's result, encapsualted by a task.</returns>
     public static async Task<IResult> HandleAsync<TRequest, TResponse>(
         [AsParameters] TRequest input,
-        [FromServices] IMediator mediator,
+        [FromServices] IRequestHandler<TRequest, Result<TResponse>> hanlder,
         [FromServices] IValidator<TRequest>? requestValidator,
         [FromServices] IDataIntegrityEvaluator<TRequest>? dataIntegrityEvaluator,
         [FromServices] IValidationProblemWriter validationProblemWriter,
@@ -48,15 +48,10 @@ public static class HttpHandler
             }
         }
 
-        var result = await mediator.Send(input, cancellationToken);
+        var result = await hanlder.Handle(input, cancellationToken);
 
         if (result.IsSuccess)
         {
-            if (result.Value is null)
-            {
-                return Results.Problem(statusCode: StatusCodes.Status404NotFound);
-            }
-
             return result switch
             {
                 IOk => Results.Ok(result.Value),

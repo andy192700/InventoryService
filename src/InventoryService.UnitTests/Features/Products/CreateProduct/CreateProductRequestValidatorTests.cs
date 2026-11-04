@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture;
+using FluentAssertions;
 using InventoryService.Features.Products.CreateProduct;
 
 namespace InventoryService.UnitTests.Features.Products.CreateProduct;
@@ -48,17 +49,24 @@ public class CreateProductRequestValidatorTests
     [InlineAutoMoqData(null!)]
     public void Validate_IsInValid_WhenProductNameIsEmpty(
         string? productName,
-        CreateProductRequest request)
+        string productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductName = productName!;
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -77,17 +85,24 @@ public class CreateProductRequestValidatorTests
     [InlineAutoMoqData(null!)]
     public void Validate_IsInValid_WhenProductDescIsEmpty(
         string? productDesc,
-        CreateProductRequest request)
+        string productName)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductDesc = productDesc!;
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -104,17 +119,26 @@ public class CreateProductRequestValidatorTests
     [Theory]
     [InlineAutoMoqData]
     public void Validate_IsInValid_WhenProductNameIsTooLong(
-        CreateProductRequest request)
+        string? productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
+        var productName = new string('A', 101);
 
-        testPayload.ProductName = new string('A', 101);
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -125,23 +149,32 @@ public class CreateProductRequestValidatorTests
         result.Should().NotBeNull();
         result.IsValid.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
-        result.Errors[0].ErrorMessage.Should().Be($"The length of 'Product Name' must be 100 characters or fewer. You entered {testPayload.ProductName.Length} characters.");
+        result.Errors[0].ErrorMessage.Should().Be($"The length of 'Product Name' must be 100 characters or fewer. You entered {productName.Length} characters.");
     }
 
     [Theory]
     [InlineAutoMoqData]
     public void Validate_IsInValid_WhenProductDescIsTooLong(
-        CreateProductRequest request)
+        string? productName)
     {
         // Arrange
-        var testPayload = request.Payload;
+        var productDesc = new string('A', 256);
 
-        testPayload.ProductDesc = new string('A', 256);
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -152,24 +185,25 @@ public class CreateProductRequestValidatorTests
         result.Should().NotBeNull();
         result.IsValid.Should().BeFalse();
         result.Errors.Should().HaveCount(1);
-        result.Errors[0].ErrorMessage.Should().Be($"The length of 'Product Desc' must be 255 characters or fewer. You entered {testPayload.ProductDesc.Length} characters.");
+        result.Errors[0].ErrorMessage.Should().Be($"The length of 'Product Desc' must be 255 characters or fewer. You entered {productDesc.Length} characters.");
     }
 
     [Theory]
     [InlineAutoMoqData]
     public void Validate_IsInValid_WhenProductCountriesIsNotSupplied(
-        CreateProductRequest request)
+        string productName,
+        string productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductCountries = null;
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
-
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                default
+            )
+        );
         var sut = new CreateProductRequestValidator();
 
         // Act
@@ -185,29 +219,30 @@ public class CreateProductRequestValidatorTests
     [Theory]
     [InlineAutoMoqData]
     public void Validate_IsInValid_WhenCountryIdsAreDuplicated(
-        CreateProductRequest request)
+        string? productName,
+        string productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductCountries = 
-        [
-            new CreateProductRequestProductCountries
-            {
-                UnitPrice = "2.3",
-                CountryId = "1"
-            },
-            new CreateProductRequestProductCountries
-            {
-                UnitPrice = "2.3",
-                CountryId = "1"
-            }
-        ];
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    ),
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: "2.3",
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -226,17 +261,25 @@ public class CreateProductRequestValidatorTests
     [InlineAutoMoqData(-1.0)]
     public void Validate_IsInValid_WhenUnitPriceIsInValid(
         double unitPrice,
-        CreateProductRequest request)
+        string productName,
+        string productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductCountries!.First().UnitPrice = unitPrice.ToString();
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: unitPrice.ToString(),
+                        CountryId: "1"
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 
@@ -255,17 +298,26 @@ public class CreateProductRequestValidatorTests
     [InlineAutoMoqData(-1)]
     public void Validate_IsInValid_WhenCountryIdIsInValid(
         int countryId,
-        CreateProductRequest request)
+        double unitPrice,
+        string productName,
+        string productDesc)
     {
         // Arrange
-        var testPayload = request.Payload;
-
-        testPayload.ProductCountries!.First().CountryId = countryId.ToString();
-
-        var testRequest = request with
-        {
-            Payload = testPayload!
-        };
+        var testRequest = new CreateProductRequest
+        (
+            new CreateProductRequestPayload
+            (
+                productName,
+                productDesc,
+                [
+                    new CreateProductRequestProductCountry
+                    (
+                        UnitPrice: unitPrice.ToString(),
+                        CountryId: countryId.ToString()
+                    )
+                ]
+            )
+        );
 
         var sut = new CreateProductRequestValidator();
 

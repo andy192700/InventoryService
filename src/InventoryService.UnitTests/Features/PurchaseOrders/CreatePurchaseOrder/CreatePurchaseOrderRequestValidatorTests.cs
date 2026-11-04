@@ -25,14 +25,14 @@ public class CreatePurchaseOrderRequestValidatorTests
     public void Validate_IsInValid_WhenPurchaseOrderLineNotSupplied()
     {
         // Arrange
-
         var request = new CreatePurchaseOrderRequest
         (
             new CreatePurchaseOrderPayload
-            {
-                CustomerId = "1",
-                CountryId = "2"
-            }
+            (
+                CustomerId: "1",
+                CountryId: "2",
+                []
+            )
         );
 
         var sut = new CreatePurchaseOrderRequestValidator();
@@ -55,23 +55,23 @@ public class CreatePurchaseOrderRequestValidatorTests
         var request = new CreatePurchaseOrderRequest
         (
             new CreatePurchaseOrderPayload
-            {
-                CustomerId = "1",
-                CountryId = "2",
-                lines = 
+            (
+                CustomerId: "1",
+                CountryId: "2",
+                lines:
                 [
                     new CreatePurchaseOrderPayloadLine
-                    {
-                        OrderQuantity = "2",
-                        ProductId = "1"
-                    },
+                    (
+                        OrderQuantity: "2",
+                        ProductId: "1"
+                    ),
                     new CreatePurchaseOrderPayloadLine
-                    {
-                        OrderQuantity = "2",
-                        ProductId = "1"
-                    }
+                    (
+                        OrderQuantity: "2",
+                        ProductId: "1"
+                    )
                 ]
-            }
+            )
         );
 
         var sut = new CreatePurchaseOrderRequestValidator();
@@ -93,20 +93,20 @@ public class CreatePurchaseOrderRequestValidatorTests
         var lines = new List<CreatePurchaseOrderPayloadLine>()
         {
             new CreatePurchaseOrderPayloadLine
-            {
-                OrderQuantity = "abc",
-                ProductId = "abc"
-            }
+            (
+                OrderQuantity: "abc",
+                ProductId: "abc"
+            )
         };
 
         var request = new CreatePurchaseOrderRequest
         (
             new CreatePurchaseOrderPayload
-            {
-                CustomerId = "abc",
-                CountryId = "abc",
-                lines = lines
-            }
+            (
+                CustomerId: "abc",
+                CountryId: "abc",
+                lines: lines
+            )
         );
 
         var sut = new CreatePurchaseOrderRequestValidator();

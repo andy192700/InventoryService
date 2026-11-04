@@ -67,25 +67,25 @@ public class CreatePurchaseOrderRequestSpecimenBuilder : ISpecimenBuilder
             var lines = new List<CreatePurchaseOrderPayloadLine>()
             {
                 new CreatePurchaseOrderPayloadLine
-                {
-                    OrderQuantity = "2",
-                    ProductId = "2"
-                },
+                (
+                    OrderQuantity: "2",
+                    ProductId: "2"
+                ),
                 new CreatePurchaseOrderPayloadLine
-                {
-                    OrderQuantity = "1",
-                    ProductId = "1"
-                }
+                (
+                    OrderQuantity: "1",
+                    ProductId: "1"
+                )
             };
 
             return new CreatePurchaseOrderRequest
             (
                 new CreatePurchaseOrderPayload
-                { 
-                    CustomerId = "2",
-                    CountryId = "1",
-                    lines = lines
-                }
+                (
+                    CustomerId: "2",
+                    CountryId: "1",
+                    lines: lines
+                )
             );
         }
 
@@ -100,28 +100,28 @@ public class CreateProductRequestSpecimenBuilder : ISpecimenBuilder
     {
         if (request is Type type && type == typeof(CreateProductRequest))
         {
-            var productCountries = new List<CreateProductRequestProductCountries>()
+            var productCountries = new List<CreateProductRequestProductCountry>()
             {
-                new CreateProductRequestProductCountries
-                {
-                    UnitPrice = "2.22",
-                    CountryId = "2"
-                },
-                new CreateProductRequestProductCountries
-                {
-                    UnitPrice = "1.1",
-                    CountryId = "1"
-                }
+                new CreateProductRequestProductCountry
+                (
+                    UnitPrice: "2.22",
+                    CountryId: "2"
+                ),
+                new CreateProductRequestProductCountry
+                (
+                    UnitPrice: "1.1",
+                    CountryId: "1"
+                )
             };
 
             return new CreateProductRequest
             (
                 new CreateProductRequestPayload
-                {
-                    ProductName = "product_name",
-                    ProductDesc = "product_desc",
-                    ProductCountries = productCountries
-                }
+                (
+                    ProductName: "product_name",
+                    ProductDesc: "product_desc",
+                    ProductCountries: productCountries
+                )
             );
         }
 
@@ -171,30 +171,30 @@ public class CreateProductDBParametersSpecimenBuilder : ISpecimenBuilder
         if (request is Type type && type == typeof(CreateProductDBParameters))
         {
             var createProductRequest = new CreateProductRequest
+            (
+                new CreateProductRequestPayload
                 (
-                    new CreateProductRequestPayload
+                    ProductName: "ProductName",
+                    ProductDesc: "ProductDesc",
+                    ProductCountries: new List<CreateProductRequestProductCountry>
                     {
-                        ProductName = "ProductName",
-                        ProductDesc = "ProductDesc",
-                        ProductCountries = new List<CreateProductRequestProductCountries>
                         {
-                            {
-                                new CreateProductRequestProductCountries
-                                {
-                                    CountryId = "1",
-                                    UnitPrice = "3.44"
-                                }
-                            },
-                            {
-                                new CreateProductRequestProductCountries
-                                {
-                                    CountryId = "2",
-                                    UnitPrice = "1.24"
-                                }
-                            }
+                            new CreateProductRequestProductCountry
+                            (
+                                CountryId: "1",
+                                UnitPrice: "3.44"
+                            )
+                        },
+                        {
+                            new CreateProductRequestProductCountry
+                            (
+                                CountryId: "2",
+                                UnitPrice: "1.24"
+                            )
                         }
                     }
-                );
+                )
+            );
 
             var productCountriesdt = new DataTable();
 
@@ -232,27 +232,27 @@ public class CreatePurchaseOrderDBParametersSpecimenBuilder : ISpecimenBuilder
             var createPurchaseOrderRequest = new CreatePurchaseOrderRequest
             (
                 new CreatePurchaseOrderPayload
-                {
-                    CountryId = "2",
-                    CustomerId = "7",
-                    lines = new List<CreatePurchaseOrderPayloadLine>
+                (
+                    CountryId: "2",
+                    CustomerId: "7",
+                    lines: new List<CreatePurchaseOrderPayloadLine>
                     {
                         {
                             new CreatePurchaseOrderPayloadLine
-                            {
-                                OrderQuantity = "75",
-                                ProductId = "4"
-                            }
+                            (
+                                OrderQuantity: "75",
+                                ProductId: "4"
+                            )
                         },
                         {
                             new CreatePurchaseOrderPayloadLine
-                            {
-                                OrderQuantity = "22",
-                                ProductId = "3"
-                            }
+                            (
+                                OrderQuantity: "22",
+                                ProductId: "3"
+                            )
                         }
                     }
-                }
+                )
             );
 
             var linesdt = new DataTable();

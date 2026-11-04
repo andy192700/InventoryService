@@ -12,36 +12,14 @@ public record CreatePurchaseOrderRequest([FromBody] CreatePurchaseOrderPayload P
 /// <summary>
 /// Payload for creating a purchase order.
 /// </summary>
-public class CreatePurchaseOrderPayload
-{
-    /// <summary>
-    /// Gets or sets the customer identifier.
-    /// </summary>
-    public string? CustomerId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the country identifier.
-    /// </summary>
-    public string? CountryId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the collection of purchase order lines.
-    /// </summary>
-    public ICollection<CreatePurchaseOrderPayloadLine>? lines { get; set; }
-}
+/// <param name="CustomerId">Gets or sets the customer identifier.</param>
+/// <param name="CountryId">Gets or sets the country identifier.</param>
+/// <param name="lines">Gets or sets the collection of purchase order lines.</param>
+public record CreatePurchaseOrderPayload(string? CustomerId, string? CountryId, ICollection<CreatePurchaseOrderPayloadLine>? lines);
 
 /// <summary>
 /// Represents a line item in a purchase order payload.
 /// </summary>
-public class CreatePurchaseOrderPayloadLine
-{
-    /// <summary>
-    /// Gets or sets the product identifier.
-    /// </summary>
-    public string? ProductId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the quantity ordered.
-    /// </summary>
-    public string? OrderQuantity { get; set; }
-}
+/// <param name="ProductId">Gets or sets the product identifier.</param>
+/// <param name="OrderQuantity">Gets or sets the quantity ordered.</param>
+public record CreatePurchaseOrderPayloadLine(string? ProductId, string? OrderQuantity);
