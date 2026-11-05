@@ -39,10 +39,10 @@ public class CreatePurchaseOrderDBParametersMapper : ICreatePurchaseOrderDBParam
         }
 
         return new CreatePurchaseOrderDBParameters
-        {
-            CountryId = int.Parse(request.Payload.CountryId!),
-            CustomerId = int.Parse(request.Payload.CustomerId!),
-            Lines = linesdt
-        };
+        (
+            CountryId: int.Parse(request.Payload.CountryId!),
+            CustomerId: int.Parse(request.Payload.CustomerId!),
+            Lines: linesdt
+        );
     }
 }

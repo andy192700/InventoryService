@@ -3,10 +3,8 @@
 /// <summary>
 /// Parameters for the database call for listing customers.
 /// </summary>
-public class GetCustomersDBParameters
-{
-    /// <summary>
-    /// the search filter.
-    /// </summary>
-    public string? Filter { get; set; }
-}
+/// <param name="Filter">The search filter.</param>
+public record GetCustomersDBParameters
+(
+    string? Filter
+);

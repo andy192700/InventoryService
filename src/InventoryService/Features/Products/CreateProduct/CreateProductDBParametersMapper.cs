@@ -39,10 +39,10 @@ public class CreateProductDBParametersMapper : ICreateProductDBParametersMapper
         }
 
         return new CreateProductDBParameters
-        {
-            ProductName = request.Payload.ProductName!,
-            ProductDesc = request.Payload.ProductDesc!,
-            ProductCountries = productCountriesdt
-        };
+        (
+            ProductName: request.Payload.ProductName!,
+            ProductDesc: request.Payload.ProductDesc!,
+            ProductCountries: productCountriesdt
+        );
     }
 }

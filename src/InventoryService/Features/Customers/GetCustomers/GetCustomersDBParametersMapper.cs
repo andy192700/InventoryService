@@ -22,8 +22,8 @@ public class GetCustomersDBParametersMapper : IGetCustomersDBParametersMapper
     public GetCustomersDBParameters Map(GetCustomersRequest request)
     {
         return new GetCustomersDBParameters
-        {
-            Filter = request.Filter
-        };
+        (
+            Filter: request.Filter
+        );
     }
 }

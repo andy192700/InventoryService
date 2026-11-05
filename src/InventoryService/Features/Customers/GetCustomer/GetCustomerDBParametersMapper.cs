@@ -22,8 +22,8 @@ public class GetCustomerDBParametersMapper : IGetCustomerDBParametersMapper
     public GetCustomerDBParameters Map(GetCustomerRequest request)
     {
         return new GetCustomerDBParameters
-        {
-            CustomerId = int.Parse(request.CustomerId!)
-        };
+        (
+            CustomerId: int.Parse(request.CustomerId!)
+        );
     }
 }
