@@ -3,46 +3,27 @@
 /// <summary>
 /// A response containing a product's details.
 /// </summary>
-public class GetProductsResponse
-{
-    /// <summary>
-    /// The Product's Id.
-    /// </summary>
-    public int ProductId { get; set; }
-
-    /// <summary>
-    /// The date and time the customer was created.
-    /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
-
-    /// <summary>
-    /// The Product's Name.
-    /// </summary>
-    public string ProductName { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The Product's Description.
-    /// </summary>
-    public string ProductDesc { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The Product Countries.
-    /// </summary>
-    public ICollection<GetProductCountriesResponse> ProductCountries { get; set; } = [];
-}
+/// <param name="ProductId">The Product's Id.</param>
+/// <param name="CreatedDate">The date and time the customer was created.</param>
+/// <param name="ProductName">The Product's Name.</param>
+/// <param name="ProductDesc">The Product's Description.</param>
+/// <param name="ProductCountries">The Product Countries.</param>
+public record GetProductsResponse
+(
+    int ProductId,
+    DateTimeOffset CreatedDate,
+    string ProductName,
+    string ProductDesc,
+    ICollection<GetProductsCountriesResponse> ProductCountries
+);
 
 /// <summary>
-/// Represents a Product's price per Country of origin.
+/// Contains a Product's per country pricing.
 /// </summary>
-public class GetProductCountriesResponse
-{
-    /// <summary>
-    /// The Country Id.
-    /// </summary>
-    public int CountryId { get; set; }
-
-    /// <summary>
-    /// The Unit Price of the parent product in the specified country.
-    /// </summary>
-    public double UnitPrice { get; set; }
-}
+/// <param name="CountryId">The Country Id.</param>
+/// <param name="UnitPrice">The Unit Price of the parent product in the specified country.</param>
+public record GetProductsCountriesResponse
+(
+    int CountryId,
+    double UnitPrice
+);

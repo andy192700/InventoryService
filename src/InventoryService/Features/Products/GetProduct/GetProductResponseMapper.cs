@@ -21,22 +21,25 @@ public class GetProductResponseMapper : IGetProductResponseMapper
     /// <inheritdoc/>
     public GetProductResponse Map(GetProductDBResponse getProductDBResponse)
     {
-        var product = new GetProductResponse
-        {
-            ProductId = getProductDBResponse.Product!.ProductId,
-            CreatedDate = getProductDBResponse.Product.CreatedDate,
-            ProductName = getProductDBResponse.Product.ProductName,
-            ProductDesc = getProductDBResponse.Product.ProductDesc
-        };
+        var productCountries = new List<GetProductCountriesResponse>();
 
         foreach (var productCountry in getProductDBResponse.ProductCountries)
         {
-            product.ProductCountries.Add(new GetProductCountriesResponse
-            {
-                CountryId = productCountry.CountryId,
-                UnitPrice = productCountry.UnitPrice
-            });
+            productCountries.Add(new GetProductCountriesResponse
+            (
+                CountryId: productCountry.CountryId,
+                UnitPrice: productCountry.UnitPrice
+            ));
         }
+
+        var product = new GetProductResponse
+        (
+            ProductId: getProductDBResponse.Product!.ProductId,
+            CreatedDate: getProductDBResponse.Product.CreatedDate,
+            ProductName: getProductDBResponse.Product.ProductName,
+            ProductDesc: getProductDBResponse.Product.ProductDesc,
+            ProductCountries: productCountries
+        );
 
         return product;
     }

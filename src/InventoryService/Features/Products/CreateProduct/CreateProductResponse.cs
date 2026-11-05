@@ -3,10 +3,8 @@
 /// <summary>
 /// A response after successfully creating a new product.
 /// </summary>
-public class CreateProductResponse
-{
-    /// <summary>
-    /// The Product's Id.
-    /// </summary>
-    public int ProductId { get; set; }
-}
+/// <param name="ProductId">The Product's Id.</param>
+public record CreateProductResponse
+(
+    int ProductId
+);

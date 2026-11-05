@@ -21,31 +21,38 @@ public class GetProductsResponseMapper : IGetProductsResponseMapper
     /// <inheritdoc/>
     public ICollection<GetProductsResponse> Map(GetProductsDBResponse getProductsDBResponse)
     {
+        var productCountries = new Dictionary<int, List<GetProductsCountriesResponse>>();
+
+        foreach (var product in getProductsDBResponse.Products)
+        {
+            var items = getProductsDBResponse.ProductCountries.Where(x => x.ProductId == product.ProductId);
+
+            var productCountryCollection = new List<GetProductsCountriesResponse>();
+
+            foreach (var productCountry in items)
+            {
+                productCountryCollection.Add(new GetProductsCountriesResponse
+                (
+                    CountryId: productCountry.CountryId,
+                    UnitPrice: productCountry.UnitPrice
+                ));
+            }
+
+            productCountries.TryAdd(product.ProductId, productCountryCollection);
+        }
+
         var products = new List<GetProductsResponse>();
 
         foreach (var product in getProductsDBResponse.Products)
         {
             products.Add(new GetProductsResponse
-            {
-                ProductId = product.ProductId,
-                CreatedDate = product.CreatedDate,
-                ProductName = product.ProductName,
-                ProductDesc = product.ProductDesc
-            });
-        }
-
-        foreach (var product in products)
-        {
-            var productCountries = getProductsDBResponse.ProductCountries.Where(x => x.ProductId == product.ProductId);
-
-            foreach (var productCountry in productCountries)
-            {
-                product.ProductCountries.Add(new GetProductCountriesResponse
-                {
-                    CountryId = productCountry.CountryId,
-                    UnitPrice = productCountry.UnitPrice
-                });
-            }
+            (
+                ProductId: product.ProductId,
+                CreatedDate: product.CreatedDate,
+                ProductName: product.ProductName,
+                ProductDesc: product.ProductDesc,
+                ProductCountries: productCountries[product.ProductId]
+            ));
         }
 
         return products;
