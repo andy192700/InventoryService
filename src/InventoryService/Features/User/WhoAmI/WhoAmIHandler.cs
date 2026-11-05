@@ -44,9 +44,9 @@ public class WhoAmIHandler : IRequestHandler<WhoAmIRequest, Result<WhoAmIRespons
         var roles = identity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
 
         return Task.FromResult((Result<WhoAmIResponse>)RequestHandlerResponses.Ok(new WhoAmIResponse
-        {
-            UserName = userName,
-            Roles = roles
-        }));
+        (
+            UserName: userName,
+            Roles: roles
+        )));
     }
 }

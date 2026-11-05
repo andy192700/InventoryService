@@ -3,56 +3,31 @@
 /// <summary>
 /// A Purchase Order response.
 /// </summary>
-public class GetPurchaseOrderResponse
-{
-    /// <summary>
-    /// The Purchase Order Id.
-    /// </summary>
-    public int PurchaseOrderId { get; set; }
-
-    /// <summary>
-    /// The date and time when the order was created.
-    /// </summary>
-    public DateTimeOffset OrderDate { get; set; }
-
-    /// <summary>
-    /// The Customer Id.
-    /// </summary>
-    public int CustomerId { get; set; }
-
-    /// <summary>
-    /// The Country Id.
-    /// </summary>
-    public int CountryId { get; set; }
-
-    /// <summary>
-    /// A collection of purchase order lines.
-    /// </summary>
-    public required ICollection<GetPurchaseOrderLineResponse> PurchaseOrderLines { get; set; }
-}
+/// <param name="PurchaseOrderId">The Purchase Order Id.</param>
+/// <param name="OrderDate">The date and time when the order was created.</param>
+/// <param name="CustomerId">The Customer Id.</param>
+/// <param name="CountryId">The Country Id.</param>
+/// <param name="PurchaseOrderLines">A collection of purchase order lines.</param>
+public record GetPurchaseOrderResponse
+(
+    int PurchaseOrderId,
+    DateTimeOffset OrderDate,
+    int CustomerId,
+    int CountryId,
+    ICollection<GetPurchaseOrderLineResponse> PurchaseOrderLines
+);
 
 /// <summary>
 /// A purchase order line.
 /// </summary>
-public class GetPurchaseOrderLineResponse
-{
-    /// <summary>
-    /// The Purchase Order Line Id.
-    /// </summary>
-    public int PurchaseOrderLineId { get; set; }
-
-    /// <summary>
-    /// The Product Id.
-    /// </summary>
-    public int ProductId { get; set; }
-
-    /// <summary>
-    /// The Order Quantity.
-    /// </summary>
-    public int OrderQuantity { get; set; }
-
-    /// <summary>
-    /// The Row Number.
-    /// </summary>
-    public int RowNo { get; set; }
-}
+/// <param name="PurchaseOrderLineId">The Purchase Order Line Id.</param>
+/// <param name="ProductId">The Product Id.</param>
+/// <param name="OrderQuantity">The Order Quantity.</param>
+/// <param name="RowNo">The Row Number.</param>
+public record GetPurchaseOrderLineResponse
+(
+    int PurchaseOrderLineId,
+    int ProductId,
+    int OrderQuantity,
+    int RowNo
+);

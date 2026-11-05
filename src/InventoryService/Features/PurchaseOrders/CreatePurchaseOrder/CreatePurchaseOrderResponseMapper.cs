@@ -22,8 +22,8 @@ public class CreatePurchaseOrderResponseMapper : ICreatePurchaseOrderResponseMap
     public CreatePurchaseOrderResponse Map(CreatePurchaseOrderDBResponse dbResponse)
     {
         return new CreatePurchaseOrderResponse
-        {
-            PurchaseOrderId = dbResponse.PurchaseOrderId
-        };
+        (
+            PurchaseOrderId: dbResponse.PurchaseOrderId
+        );
     }
 }

@@ -123,7 +123,6 @@ public class WhoAmIHandlerTests
         [Frozen] Mock<IHttpContextAccessor> mockAccessor,
         [Frozen] Mock<HttpContext> mockContext,
         WhoAmIRequest request,
-        string authType,
         List<string> userPermissions,
         string userName,
         string scheme,
