@@ -146,7 +146,7 @@ public class BasicAuthenticationHandlerTests
         mockOptionsMonitor.Setup(x => x.CurrentValue).Returns(new AuthenticationSchemeOptions());
 
         mockVerifyUserQuery.Setup(x => x.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new UserPermissions());
+            .ReturnsAsync(new UserPermissions(default, []));
 
         var loggerFactory = NullLoggerFactory.Instance;
         var encoder = System.Text.Encodings.Web.UrlEncoder.Default;
@@ -190,10 +190,10 @@ public class BasicAuthenticationHandlerTests
 
         mockVerifyUserQuery.Setup(x => x.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserPermissions
-            {
-                UserName = userName,
-                Permissions = permissions
-            });
+            (
+                UserName: userName,
+                Permissions: permissions
+            ));
 
         var loggerFactory = NullLoggerFactory.Instance;
         var encoder = System.Text.Encodings.Web.UrlEncoder.Default;

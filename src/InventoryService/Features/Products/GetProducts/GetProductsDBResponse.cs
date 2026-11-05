@@ -17,48 +17,29 @@ public class GetProductsDBResponse
 }
 
 /// <summary>
-/// A product response, retrieved from the database
+/// A database response containing a product's details.
 /// </summary>
-public class GetProductsDBProductsResponse
-{
-    /// <summary>
-    /// The Product's Id.
-    /// </summary>
-    public int ProductId { get; set; }
-
-    /// <summary>
-    /// The date and time the product was created.
-    /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
-
-    /// <summary>
-    /// The product name.
-    /// </summary>
-    public string ProductName { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The product description.
-    /// </summary>
-    public string ProductDesc { get; set; } = string.Empty;
-}
+/// <param name="ProductId">The Product's Id.</param>
+/// <param name="CreatedDate">The date and time the product was created.</param>
+/// <param name="ProductName">The product name.</param>
+/// <param name="ProductDesc">The product description.</param>
+public record GetProductsDBProductsResponse
+(
+    int ProductId,
+    DateTimeOffset CreatedDate,
+    string ProductName,
+    string ProductDesc
+);
 
 /// <summary>
-/// A product countries response, retrieved from the database
+/// A database response item containing product country details.
 /// </summary>
-public class GetProductsDbProductCountriesResponse
-{
-    /// <summary>
-    /// The Product's Id.
-    /// </summary>
-    public int ProductId { get; set; }
-
-    /// <summary>
-    /// The Country's Id.
-    /// </summary>
-    public int CountryId { get; set; }
-
-    /// <summary>
-    /// The unit price for the country.
-    /// </summary>
-    public double UnitPrice { get; set; }
-}
+/// <param name="ProductId">The Product Id.</param>
+/// <param name="CountryId">The Country's Id.</param>
+/// <param name="UnitPrice">The unit price for the country.</param>
+public record GetProductsDbProductCountriesResponse
+(
+    int ProductId,
+    int CountryId,
+    decimal UnitPrice
+);

@@ -31,7 +31,7 @@ public class GetProductsResponseMapperTests
             {
                 dbResponse.ProductCountries.Any(x =>
                        x.ProductId == product.ProductId
-                    && x.UnitPrice == productCountry.UnitPrice
+                    && (double)x.UnitPrice == productCountry.UnitPrice
                     && x.CountryId == productCountry.CountryId).Should().BeTrue();
             }
         }

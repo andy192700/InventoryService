@@ -51,10 +51,10 @@ public class GetUserPermissionsDBQuery : IGetUserPermissionsDBQuery
             var permissions = (await result.ReadAsync<string>()).ToList();
 
             return new UserPermissions
-            {
-                UserName = userName,
-                Permissions = permissions
-            };
+            (
+                UserName: userName,
+                Permissions: permissions
+            );
         });
     }
 }

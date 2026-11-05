@@ -55,6 +55,6 @@ public class CreateCustomerDBCommand : ICreateCustomerDBCommand
             return await connection.ExecuteScalarAsync<int>(cmd);
         });
 
-        return new CreateCustomerDBResponse { CustomerId = customerId };
+        return new CreateCustomerDBResponse ( CustomerId: customerId );
     }
 }

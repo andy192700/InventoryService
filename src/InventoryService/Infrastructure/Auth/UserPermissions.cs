@@ -3,18 +3,13 @@
 /// <summary>
 /// Contains details regarding a user.
 /// </summary>
-public class UserPermissions
-{
-    /// <summary>
-    /// The user's username.
-    /// </summary>
-    public string? UserName { get; set; }
-
-    /// <summary>
-    /// The user's permissions.
-    /// </summary>
-    public ICollection<string> Permissions { get; set; } = [];
-}
+/// <param name="UserName">The user's username.</param>
+/// <param name="Permissions">The user's permissions.</param>
+public record UserPermissions
+(
+    string? UserName,
+    ICollection<string> Permissions
+);
 
 /// <summary>
 /// Enum containing all available user permissions, available at compile time.
