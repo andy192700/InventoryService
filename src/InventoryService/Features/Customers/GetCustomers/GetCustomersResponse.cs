@@ -3,25 +3,14 @@
 /// <summary>
 /// A response containing a customer's details.
 /// </summary>
-public class GetCustomersResponse
-{
-    /// <summary>
-    /// The Customer's Id.
-    /// </summary>
-    public int CustomerId { get; set; }
-
-    /// <summary>
-    /// The date and time the customer was created.
-    /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
-
-    /// <summary>
-    /// The Customer's first name.
-    /// </summary>
-    public required string FirstName { get; set; }
-
-    /// <summary>
-    /// The Customer's last name.
-    /// </summary>
-    public required string LastName { get; set; }
-}
+/// <param name="CustomerId">The Customer's Id.</param>
+/// <param name="CreatedDate">The date and time the customer was created.</param>
+/// <param name="FirstName">The Customer's first name.</param>
+/// <param name="LastName">The Customer's last name.</param>
+public record GetCustomersResponse
+(
+    int CustomerId,
+    DateTimeOffset CreatedDate,
+    string FirstName,
+    string LastName
+);

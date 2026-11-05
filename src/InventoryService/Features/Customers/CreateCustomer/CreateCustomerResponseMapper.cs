@@ -22,8 +22,8 @@ public class CreateCustomerResponseMapper : ICreateCustomerResponseMapper
     public CreateCustomerResponse Map(CreateCustomerDBResponse dbResponse)
     {
         return new CreateCustomerResponse
-        {
-            CustomerId = dbResponse.CustomerId
-        };
+        (
+            CustomerId: dbResponse.CustomerId
+        );
     }
 }
