@@ -26,13 +26,13 @@ public class GetPurchaseOrdersResponseMapper : IGetPurchaseOrdersResponseMapper
         foreach (var order in dbResponse.Headers)
         {
             orders.Add(new GetPurchaseOrdersResponse
-            {
-                PurchaseOrderId = order.PurchaseOrderId,
-                OrderDate = order.OrderDate,
-                CustomerId = order.CustomerId,
-                CountryId = order.CountryId,
-                PurchaseOrderLines = []
-            });
+            (
+                PurchaseOrderId: order.PurchaseOrderId,
+                OrderDate: order.OrderDate,
+                CustomerId: order.CustomerId,
+                CountryId: order.CountryId,
+                PurchaseOrderLines: []
+            ));
         }
 
         foreach (var order in orders)
@@ -42,12 +42,12 @@ public class GetPurchaseOrdersResponseMapper : IGetPurchaseOrdersResponseMapper
             foreach (var line in lines)
             {
                 order.PurchaseOrderLines.Add(new GetPurchaseOrdersLineResponse
-                {
-                    PurchaseOrderLineId = line.PurchaseOrderLineId,
-                    ProductId = line.ProductId,
-                    OrderQuantity = line.OrderQuantity,
-                    RowNo = line.RowNo
-                });
+                (
+                    PurchaseOrderLineId: line.PurchaseOrderLineId,
+                    ProductId: line.ProductId,
+                    OrderQuantity: line.OrderQuantity,
+                    RowNo: line.RowNo
+                ));
             }
         }
 

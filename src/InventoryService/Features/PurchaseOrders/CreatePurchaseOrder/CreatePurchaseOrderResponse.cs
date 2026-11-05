@@ -3,10 +3,8 @@
 /// <summary>
 /// A Create purchase order response.
 /// </summary>
-public class CreatePurchaseOrderResponse
-{
-    /// <summary>
-    /// Gets or sets the identifier of the created purchase order.
-    /// </summary>
-    public int PurchaseOrderId { get; set; }
-}
+/// <param name="PurchaseOrderId">Gets or sets the identifier of the created purchase order.</param>
+public record CreatePurchaseOrderResponse
+(
+    int PurchaseOrderId
+);

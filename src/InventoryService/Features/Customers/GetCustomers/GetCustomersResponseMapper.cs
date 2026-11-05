@@ -26,12 +26,12 @@ public class GetCustomersResponseMapper : IGetCustomersResponseMapper
         foreach (var customer in dBResponse.Customers)
         {
             customers.Add(new GetCustomersResponse
-            {
-                CustomerId = customer.CustomerId,
-                CreatedDate = customer.CreatedDate,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName
-            });
+            (
+                CustomerId: customer.CustomerId,
+                CreatedDate: customer.CreatedDate,
+                FirstName: customer.FirstName,
+                LastName: customer.LastName
+            ));
         }
 
         return customers;

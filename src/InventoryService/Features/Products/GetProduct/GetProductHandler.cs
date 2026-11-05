@@ -32,11 +32,11 @@ public class GetProductHandler : IRequestHandler<GetProductRequest, Result<GetPr
 
         if (dbResult.Product is null)
         {
-            return HttpResponses.Notfound("Product not found");
+            return RequestHandlerResponses.Notfound("Product not found");
         }
 
         var response = _getProductResponseMapper.Map(dbResult);
 
-        return HttpResponses.Ok(response);
+        return RequestHandlerResponses.Ok(response);
     }
 }

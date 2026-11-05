@@ -22,8 +22,8 @@ public class CreateProductResponseMapper : ICreateProductResponseMapper
     public CreateProductResponse Map(CreateProductDBResponse dBResponse)
     {
         return new CreateProductResponse
-        {
-            ProductId = dBResponse.ProductId
-        };
+        (
+            ProductId: dBResponse.ProductId
+        );
     }
 }

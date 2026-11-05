@@ -3,20 +3,12 @@
 /// <summary>
 /// An individual Country response, returned by the <see cref="GetCountriesHandler"/>
 /// </summary>
-public class GetCountriesResponse
-{
-    /// <summary>
-    /// The Country's Country Id.
-    /// </summary>
-    public int CountryId { get; set; }
-
-    /// <summary>
-    /// The Country's Country Code.
-    /// </summary>
-    public required string CountryCode { get; set; }
-
-    /// <summary>
-    /// The Country's Currency Code.
-    /// </summary>
-    public required string CurrencyCode { get; set; }
-}
+/// <param name="CountryId">The Country's Country Id.</param>
+/// <param name="CountryCode">The Country's Country Code.</param>
+/// <param name="CurrencyCode">The Country's Currency Code.</param>
+public record GetCountriesResponse
+(
+    int CountryId,
+    string CountryCode,
+    string CurrencyCode
+);

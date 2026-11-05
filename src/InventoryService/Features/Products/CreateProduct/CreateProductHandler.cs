@@ -49,6 +49,6 @@ public class CreateProductHandler : IRequestHandler<CreateProductRequest, Result
             EndpointNames.GetProduct,
             new GetProductRequest(response.ProductId.ToString()));
 
-        return HttpResponses.Created(response, location);
+        return RequestHandlerResponses.Created(response, location);
     }
 }

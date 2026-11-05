@@ -4,7 +4,9 @@ GO
 
 CREATE PROC governance.usp_GetCredentials @UserName VARCHAR(50), @PasswordHash NVARCHAR(255)
 AS
-BEGIN   
+BEGIN
+    SET NOCOUNT ON
+
     SELECT uc.UserName
     FROM governance.UserCredential uc
     WHERE uc.UserName = @UserName

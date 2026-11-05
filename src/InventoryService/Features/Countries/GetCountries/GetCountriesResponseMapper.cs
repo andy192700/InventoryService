@@ -26,11 +26,11 @@ public class GetCountriesResponseMapper : IGetCountriesResponseMapper
         foreach (var country in dbResponse.Countries)
         {
             countries.Add(new GetCountriesResponse
-            {
-                CountryId = country.CountryId,
-                CountryCode = country.CountryCode,
-                CurrencyCode = country.CurrencyCode,
-            });
+            (
+                CountryId: country.CountryId,
+                CountryCode: country.CountryCode,
+                CurrencyCode: country.CurrencyCode
+            ));
         }
 
         return countries;

@@ -2,7 +2,7 @@
 
 namespace InventoryService.Infrastructure;
 
-public static class HttpResponses
+public static class RequestHandlerResponses
 {
     /// <summary>
     /// Indicates the response status code is 200.
