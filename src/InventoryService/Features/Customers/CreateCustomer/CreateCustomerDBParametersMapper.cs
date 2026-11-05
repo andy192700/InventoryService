@@ -22,9 +22,9 @@ public class CreateCustomerDBParametersMapper : ICreateCustomerDBParametersMappe
     public CreateCustomerDBParameters Map(CreateCustomerRequest request)
     {
         return new CreateCustomerDBParameters
-        {
-            FirstName = request.Payload.FirstName!,
-            LastName = request.Payload.LastName!
-        };
+        (
+            FirstName: request.Payload.FirstName!,
+            LastName: request.Payload.LastName!
+        );
     }
 }

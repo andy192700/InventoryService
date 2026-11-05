@@ -3,36 +3,23 @@
 /// <summary>
 /// A database response containing customers.
 /// </summary>
-public class GetCustomersDBResponse
-{
-    /// <summary>
-    /// The customers returned by the query.
-    /// </summary>
-    public required ICollection<GetCustomersDBResponseItem> Customers { get; set; }
-}
+/// <param name="Customers">The customers returned by the query.</param>
+public record GetCustomersDBResponse
+(
+    ICollection<GetCustomersDBResponseItem> Customers
+);
 
 /// <summary>
-/// A database response item containing a customer's details.
+/// A database response containing a customer's details.
 /// </summary>
-public class GetCustomersDBResponseItem
-{
-    /// <summary>
-    /// The Customer's Id.
-    /// </summary>
-    public int CustomerId { get; set; }
-
-    /// <summary>
-    /// The date and time the customer was created.
-    /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
-
-    /// <summary>
-    /// The Customer's first name.
-    /// </summary>
-    public required string FirstName { get; set; }
-
-    /// <summary>
-    /// The Customer's last name.
-    /// </summary>
-    public required string LastName { get; set; }
-}
+/// <param name="CustomerId">The Customer's Id.</param>
+/// <param name="CreatedDate">The date and time the customer was created.</param>
+/// <param name="FirstName">The Customer's first name.</param>
+/// <param name="LastName">The Customer's last name.</param>
+public record GetCustomersDBResponseItem
+(
+    int CustomerId,
+    DateTimeOffset CreatedDate,
+    string FirstName,
+    string LastName
+);

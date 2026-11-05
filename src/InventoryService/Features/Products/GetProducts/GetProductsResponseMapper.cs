@@ -34,7 +34,7 @@ public class GetProductsResponseMapper : IGetProductsResponseMapper
                 productCountryCollection.Add(new GetProductsCountriesResponse
                 (
                     CountryId: productCountry.CountryId,
-                    UnitPrice: productCountry.UnitPrice
+                    UnitPrice: (double)productCountry.UnitPrice
                 ));
             }
 

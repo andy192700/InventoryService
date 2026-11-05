@@ -43,8 +43,8 @@ public class GetCountriesDBQuery : IGetCountriesDBQuery
         });
 
         return new GetCountriesDBResponse
-        {
-            Countries = countries
-        };
+        (
+            Countries: countries
+        );
     }
 }

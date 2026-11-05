@@ -3,15 +3,10 @@
 /// <summary>
 /// Parameters for the database call to create a new customer.
 /// </summary>
-public class CreateCustomerDBParameters
-{
-    /// <summary>
-    /// The Customer's first name.
-    /// </summary>
-    public required string FirstName { get; set; }
-
-    /// <summary>
-    /// The Customer's last name.
-    /// </summary>
-    public required string LastName { get; set; }
-}
+/// <param name="FirstName">The Customer's first name.</param>
+/// <param name="LastName">The Customer's last name.</param>
+public record CreateCustomerDBParameters
+(
+    string FirstName,
+    string LastName
+);

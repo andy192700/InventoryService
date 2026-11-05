@@ -5,20 +5,12 @@ namespace InventoryService.Features.Products.CreateProduct;
 /// <summary>
 /// Database parameters for creating a product.
 /// </summary>
-public class CreateProductDBParameters
-{
-    /// <summary>
-    /// The product name.
-    /// </summary>
-    public required string ProductName { get; set; }
-
-    /// <summary>
-    /// The product description.
-    /// </summary>
-    public required string ProductDesc { get; set; }
-
-    /// <summary>
-    /// The countries associated with the product.
-    /// </summary>
-    public required DataTable ProductCountries { get; set; }
-}
+/// <param name="ProductName">The product name.</param>
+/// <param name="ProductDesc">The product description.</param>
+/// <param name="ProductCountries">The countries associated with the product.</param>
+public record CreateProductDBParameters
+(
+    string ProductName,
+    string ProductDesc,
+    DataTable ProductCountries
+);

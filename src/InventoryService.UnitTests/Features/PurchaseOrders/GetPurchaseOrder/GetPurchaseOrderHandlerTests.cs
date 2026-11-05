@@ -47,7 +47,6 @@ public class GetPurchaseOrderHandlerTests
         mockParamsMapper.Verify(x => x.Map(request), Times.Once);
     }
 
-
     [Theory]
     [AutoMoqData]
     public async Task Handle_ReturnsNotFound(
@@ -61,7 +60,7 @@ public class GetPurchaseOrderHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        dbResponse.header = null;
+        dbResponse = new GetPurchaseOrderDBResponse(default, default);
 
         mockParamsMapper.Setup(x => x.Map(request))
             .Returns(dbParams);

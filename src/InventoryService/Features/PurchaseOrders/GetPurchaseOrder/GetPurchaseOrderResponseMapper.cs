@@ -30,7 +30,7 @@ public class GetPurchaseOrderResponseMapper : IGetPurchaseOrderResponseMapper
                 PurchaseOrderLineId: line.PurchaseOrderLineId,
                 ProductId: line.ProductId,
                 OrderQuantity: line.OrderQuantity,
-                RowNo: line.RowNo
+                RowNo: (int)line.RowNo
             ));
         }
 

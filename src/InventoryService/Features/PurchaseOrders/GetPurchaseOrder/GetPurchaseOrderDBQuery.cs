@@ -50,10 +50,10 @@ public class GetPurchaseOrderDBQuery : IGetPurchaseOrderDBQuery
             var lines = (await result.ReadAsync<GetPurchaseOrderDBResponseLine>()).ToList();
 
             return new GetPurchaseOrderDBResponse
-            {
-                header = header,
-                lines = lines
-            };
+            (
+                header: header,
+                lines: lines
+            );
         });
     }
 }

@@ -23,7 +23,7 @@ public class GetProductResponseMapperTests
         result.ProductDesc.Should().Be(dbResponse.Product.ProductDesc);
         result.ProductCountries.Count.Should().Be(dbResponse.ProductCountries.Count);
         result.ProductCountries.All(x => dbResponse.ProductCountries.Any(y =>
-               x.UnitPrice == y.UnitPrice
+               x.UnitPrice == (double)y.UnitPrice
             && x.CountryId == y.CountryId)).Should().BeTrue();
     }
 }

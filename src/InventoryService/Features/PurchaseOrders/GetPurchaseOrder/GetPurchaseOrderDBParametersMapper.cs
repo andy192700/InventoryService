@@ -22,8 +22,8 @@ public class GetPurchaseOrderDBParametersMapper : IGetPurchaseOrderDBParametersM
     public GetPurchaseOrderDBParameters Map(GetPurchaseOrderRequest request)
     {
         return new GetPurchaseOrderDBParameters
-        {
-            PurchaseOrderId = int.Parse(request.PurchaseOrderId!)
-        };
+        (
+            PurchaseOrderId: int.Parse(request.PurchaseOrderId!)
+        );
     }
 }

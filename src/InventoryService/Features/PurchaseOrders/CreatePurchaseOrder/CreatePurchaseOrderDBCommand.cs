@@ -56,8 +56,8 @@ public class CreatePurchaseOrderDBCommand : ICreatePurchaseOrderDBCommand
         });
 
         return new CreatePurchaseOrderDBResponse
-        {
-            PurchaseOrderId = purchaseOrderId,
-        };
+        (
+            PurchaseOrderId: purchaseOrderId
+        );
     }
 }

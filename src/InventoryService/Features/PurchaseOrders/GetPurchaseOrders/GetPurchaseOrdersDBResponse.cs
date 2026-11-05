@@ -3,72 +3,42 @@
 /// <summary>
 /// A purchase orders database response.
 /// </summary>
-public class GetPurchaseOrdersDBResponse
-{
-    /// <summary>
-    /// Header components of the database response.
-    /// </summary>
-    public required ICollection<GetPurchaseOrdersDBResponseHeader> Headers { get; set; }
-
-    /// <summary>
-    /// Line components of the database response.
-    /// </summary>
-    public required ICollection<GetPurchaseOrdersDBResponseLine> Lines { get; set; }
-}
+/// <param name="Headers">Header components of the database response.</param>
+/// <param name="Lines">Line components of the database response.</param>
+public record GetPurchaseOrdersDBResponse
+(
+    ICollection<GetPurchaseOrdersDBResponseHeader> Headers,
+    ICollection<GetPurchaseOrdersDBResponseLine> Lines
+);
 
 /// <summary>
 /// Header component of the database response.
 /// </summary>
-public class GetPurchaseOrdersDBResponseHeader
-{
-    /// <summary>
-    /// THe Purchase Order's Id.
-    /// </summary>
-    public int PurchaseOrderId { get; set; }
-
-    /// <summary>
-    /// The date and time when the order was made.
-    /// </summary>
-    public DateTimeOffset OrderDate { get; set; }
-
-    /// <summary>
-    /// The Purchase Order's CustomerId.
-    /// </summary>
-    public int CustomerId { get; set; }
-
-    /// <summary>
-    /// The Purchase Order's CountyId.
-    /// </summary>
-    public int CountryId { get; set; }
-}
+/// <param name="PurchaseOrderId">THe Purchase Order's Id.</param>
+/// <param name="OrderDate">The date and time when the order was made.</param>
+/// <param name="CustomerId">The Purchase Order's CustomerId.</param>
+/// <param name="CountryId">The Purchase Order's CountyId.</param>
+public record GetPurchaseOrdersDBResponseHeader
+(
+    int PurchaseOrderId,
+    DateTimeOffset OrderDate,
+    int CustomerId,
+    int CountryId
+);
 
 /// <summary>
 /// Line components of the database response.
 /// </summary>
-public class GetPurchaseOrdersDBResponseLine
-{
-    /// <summary>
-    /// The Purchase Order Id.
-    /// </summary>
-    public int PurchaseOrderId { get; set; }
-
-    /// <summary>
-    /// The Purchase Order Line Id.
-    /// </summary>
-    public int PurchaseOrderLineId { get; set; }
-
-    /// <summary>
-    /// The Product Id.
-    /// </summary>
-    public int ProductId { get; set; }
-
-    /// <summary>
-    /// The Order Quantity.
-    /// </summary>
-    public int OrderQuantity { get; set; }
-
-    /// <summary>
-    /// The Row Number.
-    /// </summary>
-    public int RowNo { get; set; }
-}
+/// <param name="PurchaseOrderId">The Purchase Order Id.</param>
+/// <param name="PurchaseOrderLineId">The Purchase Order Line Id.</param>
+/// <param name="ProductId">The Product Id.</param>
+/// <param name="OrderQuantity">The Order Quantity.</param>
+/// <param name="RowNo">The Row Number.</param>
+public record GetPurchaseOrdersDBResponseLine
+(
+    int PurchaseOrderId,
+    int PurchaseOrderLineId,
+    int ProductId,
+    int OrderQuantity,
+    long RowNo
+);

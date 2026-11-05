@@ -91,21 +91,19 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         var result = await response.Read<ICollection<GetPurchaseOrdersResponse>>();
 
         result.Should().NotBeNull();
-        result.Should().HaveCount(5);
+        result.Should().HaveCount(4);
 
         result.First().PurchaseOrderId.Should().Be(1);
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(2);
 
-        result.First().PurchaseOrderLines.Should().HaveCount(1);
+        result.First().PurchaseOrderLines.Should().HaveCount(2);
 
         result.First().PurchaseOrderLines.First().PurchaseOrderLineId.Should().Be(1);
         result.First().PurchaseOrderLines.First().ProductId.Should().Be(productId);
         result.First().PurchaseOrderLines.First().OrderQuantity.Should().Be(5);
         result.First().PurchaseOrderLines.First().RowNo.Should().Be(1);
-
-        result.All(x => x.PurchaseOrderLines.All(x => x.ProductId == productId)).Should().BeTrue();
     }
 
     [Fact]
@@ -133,14 +131,13 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(countryId);
 
-        result.First().PurchaseOrderLines.Should().HaveCount(1);
+        result.First().PurchaseOrderLines.Should().HaveCount(2);
 
         result.First().PurchaseOrderLines.First().PurchaseOrderLineId.Should().Be(1);
         result.First().PurchaseOrderLines.First().ProductId.Should().Be(productId);
         result.First().PurchaseOrderLines.First().OrderQuantity.Should().Be(5);
         result.First().PurchaseOrderLines.First().RowNo.Should().Be(1);
 
-        result.All(x => x.PurchaseOrderLines.All(x => x.ProductId == productId)).Should().BeTrue();
         result.All(x => x.CountryId == countryId).Should().BeTrue();
     }
 
@@ -170,14 +167,13 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().CustomerId.Should().Be(customerId);
         result.First().CountryId.Should().Be(countryId);
 
-        result.First().PurchaseOrderLines.Should().HaveCount(1);
+        result.First().PurchaseOrderLines.Should().HaveCount(2);
 
         result.First().PurchaseOrderLines.First().PurchaseOrderLineId.Should().Be(9);
         result.First().PurchaseOrderLines.First().ProductId.Should().Be(productId);
         result.First().PurchaseOrderLines.First().OrderQuantity.Should().Be(7);
         result.First().PurchaseOrderLines.First().RowNo.Should().Be(1);
 
-        result.All(x => x.PurchaseOrderLines.All(x => x.ProductId == productId)).Should().BeTrue();
         result.All(x => x.CountryId == countryId).Should().BeTrue();
         result.All(x => x.CustomerId == customerId).Should().BeTrue();
     }

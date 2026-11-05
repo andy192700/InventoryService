@@ -54,10 +54,10 @@ public class GetProductDBQuery : IGetProductDBQuery
             var productCountries = (await result.ReadAsync<GetProductDbProductCountriesResponse>()).ToList();
 
             return new GetProductDBResponse
-            {
-                Product = product,
-                ProductCountries = productCountries
-            };
+            (
+                Product: product,
+                ProductCountries: productCountries
+            );
         });
     }
 }

@@ -49,8 +49,8 @@ public class GetCustomersDBQuery : IGetCustomersDBQuery
         });
 
         return new GetCustomersDBResponse
-        {
-            Customers = customers
-        };
+        (
+            Customers: customers
+        );
     }
 }

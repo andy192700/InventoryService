@@ -57,6 +57,6 @@ public class CreateProductDBCommand : ICreateProductDBCommand
             return await connection.ExecuteScalarAsync<int>(cmd);
         });
 
-        return new CreateProductDBResponse { ProductId = productId };
+        return new CreateProductDBResponse ( ProductId: productId );
     }
 }

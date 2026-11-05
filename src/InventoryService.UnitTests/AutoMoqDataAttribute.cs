@@ -212,11 +212,11 @@ public class CreateProductDBParametersSpecimenBuilder : ISpecimenBuilder
             }
 
             return new CreateProductDBParameters
-            {
-                ProductName = createProductRequest.Payload.ProductName!,
-                ProductDesc = createProductRequest.Payload.ProductDesc!,
-                ProductCountries = productCountriesdt
-            };
+            (
+                ProductName: createProductRequest.Payload.ProductName!,
+                ProductDesc: createProductRequest.Payload.ProductDesc!,
+                ProductCountries: productCountriesdt
+            );
         }
 
         return new NoSpecimen();
@@ -271,11 +271,11 @@ public class CreatePurchaseOrderDBParametersSpecimenBuilder : ISpecimenBuilder
             }
 
             return new CreatePurchaseOrderDBParameters
-            {
-                CountryId = int.Parse(createPurchaseOrderRequest.Payload.CountryId!),
-                CustomerId = int.Parse(createPurchaseOrderRequest.Payload.CustomerId!),
-                Lines = linesdt
-            };
+            (
+                CountryId: int.Parse(createPurchaseOrderRequest.Payload.CountryId!),
+                CustomerId: int.Parse(createPurchaseOrderRequest.Payload.CustomerId!),
+                Lines: linesdt
+            );
         }
 
         return new NoSpecimen();

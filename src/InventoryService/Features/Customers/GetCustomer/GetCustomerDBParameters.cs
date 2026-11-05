@@ -3,10 +3,8 @@
 /// <summary>
 /// Parameters for the database call to retrieve a customer.
 /// </summary>
-public class GetCustomerDBParameters
-{
-    /// <summary>
-    /// The Customer Id.
-    /// </summary>
-    public int CustomerId { get; set; }
-}
+/// <param name="CustomerId">The Customer Id.</param>
+public record GetCustomerDBParameters
+(
+    int CustomerId
+);

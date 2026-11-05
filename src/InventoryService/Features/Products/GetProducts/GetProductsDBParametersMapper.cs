@@ -22,8 +22,8 @@ public class GetProductsDBParametersMapper : IGetProductsDBParametersMapper
     public GetProductsDBParameters Map(GetProductsRequest request)
     {
         return new GetProductsDBParameters
-        {
-            Filter = request.Filter
-        };
+        (
+            Filter: request.Filter
+        );
     }
 }

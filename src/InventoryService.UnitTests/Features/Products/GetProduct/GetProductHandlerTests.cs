@@ -60,7 +60,7 @@ public class GetProductHandlerTests
         CancellationToken cancellation)
     {
         // Arrange
-        dbResponse.Product = null;
+        dbResponse = dbResponse with { Product = null };
 
         mockParamsMapper.Setup(x => x.Map(request))
             .Returns(dbParams);
