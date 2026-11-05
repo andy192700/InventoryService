@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryService.Infrastructure;
 
-public static class HttpHandler
+public static class RequestHandler
 {
     /// <summary>
     /// Request handler delegate for handling http requests.

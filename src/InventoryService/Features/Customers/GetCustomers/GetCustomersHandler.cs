@@ -34,6 +34,6 @@ public class GetCustomersHandler : IRequestHandler<GetCustomersRequest, Result<I
 
         var response = _getCustomersResponseMapper.Map(dbResponse);
 
-        return HttpResponses.Ok(response);
+        return RequestHandlerResponses.Ok(response);
     }
 }

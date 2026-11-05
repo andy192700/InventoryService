@@ -12,7 +12,7 @@ using Moq;
 
 namespace InventoryService.UnitTests.Infrastructure;
 
-public class HttpHandlerTests
+public class RequestHandlerTests
 {
     [Theory]
     [AutoMoqData]
@@ -35,7 +35,7 @@ public class HttpHandlerTests
             .Returns(Results.ValidationProblem([]));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             default!,
             mockValidator.Object,
@@ -73,7 +73,7 @@ public class HttpHandlerTests
             .Returns(Results.ValidationProblem([]));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             default!,
             default,
@@ -101,10 +101,10 @@ public class HttpHandlerTests
     {
         // Arrange
         mockHandler.Setup(x => x.Handle(request, cancellation))
-            .ReturnsAsync(HttpResponses.Ok(response));
+            .ReturnsAsync(RequestHandlerResponses.Ok(response));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -136,10 +136,10 @@ public class HttpHandlerTests
             .ReturnsAsync(new ValidationResult());
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
-            .ReturnsAsync(HttpResponses.Ok(response));
+            .ReturnsAsync(RequestHandlerResponses.Ok(response));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             mockValidator.Object,
@@ -166,13 +166,13 @@ public class HttpHandlerTests
         string location)
     {
         // Arrange
-        var responseValue = HttpResponses.Created(response, location);
+        var responseValue = RequestHandlerResponses.Created(response, location);
 
         mockHandler.Setup(x => x.Handle(request, cancellation))
             .ReturnsAsync(responseValue);
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -203,7 +203,7 @@ public class HttpHandlerTests
             .ReturnsAsync(response);
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -231,10 +231,10 @@ public class HttpHandlerTests
     {
         // Arrange
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(HttpResponses.Notfound(message));
+            .ReturnsAsync(RequestHandlerResponses.Notfound(message));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -263,10 +263,10 @@ public class HttpHandlerTests
     {
         // Arrange
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(HttpResponses.InternalServerError(message));
+            .ReturnsAsync(RequestHandlerResponses.InternalServerError(message));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -294,10 +294,10 @@ public class HttpHandlerTests
     {
         // Arrange
         mockHandler.Setup(x => x.Handle(It.IsAny<TestRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(HttpResponses.UnauthorizedError());
+            .ReturnsAsync(RequestHandlerResponses.UnauthorizedError());
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,
@@ -328,7 +328,7 @@ public class HttpHandlerTests
             .ReturnsAsync(Result.Fail(error));
 
         // Act
-        var result = await HttpHandler.HandleAsync<TestRequest, TestResponse>(
+        var result = await RequestHandler.HandleAsync<TestRequest, TestResponse>(
             request,
             mockHandler.Object,
             default,

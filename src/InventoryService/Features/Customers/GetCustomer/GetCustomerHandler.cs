@@ -34,11 +34,11 @@ public class GetCustomerHandler : IRequestHandler<GetCustomerRequest, Result<Get
 
         if (dbResponse is null)
         { 
-            return HttpResponses.Notfound("Customer not found");
+            return RequestHandlerResponses.Notfound("Customer not found");
         }
 
         var response = _responseMapper.Map(dbResponse);
 
-        return HttpResponses.Ok(response);
+        return RequestHandlerResponses.Ok(response);
     }
 }

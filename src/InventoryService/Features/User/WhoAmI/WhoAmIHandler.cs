@@ -24,26 +24,26 @@ public class WhoAmIHandler : IRequestHandler<WhoAmIRequest, Result<WhoAmIRespons
 
         if (context is null)
         {
-            return Task.FromResult((Result<WhoAmIResponse>)HttpResponses.UnauthorizedError());
+            return Task.FromResult((Result<WhoAmIResponse>)RequestHandlerResponses.UnauthorizedError());
         }
 
         var identity = context.User.Identity as ClaimsIdentity;
 
         if (identity is null || !identity.IsAuthenticated)
         {
-            return Task.FromResult((Result<WhoAmIResponse>)HttpResponses.UnauthorizedError());
+            return Task.FromResult((Result<WhoAmIResponse>)RequestHandlerResponses.UnauthorizedError());
         }
 
         var userName = identity.Name;
 
         if (string.IsNullOrWhiteSpace(userName))
         {
-            return Task.FromResult((Result<WhoAmIResponse>)HttpResponses.UnauthorizedError());
+            return Task.FromResult((Result<WhoAmIResponse>)RequestHandlerResponses.UnauthorizedError());
         }
 
         var roles = identity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
 
-        return Task.FromResult((Result<WhoAmIResponse>)HttpResponses.Ok(new WhoAmIResponse
+        return Task.FromResult((Result<WhoAmIResponse>)RequestHandlerResponses.Ok(new WhoAmIResponse
         {
             UserName = userName,
             Roles = roles

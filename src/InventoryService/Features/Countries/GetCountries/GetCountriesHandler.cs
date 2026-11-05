@@ -28,6 +28,6 @@ public class GetCountriesHandler : IRequestHandler<GetCountriesRequest, Result<I
 
         var response = _mapper.Map(dbResponse);
 
-        return HttpResponses.Ok(response);
+        return RequestHandlerResponses.Ok(response);
     }
 }

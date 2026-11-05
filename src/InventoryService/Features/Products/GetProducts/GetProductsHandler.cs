@@ -31,6 +31,6 @@ public class GetProductsHandler : IRequestHandler<GetProductsRequest, Result<ICo
 
         var dbResponse = await _getProductsDBQuery.GetProductsAsync(dbParams, cancellationToken);
 
-        return HttpResponses.Ok(_getProductsResponseMapper.Map(dbResponse));
+        return RequestHandlerResponses.Ok(_getProductsResponseMapper.Map(dbResponse));
     }
 }

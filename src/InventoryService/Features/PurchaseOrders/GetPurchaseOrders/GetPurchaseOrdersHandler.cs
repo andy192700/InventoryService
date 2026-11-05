@@ -34,6 +34,6 @@ public class GetPurchaseOrdersHandler : IRequestHandler<GetPurchaseOrdersRequest
 
         var response = _mapper.Map(dbResponse);
 
-        return HttpResponses.Ok(response);
+        return RequestHandlerResponses.Ok(response);
     }
 }
