@@ -36,6 +36,18 @@ BEGIN
     (
         @CountryId = 0 OR c.CountryId = @CountryId
     )
+    JOIN warehouse.PurchaseOrderLine pol
+    ON pol.PurchaseOrderId = po.PurchaseOrderId
+    JOIN warehouse.ProductCountry pc
+    ON pc.ProductCountryId = pol.ProductCountryId
+    AND
+    (
+        @ProductId = 0 OR pc.ProductId = @ProductId
+    )
+    GROUP BY po.PurchaseOrderId,
+             po.OrderDate,
+             co.CustomerId,
+             c.CountryId
 
     SELECT PurchaseOrderId,
            OrderDate,
@@ -52,10 +64,6 @@ BEGIN
     FROM warehouse.PurchaseOrderLine pol
     JOIN warehouse.ProductCountry pc
     ON pc.ProductCountryId = pol.ProductCountryId
-    AND
-    (
-        @ProductId = 0 OR pc.ProductId = @ProductId
-    )
     JOIN @PurchaseOrders p
     ON p.PurchaseOrderId = pol.PurchaseOrderId
     ORDER BY pol.PurchaseOrderId,
