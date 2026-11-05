@@ -8,6 +8,8 @@ CREATE PROC warehouse.usp_GetPurchaseOrders
     @CustomerId INT = 0
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @PurchaseOrders TABLE
     (
         PurchaseOrderId INT,
@@ -66,6 +68,8 @@ CREATE PROC warehouse.usp_GetPurchaseOrder
     @PurchaseOrderId INT
 AS
 BEGIN
+    SET NOCOUNT ON
+
     SELECT po.PurchaseOrderId,
            po.OrderDate,
            co.CustomerId,
@@ -104,6 +108,8 @@ CREATE PROC warehouse.usp_CreatePurchaseOrder
     @OrderLines warehouse.PurchaseOrderLine READONLY
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
     INSERT INTO warehouse.PurchaseOrder
@@ -134,6 +140,8 @@ CREATE PROC warehouse.usp_CheckPurchaseOrderProductCountry
     @OrderLines warehouse.PurchaseOrderLine READONLY
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @SuppliedLineCount INT = (SELECT COUNT(1) FROM @OrderLines)
 
     DECLARE @ProductCountryFoundCount INT

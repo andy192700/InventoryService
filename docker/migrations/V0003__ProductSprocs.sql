@@ -6,6 +6,8 @@ CREATE PROC warehouse.usp_GetProducts
     @Filter VARCHAR(100) = NULL
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @Products TABLE
     (
         ProductId INT,
@@ -48,6 +50,8 @@ CREATE PROC warehouse.usp_GetProduct
     @ProductId INT
 AS
 BEGIN
+    SET NOCOUNT ON
+
     SELECT ProductId,
            CreatedDate,
            ProductName,
@@ -82,6 +86,8 @@ CREATE PROC warehouse.usp_CreateProduct
     @ProductCountries warehouse.tvp_ProductCountry READONLY
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
     INSERT INTO warehouse.Product
@@ -105,6 +111,8 @@ GO
 CREATE PROC warehouse.usp_CheckProductName @ProductName VARCHAR(100)
 AS
 BEGIN
+    SET NOCOUNT ON
+
     IF EXISTS 
     (
         SELECT 1
@@ -123,6 +131,8 @@ GO
 CREATE PROC warehouse.usp_CheckProductCountriesExist @ProductCountries warehouse.tvp_ProductCountry READONLY
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @CountryCount INT = (SELECT COUNT(1) from @ProductCountries)
     DECLARE @CountryFoundCount INT
 

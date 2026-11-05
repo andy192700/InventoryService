@@ -6,6 +6,8 @@ CREATE PROC warehouse.usp_GetCustomers
     @Filter VARCHAR(100) = NULL
 AS
 BEGIN
+    SET NOCOUNT ON
+
     SELECT CustomerId,
            CreatedDate,
            FirstName,
@@ -22,6 +24,8 @@ CREATE PROC warehouse.usp_GetCustomer
     @CustomerId INT
 AS
 BEGIN
+    SET NOCOUNT ON
+
     SELECT CustomerId,
            CreatedDate,
            FirstName,
@@ -37,6 +41,8 @@ CREATE PROC warehouse.usp_CreateCustomer
     @LastName VARCHAR(100)
 AS
 BEGIN
+    SET NOCOUNT ON
+
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
     INSERT INTO warehouse.Customer
@@ -53,6 +59,8 @@ CREATE PROC warehouse.usp_CheckCustomerName
     @LastName VARCHAR(100)
 AS
 BEGIN
+    SET NOCOUNT ON
+
     IF EXISTS
     (
         SELECT 1
@@ -72,6 +80,8 @@ GO
 CREATE PROC warehouse.usp_CheckCustomerExists @CustomerId INT
 AS
 BEGIN
+    SET NOCOUNT ON
+
     IF EXISTS
     (
         SELECT 1
