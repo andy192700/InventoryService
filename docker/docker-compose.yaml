@@ -46,6 +46,21 @@ services:
       - -schemas=dbo
       - -connectRetries=60
 
+  localstack:
+    build:
+      context: .
+      dockerfile: localstack.dockerfile
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sns,sqs
+      DEBUG: 1
+      AWS_DEFAULT_REGION: eu-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
   inventoryservice:
     build:
       context: ..
@@ -65,3 +80,4 @@ services:
 
 volumes:
   sqlserver_data:
+  localstack_data:
