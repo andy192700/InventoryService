@@ -15,18 +15,23 @@ internal sealed class SNSEnvelope
     public string? Message { get; init; }
 }
 
+public abstract class SQSConsumer<TQueueDescriptor> : BackgroundService
+    where TQueueDescriptor : class, IQueueDescriptor
+{
+}
+
 /// <summary>
 /// The basis for a SQS Consumer, which hides any complexity.
 /// </summary>
 /// <typeparam name="TPayload">The payload type of a message received by the consumer.</typeparam>
 /// <typeparam name="TQueueDescriptor">The queue registration which will drive the consumer.</typeparam>
-public abstract class SQSConsumer<TPayload, TQueueDescriptor> : BackgroundService
+public abstract class SQSConsumer<TPayload, TQueueDescriptor> : SQSConsumer<TQueueDescriptor>
     where TPayload : class
     where TQueueDescriptor : class, IQueueDescriptor
 {
-    private readonly ISQSSource<TQueueDescriptor> _source;
+    protected readonly ILogger<SQSConsumer<TPayload, TQueueDescriptor>> _logger;
 
-    private readonly ILogger<SQSConsumer<TPayload, TQueueDescriptor>> _logger;
+    private readonly ISQSSource<TQueueDescriptor> _source;
 
     protected SQSConsumer(
         ISQSSource<TQueueDescriptor> source,

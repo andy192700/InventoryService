@@ -71,13 +71,11 @@ public static class AWSExtensions
     /// </summary>
     /// <typeparam name="TConsumer">The application's new consumer.</typeparam>
     /// <typeparam name="TQueueDescriptor">The queue registration which will drive the consumer.</typeparam>
-    /// <typeparam name="TPayload">The type of the messages the consumer will accept.</typeparam>
     /// <param name="services">The service collection to enrich.</param>
     /// <returns>The enriched service collection.</returns>
-    public static IServiceCollection AddConsumer<TConsumer, TQueueDescriptor, TPayload>(this IServiceCollection services)
+    public static IServiceCollection AddConsumer<TConsumer, TQueueDescriptor>(this IServiceCollection services)
         where TQueueDescriptor : class, IQueueDescriptor
-        where TConsumer : SQSConsumer<TPayload, TQueueDescriptor>
-        where TPayload : class
+        where TConsumer : SQSConsumer<TQueueDescriptor>
     {
         services.AddSingleton<TQueueDescriptor>();
 
@@ -90,7 +88,7 @@ public static class AWSExtensions
             return factory.Create().GetAwaiter().GetResult();
         });
 
-        services.AddSingleton(sp =>
+        services.AddSingleton<ISQSSource<TQueueDescriptor>, SQSSource<TQueueDescriptor>>(sp =>
         {
             var queueDetails = sp.GetRequiredService<QueueDetails<TQueueDescriptor>>();
             var sqs = sp.GetRequiredService<IAmazonSQS>();

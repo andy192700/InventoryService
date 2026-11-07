@@ -93,9 +93,14 @@ internal sealed class SQSSource<TQueueDescriptor> : ISQSSource<TQueueDescriptor>
                 continue;
             }
 
-            foreach (var message in response.Messages)
+            var messages = response.Messages;
+
+            if (messages is not null)
             {
-                yield return message;
+                foreach (var message in response.Messages)
+                {
+                    yield return message;
+                }
             }
         }
     }

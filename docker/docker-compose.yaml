@@ -51,8 +51,6 @@ services:
       context: .
       dockerfile: localstack.dockerfile
     container_name: localstack
-    ports:
-      - "4566:4566"
     environment:
       SERVICES: sns,sqs
       DEBUG: 1
@@ -65,7 +63,7 @@ services:
     build:
       context: ..
       dockerfile: docker/inventoryservice.dockerfile
-    container_name: inventoryservice
+    container_name: inventory
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -77,6 +75,19 @@ services:
       ASPNETCORE_URLS: http://+:6000
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Inventory: "Server=sqlserver,1433;Database=Inventory;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Encrypt=False;"
+  
+  warehouseservice:
+    build:
+      context: ..
+      dockerfile: docker/warehouseservice.dockerfile
+    container_name: warehouse
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
 
 volumes:
   sqlserver_data:
