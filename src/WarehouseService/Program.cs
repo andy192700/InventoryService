@@ -18,8 +18,8 @@ host.ConfigureAppConfiguration((hostingContext, config) =>
 host.ConfigureServices((ctx, services) =>
 {
     services.AddAWS(ctx.Configuration);
-
     services.AddConsumer<PurchaseOrderConsumer, PurchaseOrderConsumerDescriptor>();
+    services.AddProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic>();
 });
 
 await host.RunConsoleAsync();

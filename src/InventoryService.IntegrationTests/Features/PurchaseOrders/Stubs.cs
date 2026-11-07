@@ -1,5 +1,8 @@
-﻿using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
+﻿using Amazon.SQS.Model;
+using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
+using InventoryService.Features.PurchaseOrders.ShipPurchaseOrder;
 using Messaging;
+using System.Runtime.CompilerServices;
 
 namespace InventoryService.IntegrationTests.Features.PurchaseOrders;
 

@@ -10,6 +10,7 @@ using InventoryService.Features.Products.GetProducts;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
+using InventoryService.Features.PurchaseOrders.ShipPurchaseOrder;
 using InventoryService.Features.User.WhoAmI;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
@@ -72,8 +73,8 @@ public static class ServiceRegistrations
     private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAWS(configuration);
-
         services.AddProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>();
+        services.AddConsumer<ShipPurchaseOrderConsumer, ShipPurchaseOrderDescriptor>();
 
         return services;
     }

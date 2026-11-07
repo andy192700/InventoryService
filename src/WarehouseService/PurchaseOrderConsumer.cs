@@ -28,18 +28,30 @@ public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 /// </summary>
 public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest, PurchaseOrderConsumerDescriptor>
 {
+    private readonly ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> _producer;
+
+    private readonly Random _random = new Random();
+
     public PurchaseOrderConsumer(
         ISQSSource<PurchaseOrderConsumerDescriptor> source,
+        ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> producer,
         ILogger<PurchaseOrderConsumer> logger)
         : base(source, logger)
     {
+        _producer = producer;
     }
 
     /// <inheritdoc/>
-    protected override Task HandleAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
+    protected override async Task HandleAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Warehouse has received a new Purchase Order, id: {payload.PurchaseOrderId}");
 
-        return Task.CompletedTask;
+        int preparationTimeSeconds = _random.Next(10, 51);
+
+        _logger.LogInformation($"Team is working hard to fulfill the purchase order. Estimated wait time: {preparationTimeSeconds} seconds.");
+
+        await Task.Delay(TimeSpan.FromSeconds(preparationTimeSeconds), cancellationToken);
+
+        await _producer.ProduceAsync(new ShipPurchaseOrderRequest(payload.PurchaseOrderId), cancellationToken);
     }
 }
