@@ -107,17 +107,15 @@ public static class AWSExtensions
     /// Add a new SNS producer.
     /// </summary>
     /// <typeparam name="TPayload">The type of the messages the producer will create and send.</typeparam>
-    /// <typeparam name="TProducer">The application's new producer.</typeparam>
     /// <typeparam name="TTopicDescriptor">Details the destination for the producer's output.</typeparam>
     /// <param name="services">The service collection to enrich.</param>
     /// <returns>The enriched service collection.</returns>
-    public static IServiceCollection AddProducer<TPayload, TProducer, TTopicDescriptor>(this IServiceCollection services)
+    public static IServiceCollection AddProducer<TPayload, TTopicDescriptor>(this IServiceCollection services)
         where TPayload : class
-        where TProducer : class, ISNSProducer<TPayload, TTopicDescriptor>
         where TTopicDescriptor : class, ITopicDescriptor
     {
         services.AddScoped<TTopicDescriptor>();
-        services.AddScoped<ISNSProducer<TPayload, TTopicDescriptor>, TProducer>();
+        services.AddScoped<ISNSProducer<TPayload, TTopicDescriptor>, SNSProducer<TPayload, TTopicDescriptor>>();
 
         return services;
     }

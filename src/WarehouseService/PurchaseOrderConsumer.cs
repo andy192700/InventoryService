@@ -1,21 +1,32 @@
-﻿using Amazon.SQS.Model;
-using Messaging;
+﻿using Messaging;
 
 namespace WarehouseService;
 
-public record PurchaseOrderRequest
+/// <summary>
+/// A record recieved by the warehouse when a new purchase order is created.
+/// </summary>
+/// <param name="PurchaseOrderId">The Purchase Order Id.</param>
+public record FulfilPurchaseOrderRequest
 (
     int PurchaseOrderId
 );
 
+/// <summary>
+/// Describes the consumer for consuming newly created purchase orders.
+/// </summary>
 public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 {
-    public string TopicName => "NewPurchaseOrder";
+    /// <inheritdoc/>
+    public string TopicName => "CreatePurchaseOrder";
 
-    public string QueueName => "NewPurchaseOrder";
+    /// <inheritdoc/>
+    public string QueueName => "CreatePurchaseOrder";
 }
 
-public sealed class PurchaseOrderConsumer : SQSConsumer<PurchaseOrderRequest, PurchaseOrderConsumerDescriptor>
+/// <summary>
+/// A consumer that consumes purchase orders.
+/// </summary>
+public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest, PurchaseOrderConsumerDescriptor>
 {
     public PurchaseOrderConsumer(
         ISQSSource<PurchaseOrderConsumerDescriptor> source,
@@ -24,7 +35,8 @@ public sealed class PurchaseOrderConsumer : SQSConsumer<PurchaseOrderRequest, Pu
     {
     }
 
-    protected override Task HandleAsync(PurchaseOrderRequest payload, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    protected override Task HandleAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Warehouse has received a new Purchase Order, id: {payload.PurchaseOrderId}");
 

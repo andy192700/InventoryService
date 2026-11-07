@@ -23,13 +23,13 @@ public interface ISNSProducer<TMessage, TTopicDescriptor>
     /// </summary>
     /// <param name="message">The message to publish.</param>
     /// <param name="cancellationToken">A token used to cancel the operation.</param>
-    Task PublishAsync(
+    Task ProduceAsync(
         TMessage message,
         CancellationToken cancellationToken);
 }
 
 /// <summary>
-/// Base implementation of <see cref="ISNSProducer{TMessage, TTopicDescriptor}"/>
+/// Implementation of <see cref="ISNSProducer{TMessage, TTopicDescriptor}"/>
 /// for publishing messages to SNS.
 /// </summary>
 /// <typeparam name="TMessage">
@@ -38,7 +38,7 @@ public interface ISNSProducer<TMessage, TTopicDescriptor>
 /// <typeparam name="TTopicDescriptor">
 /// The descriptor that identifies the SNS topic to publish to.
 /// </typeparam>
-public abstract class SNSProducer<TMessage, TTopicDescriptor> : ISNSProducer<TMessage, TTopicDescriptor>
+internal sealed class SNSProducer<TMessage, TTopicDescriptor> : ISNSProducer<TMessage, TTopicDescriptor>
     where TMessage : class
     where TTopicDescriptor : ITopicDescriptor
 {
@@ -59,11 +59,13 @@ public abstract class SNSProducer<TMessage, TTopicDescriptor> : ISNSProducer<TMe
     }
 
     /// <inheritdoc/>
-    public async Task PublishAsync(
+    public async Task ProduceAsync(
         TMessage message,
         CancellationToken cancellationToken)
     {
         var topicArn = $"arn:aws:sns:{_awsOptions.Value.Region}:{_awsOptions.Value.AccountId}:{_topicDescriptor.TopicName}";
+
+        Console.WriteLine($"topicarn {topicArn}");
 
         await _sns.PublishAsync(
             new PublishRequest

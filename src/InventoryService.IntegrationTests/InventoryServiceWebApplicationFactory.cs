@@ -1,9 +1,13 @@
 ﻿using DotNet.Testcontainers.Builders;
+using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
+using InventoryService.IntegrationTests.Features.PurchaseOrders;
+using Messaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace InventoryService.IntegrationTests;
 
@@ -40,6 +44,9 @@ public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactor
 
         builder.ConfigureTestServices(x =>
         {
+            x.RemoveAll<ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>>();
+            x.AddScoped<ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>, CreatePurchaseOrderProducerStub>();
+
             OverrideTestServices?.Invoke(x);
         });
     }

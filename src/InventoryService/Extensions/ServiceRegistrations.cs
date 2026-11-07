@@ -16,6 +16,7 @@ using InventoryService.Infrastructure.Auth;
 using InventoryService.Infrastructure.Health;
 using InventoryService.Infrastructure.Validation;
 using MediatR;
+using Messaging;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -28,11 +29,13 @@ public static class ServiceRegistrations
     /// Register the application's services.
     /// </summary>
     /// <param name="services">The application's service collection.</param>
+    /// <param name="configuration">The application's configuration.</param>
     /// <returns>The application's service collection.</returns>
-    public static IServiceCollection RegisterServices(this IServiceCollection services)
+    public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddInfrastructure();
         services.AddSecurity();
+        services.AddMessaging(configuration);
         services.AddHandlerServices();
         services.AddDataIntegrityEvaluators();
 
@@ -56,6 +59,21 @@ public static class ServiceRegistrations
         services.AddProblemDetails();
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>(nameof(DatabaseHealthCheck), tags: [nameof(DatabaseHealthCheck)]);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds cross service communication using SQS and SNS from the messaging library.
+    /// </summary>
+    /// <param name="services">The application's service collection.</param>
+    /// <param name="configuration">The application's configuration.</param>
+    /// <returns>The application's service collection.</returns>
+    private static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAWS(configuration);
+
+        services.AddProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>();
 
         return services;
     }
