@@ -18,12 +18,14 @@ public record GetPurchaseOrdersDBResponse
 /// <param name="OrderDate">The date and time when the order was made.</param>
 /// <param name="CustomerId">The Purchase Order's CustomerId.</param>
 /// <param name="CountryId">The Purchase Order's CountyId.</param>
+/// <param name="Status">The Purchase Order's Status.</param>
 public record GetPurchaseOrdersDBResponseHeader
 (
     int PurchaseOrderId,
     DateTimeOffset OrderDate,
     int CustomerId,
-    int CountryId
+    int CountryId,
+    string Status
 );
 
 /// <summary>

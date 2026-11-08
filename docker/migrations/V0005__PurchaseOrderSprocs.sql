@@ -15,15 +15,19 @@ BEGIN
         PurchaseOrderId INT,
         OrderDate DATETIMEOFFSET(3),
         CustomerId INT,
-        CountryId INT
+        CountryId INT,
+        [Status] VARCHAR(25)
     )
 
     INSERT INTO @PurchaseOrders
     SELECT po.PurchaseOrderId,
            po.OrderDate,
            co.CustomerId,
-           c.CountryId
+           c.CountryId,
+           pos.[Status]
     FROM warehouse.PurchaseOrder po
+    JOIN warehouse.PurchaseOrderStatus pos
+    ON pos.PurchaseOrderStatusId = po.PurchaseOrderStatusId
     JOIN warehouse.Customer co
     ON co.CustomerId = po.CustomerId
     AND 
@@ -47,12 +51,14 @@ BEGIN
     GROUP BY po.PurchaseOrderId,
              po.OrderDate,
              co.CustomerId,
-             c.CountryId
+             c.CountryId,
+             pos.[Status]
 
     SELECT PurchaseOrderId,
            OrderDate,
            CustomerId,
-           CountryId
+           CountryId,
+           [Status]
     FROM @PurchaseOrders
     ORDER BY PurchaseOrderId
 
@@ -81,8 +87,11 @@ BEGIN
     SELECT po.PurchaseOrderId,
            po.OrderDate,
            co.CustomerId,
-           c.CountryId
+           c.CountryId,
+           pos.[Status]
     FROM warehouse.PurchaseOrder po
+    JOIN warehouse.PurchaseOrderStatus pos
+    ON pos.PurchaseOrderStatusId = po.PurchaseOrderStatusId
     JOIN warehouse.Customer co
     ON co.CustomerId = po.CustomerId
     JOIN warehouse.Country c
@@ -120,11 +129,14 @@ BEGIN
 
     DECLARE @Now DATETIMEOFFSET(3) = GETUTCDATE()
 
+    DECLARE @OrderPreparingStatusId INT = (SELECT PurchaseOrderStatusId FROM warehouse.PurchaseOrderStatus WHERE [Status] = 'Preparing')
+
     INSERT INTO warehouse.PurchaseOrder
-    (OrderDate, CountryId, CustomerId)
+    (OrderDate, CountryId, CustomerId, PurchaseOrderStatusId)
     SELECT @Now, 
            @CountryId,
-           @CustomerId
+           @CustomerId,
+           @OrderPreparingStatusId
 
     DECLARE @PurchaseOrderId INT = SCOPE_IDENTITY()
 
