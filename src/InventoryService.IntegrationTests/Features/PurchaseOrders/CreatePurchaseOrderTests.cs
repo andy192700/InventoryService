@@ -152,12 +152,13 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ISQLTransactionActivity>();
+            services.RemoveAll<ICreatePurchaseOrderDBCommand>();
 
-            var repository = new Mock<ISQLTransactionActivity>();
+            var repository = new Mock<ICreatePurchaseOrderDBCommand>();
 
             repository
-                .Setup(x => x.ConnectAsync(
+                .Setup(x => x.CreatePurchaseOrderAsync(
+                    It.IsAny<CreatePurchaseOrderDBParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

@@ -46,11 +46,24 @@ services:
       - -schemas=dbo
       - -connectRetries=60
 
+  localstack:
+    build:
+      context: .
+      dockerfile: localstack.dockerfile
+    container_name: localstack
+    environment:
+      SERVICES: sns,sqs
+      DEBUG: 1
+      AWS_DEFAULT_REGION: eu-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
   inventoryservice:
     build:
       context: ..
       dockerfile: docker/inventoryservice.dockerfile
-    container_name: inventoryservice
+    container_name: inventory
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -62,6 +75,20 @@ services:
       ASPNETCORE_URLS: http://+:6000
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Inventory: "Server=sqlserver,1433;Database=Inventory;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Encrypt=False;"
+  
+  warehouseservice:
+    build:
+      context: ..
+      dockerfile: docker/warehouseservice.dockerfile
+    container_name: warehouse
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
 
 volumes:
   sqlserver_data:
+  localstack_data:

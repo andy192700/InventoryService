@@ -35,6 +35,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(2);
+        result.First().Status.Should().Be("Shipped");
 
         result.First().PurchaseOrderLines.Should().HaveCount(2);
 
@@ -65,6 +66,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(2);
+        result.First().Status.Should().Be("Shipped");
 
         result.First().PurchaseOrderLines.Should().HaveCount(2);
 
@@ -97,6 +99,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(2);
+        result.First().Status.Should().Be("Shipped");
 
         result.First().PurchaseOrderLines.Should().HaveCount(2);
 
@@ -130,6 +133,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(1);
         result.First().CountryId.Should().Be(countryId);
+        result.First().Status.Should().Be("Shipped");
 
         result.First().PurchaseOrderLines.Should().HaveCount(2);
 
@@ -166,6 +170,7 @@ public class GetPurchaseOrdersTests : IntegrationTestBase
         result.First().OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.First().CustomerId.Should().Be(customerId);
         result.First().CountryId.Should().Be(countryId);
+        result.First().Status.Should().Be("Shipped");
 
         result.First().PurchaseOrderLines.Should().HaveCount(2);
 

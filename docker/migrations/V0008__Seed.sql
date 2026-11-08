@@ -67,6 +67,13 @@ VALUES (@Now, 'John', 'Smith'),
        (@Now, 'Mary', 'Taylor'),
        (@Now, 'Tom', 'Walker');
 
+INSERT INTO warehouse.PurchaseOrderStatus
+([Status])
+VALUES ('Preparing'),
+       ('Shipped')
+
+DECLARE @OrderShippedStatusId INT = (SELECT PurchaseOrderStatusId FROM warehouse.PurchaseOrderStatus WHERE [Status] = 'Shipped')
+
 DECLARE @JohnSmithCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'John' AND LastName = 'Smith')
 DECLARE @JaneJonesCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Jane' AND LastName = 'Jones')
 DECLARE @PierreDuboisCustomerId INT = (SELECT CustomerId FROM warehouse.Customer WHERE FirstName = 'Pierre' AND LastName = 'Dubois')
@@ -77,13 +84,14 @@ INSERT INTO warehouse.PurchaseOrder
 (
     OrderDate,
     CountryId,
-    CustomerId
+    CustomerId,
+    PurchaseOrderStatusId
 )
-VALUES (DATEADD(DAY, -10, @Now), @GBCountryId, @JohnSmithCustomerId),
-       (DATEADD(DAY, -8, @Now), @GBCountryId, @JaneJonesCustomerId),
-       (DATEADD(DAY, -6, @Now), @USCountryId, @MaryTaylorCustomerId),
-       (DATEADD(DAY, -4, @Now), @FRCountryId, @PierreDuboisCustomerId),
-       (DATEADD(DAY, -2, @Now), @GBCountryId, @TomWalkerCustomerId);
+VALUES (DATEADD(DAY, -10, @Now), @GBCountryId, @JohnSmithCustomerId, @OrderShippedStatusId),
+       (DATEADD(DAY, -8, @Now), @GBCountryId, @JaneJonesCustomerId, @OrderShippedStatusId),
+       (DATEADD(DAY, -6, @Now), @USCountryId, @MaryTaylorCustomerId, @OrderShippedStatusId),
+       (DATEADD(DAY, -4, @Now), @FRCountryId, @PierreDuboisCustomerId, @OrderShippedStatusId),
+       (DATEADD(DAY, -2, @Now), @GBCountryId, @TomWalkerCustomerId, @OrderShippedStatusId);
 
 DECLARE @PurchaseOrderIdOne INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @JohnSmithCustomerId)
 DECLARE @PurchaseOrderIdTwo INT = (SELECT PurchaseOrderId FROM warehouse.PurchaseOrder WHERE CustomerId = @JaneJonesCustomerId)

@@ -21,6 +21,7 @@ public class GetPurchaseOrderResponseMapperTests
         result.OrderDate.Should().Be(dbResponse.header.OrderDate);
         result.CustomerId.Should().Be(dbResponse.header.CustomerId);
         result.CountryId.Should().Be(dbResponse.header.CountryId);
+        result.Status.Should().Be(dbResponse.header.Status);
 
         foreach (var line in result.PurchaseOrderLines)
         {

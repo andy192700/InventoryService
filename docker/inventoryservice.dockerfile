@@ -3,10 +3,9 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
 
-COPY ../src/InventoryService/InventoryService.csproj InventoryService/
-RUN dotnet restore InventoryService/InventoryService.csproj
+COPY ../src/ ./ 
 
-COPY ../src/InventoryService/. InventoryService/
+RUN dotnet restore InventoryService/InventoryService.csproj
 
 WORKDIR /src/InventoryService
 RUN dotnet publish -c Release -o /app/publish

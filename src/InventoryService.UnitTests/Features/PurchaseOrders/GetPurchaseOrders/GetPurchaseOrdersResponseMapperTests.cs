@@ -25,7 +25,8 @@ public class GetPurchaseOrdersResponseMapperTests
                 x.PurchaseOrderId == purchaseOrder.PurchaseOrderId
                 && x.OrderDate == purchaseOrder.OrderDate
                 && x.CustomerId == purchaseOrder.CustomerId
-                && x.CountryId == purchaseOrder.CountryId).Should().BeTrue();
+                && x.CountryId == purchaseOrder.CountryId
+                && x.Status == purchaseOrder.Status).Should().BeTrue();
 
             foreach (var purchaseOrderLine in purchaseOrder.PurchaseOrderLines)
             {

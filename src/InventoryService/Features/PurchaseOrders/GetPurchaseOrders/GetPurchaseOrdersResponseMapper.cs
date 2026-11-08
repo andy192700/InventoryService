@@ -31,6 +31,7 @@ public class GetPurchaseOrdersResponseMapper : IGetPurchaseOrdersResponseMapper
                 OrderDate: order.OrderDate,
                 CustomerId: order.CustomerId,
                 CountryId: order.CountryId,
+                Status: order.Status,
                 PurchaseOrderLines: []
             ));
         }

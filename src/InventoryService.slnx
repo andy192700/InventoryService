@@ -2,4 +2,7 @@
   <Project Path="InventoryService.IntegrationTests/InventoryService.IntegrationTests.csproj" Id="75194ab2-7636-4bfb-8770-d11fa4228d52" />
   <Project Path="InventoryService.UnitTests/InventoryService.UnitTests.csproj" Id="ff936ece-2756-4cc9-ad56-ef7c0edaddbe" />
   <Project Path="InventoryService/InventoryService.csproj" />
+  <Project Path="Messaging.UnitTests/Messaging.UnitTests.csproj" Id="06652588-cb47-4451-8143-4d2d81b289bd" />
+  <Project Path="Messaging/Messaging.csproj" Id="415f6c0f-c403-47d9-893b-a69099e9d971" />
+  <Project Path="WarehouseService/WarehouseService.csproj" Id="867f6a1a-c4cd-4958-ab60-68fe385eca51" />
 </Solution>

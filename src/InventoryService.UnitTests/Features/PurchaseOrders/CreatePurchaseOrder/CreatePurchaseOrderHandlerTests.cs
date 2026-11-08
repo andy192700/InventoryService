@@ -2,6 +2,7 @@
 using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Infrastructure;
+using Messaging;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -16,6 +17,7 @@ public class CreatePurchaseOrderHandlerTests
         [Frozen] Mock<ICreatePurchaseOrderResponseMapper> mockResponseMapper,
         [Frozen] Mock<ICreatePurchaseOrderDBParametersMapper> mockParamsMapper,
         [Frozen] Mock<ILocationBuilder> mockLocationBuilder,
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer,
         [Frozen] Mock<ILogger<CreatePurchaseOrderHandler>> mockLogger,
         CreatePurchaseOrderDBParameters dbParams,
         CreatePurchaseOrderRequest request,
@@ -42,6 +44,7 @@ public class CreatePurchaseOrderHandlerTests
             mockCommand.Object,
             mockResponseMapper.Object,
             mockLocationBuilder.Object,
+            mockProducer.Object,
             mockLogger.Object);
 
         // Act
@@ -62,6 +65,7 @@ public class CreatePurchaseOrderHandlerTests
         mockResponseMapper.Verify(x => x.Map(dbResponse), Times.Once);
         mockParamsMapper.Verify(x => x.Map(request), Times.Once);
         mockLocationBuilder.Verify(x => x.Build(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        mockProducer.Verify(x => x.ProduceAsync(response, cancellationToken), Times.Once);
 
         mockLogger.VerifyLog(
             LogLevel.Information,

@@ -82,12 +82,28 @@ ON warehouse.Customer (FirstName, LastName)
 
 GO
 
+CREATE TABLE warehouse.PurchaseOrderStatus
+(
+    PurchaseOrderStatusId INT NOT NULL IDENTITY(1,1),
+    [Status] VARCHAR(25) NOT NULL
+)
+
+ALTER TABLE warehouse.PurchaseOrderStatus
+ADD CONSTRAINT PK_PurchaseOrderStatus
+PRIMARY KEY (PurchaseOrderStatusId)
+
+CREATE UNIQUE NONCLUSTERED INDEX UX_PurchaseOrderStatus_Status
+ON warehouse.PurchaseOrderStatus ([Status])
+
+GO
+
 CREATE TABLE warehouse.PurchaseOrder
 (
     PurchaseOrderId INT NOT NULL IDENTITY(1,1),
     OrderDate DATETIMEOFFSET(3) NOT NULL,
     CountryId INT NOT NULL,
-    CustomerId INT NOT NULL
+    CustomerId INT NOT NULL,
+    PurchaseOrderStatusId INT NOT NULL
 )
 
 ALTER TABLE warehouse.PurchaseOrder
@@ -101,6 +117,10 @@ FOREIGN KEY (CustomerId) REFERENCES warehouse.Customer(CustomerId)
 ALTER TABLE warehouse.PurchaseOrder
 ADD CONSTRAINT FK_PurchaseOrder_Country
 FOREIGN KEY (CountryId) REFERENCES warehouse.Country(CountryId)
+
+ALTER TABLE warehouse.PurchaseOrder
+ADD CONSTRAINT FK_PurchaseOrder_PurchseOrderStatus
+FOREIGN KEY (PurchaseOrderStatusId) REFERENCES warehouse.PurchaseOrderStatus(PurchaseOrderStatusId)
 
 GO
 

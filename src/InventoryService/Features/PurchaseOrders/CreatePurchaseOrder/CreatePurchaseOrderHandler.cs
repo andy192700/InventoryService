@@ -2,6 +2,7 @@
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Infrastructure;
 using MediatR;
+using Messaging;
 
 namespace InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 
@@ -18,6 +19,8 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
 
     private readonly ILocationBuilder _locationBuilder;
 
+    private readonly ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic> _producer;
+
     private readonly ILogger<CreatePurchaseOrderHandler> _logger;
 
     public CreatePurchaseOrderHandler(
@@ -25,12 +28,14 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         ICreatePurchaseOrderDBCommand dbCommand,
         ICreatePurchaseOrderResponseMapper responseMapper,
         ILocationBuilder locationBuilder,
+        ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic> producer,
         ILogger<CreatePurchaseOrderHandler> logger)
     {
         _parametersMapper = parametersMapper;
         _dbCommand = dbCommand;
         _responseMapper = responseMapper;
         _locationBuilder = locationBuilder;
+        _producer = producer;
         _logger = logger;
     }
 
@@ -44,6 +49,8 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         _logger.LogInformation($"Created Purhase Order with PurchaseOrderId = {dbResponse.PurchaseOrderId}");
 
         var response = _responseMapper.Map(dbResponse);
+
+        await _producer.ProduceAsync(response, cancellationToken);
 
         var location = _locationBuilder.Build(
             EndpointNames.GetPurchaseOrder,

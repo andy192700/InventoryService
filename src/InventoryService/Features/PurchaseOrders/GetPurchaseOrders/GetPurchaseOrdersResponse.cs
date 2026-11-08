@@ -7,6 +7,7 @@
 /// <param name="OrderDate">The date and time when the order was created.</param>
 /// <param name="CustomerId">The Customer Id.</param>
 /// <param name="CountryId">The Country Id.</param>
+/// <param name="Status">The Purchase Order's Status.</param>
 /// <param name="PurchaseOrderLines">A collection of purchase order lines.</param>
 public record GetPurchaseOrdersResponse
 (
@@ -14,6 +15,7 @@ public record GetPurchaseOrdersResponse
     DateTimeOffset OrderDate,
     int CustomerId,
     int CountryId,
+    string Status,
     ICollection<GetPurchaseOrdersLineResponse> PurchaseOrderLines
 );
 

@@ -36,6 +36,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         result.OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.CustomerId.Should().Be(2);
         result.CountryId.Should().Be(2);
+        result.Status.Should().Be("Shipped");
 
         result.PurchaseOrderLines.Should().HaveCount(2);
 
@@ -67,6 +68,7 @@ public class GetPurchaseOrderTests : IntegrationTestBase
         result.OrderDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromDays(30));
         result.CustomerId.Should().Be(2);
         result.CountryId.Should().Be(2);
+        result.Status.Should().Be("Shipped");
 
         result.PurchaseOrderLines.Should().HaveCount(2);
 

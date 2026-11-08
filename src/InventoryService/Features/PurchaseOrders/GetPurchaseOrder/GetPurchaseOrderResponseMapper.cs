@@ -40,6 +40,7 @@ public class GetPurchaseOrderResponseMapper : IGetPurchaseOrderResponseMapper
             OrderDate: dbResponse.header.OrderDate,
             CustomerId: dbResponse.header.CustomerId,
             CountryId: dbResponse.header.CountryId,
+            Status: dbResponse.header.Status,
             PurchaseOrderLines: lines
         );
     }

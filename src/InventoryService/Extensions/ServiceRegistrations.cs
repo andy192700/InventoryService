@@ -10,12 +10,14 @@ using InventoryService.Features.Products.GetProducts;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrder;
 using InventoryService.Features.PurchaseOrders.GetPurchaseOrders;
+using InventoryService.Features.PurchaseOrders.ShipPurchaseOrder;
 using InventoryService.Features.User.WhoAmI;
 using InventoryService.Infrastructure;
 using InventoryService.Infrastructure.Auth;
 using InventoryService.Infrastructure.Health;
 using InventoryService.Infrastructure.Validation;
 using MediatR;
+using Messaging;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -28,11 +30,13 @@ public static class ServiceRegistrations
     /// Register the application's services.
     /// </summary>
     /// <param name="services">The application's service collection.</param>
+    /// <param name="configuration">The application's configuration.</param>
     /// <returns>The application's service collection.</returns>
-    public static IServiceCollection RegisterServices(this IServiceCollection services)
+    public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddInfrastructure();
         services.AddSecurity();
+        services.AddAWS(configuration);
         services.AddHandlerServices();
         services.AddDataIntegrityEvaluators();
 
@@ -167,6 +171,7 @@ public static class ServiceRegistrations
         services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckCustomerExistsValidator>();
         services.AddScoped<DataIntegrityValidator<CreatePurchaseOrderRequest>, CreatePurchaseOrderCheckProductCountryValidator>();
         services.AddScoped<IRequestHandler<CreatePurchaseOrderRequest, Result<CreatePurchaseOrderResponse>>, CreatePurchaseOrderHandler>();
+        services.AddProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>();
 
         // Get Countries
         services.AddScoped<IGetCountriesDBQuery, GetCountriesDBQuery>();
@@ -175,6 +180,10 @@ public static class ServiceRegistrations
 
         // Who AM I
         services.AddScoped<IRequestHandler<WhoAmIRequest, Result<WhoAmIResponse>>, WhoAmIHandler>();
+
+        // Ship Purchase Order
+        services.AddSingleton<IShipPurchaseOrderDBCommand, ShipPurchaseOrderDBCommand>();
+        services.AddConsumer<ShipPurchaseOrderConsumer, ShipPurchaseOrderDescriptor>();
 
         return services;
     }
