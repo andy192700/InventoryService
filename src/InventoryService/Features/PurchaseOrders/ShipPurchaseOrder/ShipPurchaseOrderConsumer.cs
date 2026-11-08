@@ -2,11 +2,18 @@
 
 namespace InventoryService.Features.PurchaseOrders.ShipPurchaseOrder;
 
+/// <summary>
+/// Payload for the <see cref="ShipPurchaseOrderConsumer"/>.
+/// </summary>
+/// <param name="PurchaseOrderId">The purchase order id, to be marked as shipped.</param>
 public record ShipPurchaseOrderRequest
 (
     int PurchaseOrderId
 );
 
+/// <summary>
+/// The queue descriptor for the <see cref="ShipPurchaseOrderConsumer"/>.
+/// </summary>
 public class ShipPurchaseOrderDescriptor : IQueueDescriptor
 {
     /// <inheritdoc/>
@@ -16,6 +23,9 @@ public class ShipPurchaseOrderDescriptor : IQueueDescriptor
     public string QueueName => "ShipPurchaseOrder";
 }
 
+/// <summary>
+/// Consumer whose purpose is mark Purchase orders as shipped, sent by the warehouse after the team has finished preparing the order.
+/// </summary>
 public class ShipPurchaseOrderConsumer : SQSConsumer<ShipPurchaseOrderRequest, ShipPurchaseOrderDescriptor>
 {
     private readonly IShipPurchaseOrderDBCommand _dbCommand;

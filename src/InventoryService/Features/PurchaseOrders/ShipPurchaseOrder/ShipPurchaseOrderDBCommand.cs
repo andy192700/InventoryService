@@ -4,13 +4,25 @@ using InventoryService.Infrastructure;
 
 namespace InventoryService.Features.PurchaseOrders.ShipPurchaseOrder;
 
+/// <summary>
+/// Command to mark a Purchase Order as shipped.
+/// </summary>
 public interface IShipPurchaseOrderDBCommand
 {
+    /// <summary>
+    /// Marks the supplied order as shipped.
+    /// </summary>
+    /// <param name="purchaseOrderId">The purchase order id.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>A bool indicating whether the purchase order status was updated as expected.</returns>
     Task<bool> MarkAsShippedAsync(
         int purchaseOrderId,
         CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Command to mark a Purchase Order as shipped.
+/// </summary>
 public class ShipPurchaseOrderDBCommand : IShipPurchaseOrderDBCommand
 {
     private readonly ISQLTransactionActivity _activity;
@@ -25,6 +37,7 @@ public class ShipPurchaseOrderDBCommand : IShipPurchaseOrderDBCommand
         _logger = logger;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> MarkAsShippedAsync(
         int purchaseOrderId,
         CancellationToken cancellationToken)

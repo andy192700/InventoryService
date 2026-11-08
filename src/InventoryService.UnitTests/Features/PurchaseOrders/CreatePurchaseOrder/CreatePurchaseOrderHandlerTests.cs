@@ -17,7 +17,7 @@ public class CreatePurchaseOrderHandlerTests
         [Frozen] Mock<ICreatePurchaseOrderResponseMapper> mockResponseMapper,
         [Frozen] Mock<ICreatePurchaseOrderDBParametersMapper> mockParamsMapper,
         [Frozen] Mock<ILocationBuilder> mockLocationBuilder,
-        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>> mockProducer,
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer,
         [Frozen] Mock<ILogger<CreatePurchaseOrderHandler>> mockLogger,
         CreatePurchaseOrderDBParameters dbParams,
         CreatePurchaseOrderRequest request,

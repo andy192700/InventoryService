@@ -47,8 +47,8 @@ public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactor
 
         builder.ConfigureTestServices(x =>
         {
-            x.RemoveAll<ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>>();
-            x.AddScoped<ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic>, CreatePurchaseOrderProducerStub>();
+            x.RemoveAll<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>>();
+            x.AddScoped<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>, CreatePurchaseOrderProducerStub>();
 
             x.RemoveAll<IHostedService>();
             x.RemoveAll<ISQSSource<ShipPurchaseOrderDescriptor>>();

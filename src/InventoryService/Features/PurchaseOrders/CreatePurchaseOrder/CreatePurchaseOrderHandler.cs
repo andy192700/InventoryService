@@ -19,7 +19,7 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
 
     private readonly ILocationBuilder _locationBuilder;
 
-    private readonly ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic> _producer;
+    private readonly ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic> _producer;
 
     private readonly ILogger<CreatePurchaseOrderHandler> _logger;
 
@@ -28,7 +28,7 @@ public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderReq
         ICreatePurchaseOrderDBCommand dbCommand,
         ICreatePurchaseOrderResponseMapper responseMapper,
         ILocationBuilder locationBuilder,
-        ISNSProducer<CreatePurchaseOrderResponse, CreatePurchaseOrderTopic> producer,
+        ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic> producer,
         ILogger<CreatePurchaseOrderHandler> logger)
     {
         _parametersMapper = parametersMapper;

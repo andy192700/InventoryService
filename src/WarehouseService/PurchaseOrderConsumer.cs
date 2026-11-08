@@ -17,10 +17,10 @@ public record FulfilPurchaseOrderRequest
 public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 {
     /// <inheritdoc/>
-    public string TopicName => "CreatePurchaseOrder";
+    public string TopicName => "PurchaseOrderCreated";
 
     /// <inheritdoc/>
-    public string QueueName => "CreatePurchaseOrder";
+    public string QueueName => "PurchaseOrderCreated";
 }
 
 /// <summary>
