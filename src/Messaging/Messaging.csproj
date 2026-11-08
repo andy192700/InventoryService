@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="InventoryService.IntegrationTests" />
+		<InternalsVisibleTo Include="Messaging.UnitTests" />
 	</ItemGroup>
 
 </Project>

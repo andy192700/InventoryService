@@ -30,7 +30,7 @@ public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderReque
 {
     private readonly ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> _producer;
 
-    private readonly Random _random = new Random();
+    private readonly Random _random = new();
 
     public PurchaseOrderConsumer(
         ISQSSource<PurchaseOrderConsumerDescriptor> source,

@@ -65,8 +65,6 @@ internal sealed class SNSProducer<TMessage, TTopicDescriptor> : ISNSProducer<TMe
     {
         var topicArn = $"arn:aws:sns:{_awsOptions.Value.Region}:{_awsOptions.Value.AccountId}:{_topicDescriptor.TopicName}";
 
-        Console.WriteLine($"topicarn {topicArn}");
-
         await _sns.PublishAsync(
             new PublishRequest
             {
