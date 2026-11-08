@@ -195,6 +195,9 @@ public static class ServiceRegistrations
         // Who AM I
         services.AddScoped<IRequestHandler<WhoAmIRequest, Result<WhoAmIResponse>>, WhoAmIHandler>();
 
+        // Ship Purchase Order
+        services.AddSingleton<IShipPurchaseOrderDBCommand, ShipPurchaseOrderDBCommand>();
+
         return services;
     }
 

@@ -174,3 +174,21 @@ BEGIN
 
     SELECT IIF(@SuppliedLineCount = @ProductCountryFoundCount, 1, 0)
 END
+
+GO
+
+CREATE PROC warehouse.usp_MarkPurchaseOrderAsShipped
+    @PurchaseOrderId INT
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @OrderShippedStatusId INT = (SELECT PurchaseOrderStatusId FROM warehouse.PurchaseOrderStatus WHERE [Status] = 'Shipped')
+
+    UPDATE po
+    SET po.PurchaseOrderStatusId = @OrderShippedStatusId
+    FROM warehouse.PurchaseOrder po
+    WHERE po.PurchaseOrderId = @PurchaseOrderId
+
+    SELECT IIF(@@ROWCOUNT = 1, 1, 0)
+END

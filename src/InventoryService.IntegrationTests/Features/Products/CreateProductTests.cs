@@ -150,12 +150,13 @@ public class CreateProductTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ISQLTransactionActivity>();
+            services.RemoveAll<ICreateProductDBCommand>();
 
-            var repository = new Mock<ISQLTransactionActivity>();
+            var repository = new Mock<ICreateProductDBCommand>();
 
             repository
-                .Setup(x => x.ConnectAsync(
+                .Setup(x => x.CreateProductAsync(
+                    It.IsAny<CreateProductDBParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 

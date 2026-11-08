@@ -129,12 +129,13 @@ public class CreateCustomerTests : IntegrationTestBase
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
-            services.RemoveAll<ISQLTransactionActivity>();
+            services.RemoveAll<ICreateCustomerDBCommand>();
 
-            var repository = new Mock<ISQLTransactionActivity>();
+            var repository = new Mock<ICreateCustomerDBCommand>();
 
             repository
-                .Setup(x => x.ConnectAsync(
+                .Setup(x => x.CreateCustomerAsync(
+                    It.IsAny<CreateCustomerDBParameters>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
 
