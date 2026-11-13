@@ -47,15 +47,12 @@ public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactor
 
         builder.ConfigureTestServices(x =>
         {
-            x.RemoveAll<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>>();
-            x.AddScoped<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>, CreatePurchaseOrderProducerStub>();
-
+            // remove any SQS consumers for now
             x.RemoveAll<IHostedService>();
             x.RemoveAll<ISQSReader<ShipPurchaseOrderDescriptor>>();
             x.RemoveAll<SQSSource<ShipPurchaseOrderDescriptor>>();
             x.RemoveAll<IQueueFactory<ShipPurchaseOrderDescriptor>>();
             x.RemoveAll<IAmazonSQS>();
-            x.RemoveAll<IAmazonSimpleNotificationService>();
 
             OverrideTestServices?.Invoke(x);
         });
