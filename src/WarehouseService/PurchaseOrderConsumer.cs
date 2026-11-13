@@ -26,23 +26,25 @@ public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 /// <summary>
 /// A consumer that consumes purchase orders.
 /// </summary>
-public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest, PurchaseOrderConsumerDescriptor>
+public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest>
 {
     private readonly ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> _producer;
+
+    private readonly ILogger<PurchaseOrderConsumer> _logger;
 
     private readonly Random _random = new();
 
     public PurchaseOrderConsumer(
-        ISQSSource<PurchaseOrderConsumerDescriptor> source,
         ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> producer,
         ILogger<PurchaseOrderConsumer> logger)
-        : base(source, logger)
     {
         _producer = producer;
+
+        _logger = logger;
     }
 
     /// <inheritdoc/>
-    protected override async Task HandleAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
+    protected override async Task ConsumeAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Warehouse has received a new Purchase Order, id: {payload.PurchaseOrderId}");
 

@@ -51,7 +51,8 @@ public sealed class InventoryServiceWebApplicationFactory : WebApplicationFactor
             x.AddScoped<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>, CreatePurchaseOrderProducerStub>();
 
             x.RemoveAll<IHostedService>();
-            x.RemoveAll<ISQSSource<ShipPurchaseOrderDescriptor>>();
+            x.RemoveAll<ISQSReader<ShipPurchaseOrderDescriptor>>();
+            x.RemoveAll<SQSSource<ShipPurchaseOrderDescriptor>>();
             x.RemoveAll<IQueueFactory<ShipPurchaseOrderDescriptor>>();
             x.RemoveAll<IAmazonSQS>();
             x.RemoveAll<IAmazonSimpleNotificationService>();

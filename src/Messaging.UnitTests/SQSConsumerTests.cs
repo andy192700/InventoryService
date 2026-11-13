@@ -1,8 +1,5 @@
 ﻿using Amazon.SQS.Model;
-using AutoFixture.Xunit2;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
 using System.Text.Json;
 using Xunit;
 
@@ -12,56 +9,65 @@ public class SQSConsumerTests
 {
     [Theory]
     [InlineAutoMoqData]
-    public async Task ExecuteAsync_DeserializesPayload_HandlesMessage_AndCompletesMessage(
-        [Frozen] Mock<ISQSSource<TestQueueDescriptor>> mockSource,
-        [Frozen] Mock<ILogger<SQSConsumer<TestPayload, TestQueueDescriptor>>> mockLogger,
+    public async Task HandleAsync_DeserializesPayload_HandlesMessage(
         TestPayload payload,
-        string receiptHandle,
-        string queueUrl)
+        CancellationToken cancellationToken)
     {
         // Arrange
-        mockSource.Setup(x => x.QueueDetails)
-            .Returns(new QueueDetails<TestQueueDescriptor>(new TestQueueDescriptor(), queueUrl));
-
         var message = new Message
         {
-            ReceiptHandle = receiptHandle,
             Body = JsonSerializer.Serialize(new SNSEnvelope
             {
                 Message = JsonSerializer.Serialize(payload)
             })
         };
 
-        mockSource
-            .Setup(x => x.ReadAsync(It.IsAny<CancellationToken>()))
-            .Returns(GetMessages(message));
-
-        var sut = new TestConsumer(mockSource.Object, mockLogger.Object);
+        var sut = new TestConsumer();
 
         // Act
-        await sut.ExecuteForTestAsync();
+        var result = await sut.HandleAsync(message.Body, cancellationToken);
 
         // Assert
-        sut.HandledPayload.Should().NotBeNull();
-        sut.HandledPayload.Should().BeEquivalentTo(payload);
-
-        mockSource.Verify(x => x.CompleteAsync(receiptHandle, It.IsAny<CancellationToken>()), Times.Once);
+        result.Should().BeTrue();
+        sut.HandledPayload.Should().BeTrue();
     }
 
-    private static async IAsyncEnumerable<Message> GetMessages(
-        params Message[] messages)
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task HandleAsync_CannotDeserializesPayload_DoesNotHandleMessage(
+        CancellationToken cancellationToken)
     {
-        foreach (var message in messages)
+        // Arrange
+        var message = new Message
         {
-            yield return message;
-        }
+            Body = JsonSerializer.Serialize(new SNSEnvelope())
+        };
 
-        await Task.CompletedTask;
+        var sut = new TestConsumer();
+
+        // Act
+        var result = await sut.HandleAsync(JsonSerializer.Serialize(message), cancellationToken);
+
+        // Assert
+        result.Should().BeFalse();
+        sut.HandledPayload.Should().BeFalse();
     }
 
-    public sealed record TestPayload(
-        string ProductId,
-        int Quantity);
+    [Theory]
+    [InlineAutoMoqData]
+    public async Task ExecuteAsync_Throws_WhenPayloadIsNotValidJson(
+        string message,
+        CancellationToken cancellationToken)
+    {
+        // Arrange
+        var sut = new TestConsumer();
+
+        // Act
+        var func = async () => await sut.HandleAsync(message, cancellationToken);
+
+        // Assert
+        await func.Should().ThrowAsync<JsonException>();
+    }
 
     public sealed class TestQueueDescriptor : IQueueDescriptor
     {
@@ -70,28 +76,20 @@ public class SQSConsumerTests
         public string TopicName => "test-topic";
     }
 
+    public sealed record TestPayload(
+        string ProductId,
+        int Quantity);
+
     public sealed class TestConsumer
-        : SQSConsumer<TestPayload, TestQueueDescriptor>
+        : SQSConsumer<TestPayload>
     {
-        public TestPayload? HandledPayload { get; private set; }
+        public bool HandledPayload { get; set; }
 
-        public TestConsumer(
-            ISQSSource<TestQueueDescriptor> source,
-            ILogger<SQSConsumer<TestPayload, TestQueueDescriptor>> logger)
-            : base(source, logger)
-        {
-        }
-
-        public Task ExecuteForTestAsync()
-        {
-            return ExecuteAsync(CancellationToken.None);
-        }
-
-        protected override Task HandleAsync(
+        protected override Task ConsumeAsync(
             TestPayload payload,
             CancellationToken cancellationToken)
         {
-            HandledPayload = payload;
+            HandledPayload = true;
 
             return Task.CompletedTask;
         }

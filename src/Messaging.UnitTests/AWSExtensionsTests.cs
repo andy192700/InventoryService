@@ -5,7 +5,6 @@ using AutoFixture.Xunit2;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -132,8 +131,12 @@ public class AWSExtensionsTests
             x.ServiceType == typeof(QueueDetails<TestQueueDescriptor>) &&
             x.Lifetime == ServiceLifetime.Singleton);
         services.Should().Contain(x =>
-            x.ServiceType == typeof(ISQSSource<TestQueueDescriptor>) &&
-            x.Lifetime == ServiceLifetime.Singleton);
+            x.ServiceType == typeof(ISQSReader<TestQueueDescriptor>) &&
+            x.ImplementationType == typeof(SQSReader<TestQueueDescriptor>));
+        services.Should().Contain(x =>
+            x.ServiceType == typeof(ISQSConsumer) &&
+            x.Lifetime == ServiceLifetime.Singleton &&
+            x.ImplementationType == typeof(TestConsumer));
         services.Should().Contain(x =>
             x.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService));
     }
@@ -152,16 +155,9 @@ public class AWSExtensionsTests
         public string TopicName => "test-queue";
     }
 
-    private sealed class TestConsumer : SQSConsumer<object, TestQueueDescriptor>
+    private sealed class TestConsumer : SQSConsumer<TestPayload>
     {
-        public TestConsumer(
-            ISQSSource<TestQueueDescriptor> source,
-            ILogger<TestConsumer> logger)
-            : base(source, logger)
-        {
-        }
-
-        protected override Task HandleAsync(object payload, CancellationToken cancellationToken)
+        protected override Task ConsumeAsync(TestPayload payload, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

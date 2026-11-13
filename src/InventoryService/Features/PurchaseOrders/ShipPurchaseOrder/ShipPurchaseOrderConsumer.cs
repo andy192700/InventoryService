@@ -26,21 +26,22 @@ public class ShipPurchaseOrderDescriptor : IQueueDescriptor
 /// <summary>
 /// Consumer whose purpose is mark Purchase orders as shipped, sent by the warehouse after the team has finished preparing the order.
 /// </summary>
-public class ShipPurchaseOrderConsumer : SQSConsumer<ShipPurchaseOrderRequest, ShipPurchaseOrderDescriptor>
+public class ShipPurchaseOrderConsumer : SQSConsumer<ShipPurchaseOrderRequest>
 {
     private readonly IShipPurchaseOrderDBCommand _dbCommand;
 
+    private readonly ILogger<ShipPurchaseOrderConsumer> _logger;
+
     public ShipPurchaseOrderConsumer(
-        ISQSSource<ShipPurchaseOrderDescriptor> source,
         IShipPurchaseOrderDBCommand dbCommand,
         ILogger<ShipPurchaseOrderConsumer> logger)
-        : base(source, logger)
     {
         _dbCommand = dbCommand;
+        _logger = logger;
     }
 
     /// <inheritdoc/>
-    protected override async Task HandleAsync(ShipPurchaseOrderRequest payload, CancellationToken cancellationToken)
+    protected override async Task ConsumeAsync(ShipPurchaseOrderRequest payload, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Warehouse has completed order {payload.PurchaseOrderId}, marking as shipped.");
 
