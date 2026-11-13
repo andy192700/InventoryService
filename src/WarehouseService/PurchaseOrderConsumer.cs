@@ -14,7 +14,7 @@ public record FulfilPurchaseOrderRequest
 /// <summary>
 /// Describes the consumer for consuming newly created purchase orders.
 /// </summary>
-public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
+public class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 {
     /// <inheritdoc/>
     public string TopicName => "PurchaseOrderCreated";
@@ -26,19 +26,22 @@ public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 /// <summary>
 /// A consumer that consumes purchase orders.
 /// </summary>
-public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest>
+public class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest>
 {
     private readonly ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> _producer;
 
     private readonly ILogger<PurchaseOrderConsumer> _logger;
 
-    private readonly Random _random = new();
+    private readonly IWorkDuration _workDuration;
 
     public PurchaseOrderConsumer(
         ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> producer,
+        IWorkDuration workDuration,
         ILogger<PurchaseOrderConsumer> logger)
     {
         _producer = producer;
+
+        _workDuration = workDuration;
 
         _logger = logger;
     }
@@ -48,7 +51,7 @@ public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderReque
     {
         _logger.LogInformation($"Warehouse has received a new Purchase Order, id: {payload.PurchaseOrderId}");
 
-        int preparationTimeSeconds = _random.Next(10, 51);
+        int preparationTimeSeconds = _workDuration.GetDuration();
 
         _logger.LogInformation($"Team is working hard to fulfill the purchase order. Estimated wait time: {preparationTimeSeconds} seconds.");
 
