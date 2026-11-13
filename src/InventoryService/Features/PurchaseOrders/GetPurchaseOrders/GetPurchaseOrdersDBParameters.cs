@@ -8,7 +8,7 @@
 /// <param name="CountryId">The Country Id.</param>
 public record GetPurchaseOrdersDBParameters
 (
-    int? ProductId,
-    int? CustomerId,
-    int? CountryId
+    string? ProductId,
+    string? CustomerId,
+    string? CountryId
 );
