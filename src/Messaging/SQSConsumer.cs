@@ -1,104 +1,81 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Messaging;
 
 /// <summary>
-/// Payload class recieved by a <see cref="SQSConsumer{TPayload, TQueueDescriptor}"/>
+/// Payload class received by a <see cref="SQSConsumer{TPayload}"/> representing a wrapped SNS message envelope.
 /// </summary>
 internal sealed class SNSEnvelope
 {
     /// <summary>
-    /// The content of the payload.
+    /// The content of the payload message as a JSON string.
     /// </summary>
     public string? Message { get; init; }
 }
 
-public abstract class SQSConsumer<TQueueDescriptor> : BackgroundService
-    where TQueueDescriptor : class, IQueueDescriptor
+/// <summary>
+/// Defines the interface for a consumer that handles messages fetched from an SQS queue.
+/// </summary>
+public interface ISQSConsumer
 {
+    /// <summary>
+    /// Processes the raw JSON body of an SQS message asynchronously.
+    /// </summary>
+    /// <param name="body">The JSON string representing the message body.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A task that returns <c>true</c> if the message was successfully handled; otherwise <c>false</c>.</returns>
+    Task<bool> HandleAsync(string body, CancellationToken cancellationToken);
 }
 
 /// <summary>
-/// The basis for a SQS Consumer, which hides any complexity.
+/// Base abstract class implementing <see cref="ISQSConsumer"/> to simplify message handling logic.
 /// </summary>
-/// <typeparam name="TPayload">The payload type of a message received by the consumer.</typeparam>
-/// <typeparam name="TQueueDescriptor">The queue registration which will drive the consumer.</typeparam>
-public abstract class SQSConsumer<TPayload, TQueueDescriptor> : SQSConsumer<TQueueDescriptor>
-    where TPayload : class
-    where TQueueDescriptor : class, IQueueDescriptor
+public abstract class SQSConsumer : ISQSConsumer
 {
-    protected readonly ILogger<SQSConsumer<TPayload, TQueueDescriptor>> _logger;
-
-    private readonly ISQSSource<TQueueDescriptor> _source;
-
-    protected SQSConsumer(
-        ISQSSource<TQueueDescriptor> source,
-        ILogger<SQSConsumer<TPayload, TQueueDescriptor>> logger)
+    /// <inheritdoc/>
+    public Task<bool> HandleAsync(string body, CancellationToken cancellationToken)
     {
-        _source = source;
-        _logger = logger;
+        return HandleInternalAsync(body, cancellationToken);
     }
 
     /// <summary>
-    /// Holds and reads incoming messages.
+    /// Handles the internal processing of the message payload.
     /// </summary>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A Task in which the operation will complete.</returns>
-    protected override async Task ExecuteAsync(
-        CancellationToken cancellationToken)
+    /// <param name="payload">The raw message body string to process.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+    /// <returns>A task that returns <c>true</c> if the message was successfully handled; otherwise <c>false</c>.</returns>
+    protected abstract Task<bool> HandleInternalAsync(string payload, CancellationToken cancellationToken);
+}
+
+/// <summary>
+/// Abstract base class for an SQS consumer type that deserializes message payloads of type <typeparamref name="TPayload"/>.
+/// </summary>
+/// <typeparam name="TPayload">The type of the payload to deserialize from the message.</typeparam>
+public abstract class SQSConsumer<TPayload> : SQSConsumer
+{
+    /// <inheritdoc/>
+    protected override Task<bool> HandleInternalAsync(string body, CancellationToken cancellationToken)
     {
-        await foreach (var message in _source.ReadAsync(cancellationToken))
+        var payload = DeserializePayload(body);
+
+        if (payload is null)
         {
-            using var scope = _logger.BeginScope(
-                new Dictionary<string, object?>
-                {
-                    ["MessageId"] = message.MessageId,
-                    ["Queue"] = _source.QueueDetails.QueueName,
-                    ["Topic"] = _source.QueueDetails.TopicName
-                });
-
-            try
-            {
-                var payload = DeserializePayload(message.Body);
-
-                if (payload is null)
-                {
-                    _logger.LogWarning(
-                        "Unable to deserialize message payload.");
-
-                    continue;
-                }
-
-                await HandleAsync(
-                    payload,
-                    cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Failed processing message.");
-            }
-            finally
-            {
-                await _source.CompleteAsync(
-                    message.ReceiptHandle,
-                    cancellationToken);
-            }
+            return Task.FromResult(false);
+        }
+        else
+        {
+            ConsumeAsync(payload, cancellationToken);
+            return Task.FromResult(true);
         }
     }
 
     /// <summary>
-    /// Handles the implementation consumer's message consumption.
+    /// Consumes the deserialized payload asynchronously.
     /// </summary>
-    /// <param name="payload">The payload of the message received by the consumer.</param>
-    /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A Task in which the operation will complete.</returns>
-    protected abstract Task HandleAsync(
-        TPayload payload,
-        CancellationToken cancellationToken);
+    /// <param name="payload">The deserialized payload to process.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    protected abstract Task ConsumeAsync(TPayload payload, CancellationToken cancellationToken);
 
     private static TPayload? DeserializePayload(string body)
     {

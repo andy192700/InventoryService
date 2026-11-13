@@ -74,8 +74,8 @@ public static class AWSExtensions
     /// <param name="services">The service collection to enrich.</param>
     /// <returns>The enriched service collection.</returns>
     public static IServiceCollection AddConsumer<TConsumer, TQueueDescriptor>(this IServiceCollection services)
+        where TConsumer : class, ISQSConsumer
         where TQueueDescriptor : class, IQueueDescriptor
-        where TConsumer : SQSConsumer<TQueueDescriptor>
     {
         services.AddSingleton<TQueueDescriptor>();
 
@@ -88,17 +88,20 @@ public static class AWSExtensions
             return factory.Create().GetAwaiter().GetResult();
         });
 
-        services.AddSingleton<ISQSSource<TQueueDescriptor>, SQSSource<TQueueDescriptor>>(sp =>
+        services.AddSingleton<ISQSReader<TQueueDescriptor>, SQSReader<TQueueDescriptor>>();
+
+        services.AddSingleton<ISQSConsumer, TConsumer>();
+
+        services.AddHostedService(sp =>
         {
             var queueDetails = sp.GetRequiredService<QueueDetails<TQueueDescriptor>>();
             var sqs = sp.GetRequiredService<IAmazonSQS>();
-            var options = sp.GetRequiredService<IOptions<AWSOptions>>();
+            var consumer = sp.GetRequiredService<ISQSConsumer>();
+            var reader = sp.GetRequiredService<ISQSReader<TQueueDescriptor>>();
             var logger = sp.GetRequiredService<ILogger<SQSSource<TQueueDescriptor>>>();
 
-            return new SQSSource<TQueueDescriptor>(queueDetails, sqs, options, logger);
+            return new SQSSource<TQueueDescriptor>(queueDetails, sqs, consumer, reader, logger);
         });
-
-        services.AddHostedService<TConsumer>();
 
         return services;
     }

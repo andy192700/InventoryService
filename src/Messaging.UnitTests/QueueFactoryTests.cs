@@ -18,7 +18,6 @@ public class QueueFactoryTests
         [Frozen] Mock<IAmazonSimpleNotificationService> mockSNS,
         [Frozen] Mock<IAmazonSQS> mockSQS,
         TestQueueDescriptor descriptor,
-        TestLogger logger,
         string queueUrl,
         string topicArn)
     {
@@ -44,6 +43,7 @@ public class QueueFactoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new GetQueueAttributesResponse());
 
+        var logger = new TestLogger<QueueFactory<TestQueueDescriptor>>();
         var sut = new QueueFactory<TestQueueDescriptor>(
             mockSNS.Object,
             mockSQS.Object,
@@ -85,9 +85,10 @@ public class QueueFactoryTests
             It.IsAny<CancellationToken>()),
             Times.Once);
 
-        logger.LoggedLevel.Should().Be(LogLevel.Information);
-        logger.LoggedMessage.Should().NotBeNull();
-        logger.LoggedMessage.Should().Be($"SNS Topic created: {topicArn}, with Queue URL: {queueUrl}");
+        // Verify logging
+        logger.LogEntries.Should().ContainSingle(log =>
+            log.LogLevel == LogLevel.Information &&
+            log.Message == $"SNS Topic created: {topicArn}, with Queue URL: {queueUrl}");
     }
 
     public sealed class TestQueueDescriptor : IQueueDescriptor
@@ -95,28 +96,5 @@ public class QueueFactoryTests
         public string QueueName => "test-queue";
 
         public string TopicName => "test-topic";
-    }
-
-    public sealed class TestLogger : ILogger<QueueFactory<TestQueueDescriptor>>
-    {
-        public LogLevel LoggedLevel { get; set; }
-
-        public string? LoggedMessage { get; set; }
-
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-        {
-            return default;
-        }
-
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return false;
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            LoggedLevel = logLevel;
-            LoggedMessage = state?.ToString();
-        }
     }
 }

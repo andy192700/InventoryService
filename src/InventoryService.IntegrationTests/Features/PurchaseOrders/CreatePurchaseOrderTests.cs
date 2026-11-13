@@ -1,6 +1,7 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.Xunit2;
+using FluentAssertions;
 using InventoryService.Features.PurchaseOrders.CreatePurchaseOrder;
-using InventoryService.Infrastructure;
+using Messaging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -18,9 +19,16 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsOk(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsOk(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer, 
+        CreatePurchaseOrderIntRequest request)
     {
         // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         AddAdminBasicAuthHeader();
 
         // Act
@@ -36,13 +44,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.PurchaseOrderId.Should().BeGreaterThan(0);
 
         response.AssertHeader("location", $"{RequestURI}/{result.PurchaseOrderId}");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsBadRequest(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsBadRequest(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer, 
+        CreatePurchaseOrderIntRequest request)
     {
         // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         AddAdminBasicAuthHeader();
 
         request.CustomerId = string.Empty;
@@ -58,13 +75,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertValidationErrorPresent("Payload.CustomerId", $"CustomerId must be a positive integer.");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsUnauthorized(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsUnauthorized(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer, 
+        CreatePurchaseOrderIntRequest request)
     {
         // Act
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         var response = await Client.PostAsJsonAsync(RequestURI, request, CancellationToken.None);
 
         // Assert
@@ -75,13 +101,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Title.Should().Be("Unauthorized");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsForbidden_WhenReadOnlyUserCalls(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsForbidden_WhenReadOnlyUserCalls(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer, 
+        CreatePurchaseOrderIntRequest request)
     {
         // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         AddReadOnlyBasicAuthHeader();
 
         // Act
@@ -95,13 +130,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Title.Should().Be("Forbidden");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenCustomerDoesNotExist(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenCustomerDoesNotExist(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer, 
+        CreatePurchaseOrderIntRequest request)
     {
         // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         AddAdminBasicAuthHeader();
 
         request.CustomerId = "300";
@@ -117,13 +161,22 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.AssertValidationErrorPresent("CustomerId", $"A Customer with the requested CustomerId does not exist.");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Theory]
     [InlineAutoMoqData]
-    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenProductIdDoesNotMatchSuppliedCountry(CreatePurchaseOrderIntRequest request)
+    public async Task CreatePurchaseOrder_ReturnsBadRequest_WhenProductIdDoesNotMatchSuppliedCountry(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer,
+        CreatePurchaseOrderIntRequest request)
     {
         // Arrange
+        WebApplicationFactory.OverrideTestServices = services =>
+        {
+            services.AddScoped(x => mockProducer.Object);
+        };
+
         AddAdminBasicAuthHeader();
 
         request.lines!.First().ProductId = "300";
@@ -140,18 +193,21 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
 
         result.AssertValidationErrorPresent("CountryId", "One or more of the requested Product Countries does not exist.");
         result.AssertValidationErrorPresent("ProductId", "One or more of the requested Product Countries does not exist.");
-    }
 
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 
     [Theory]
     [InlineAutoMoqData]
     public async Task CreatePurchaseOrder_ReturnsInternalServerError(
+        [Frozen] Mock<ISNSProducer<CreatePurchaseOrderResponse, PurchaseOrderCreatedTopic>> mockProducer,
         CreatePurchaseOrderIntRequest request,
         Exception exception)
     {
         // Arrange
         WebApplicationFactory.OverrideTestServices = services =>
         {
+            services.AddScoped(x => mockProducer.Object);
             services.RemoveAll<ICreatePurchaseOrderDBCommand>();
 
             var repository = new Mock<ICreatePurchaseOrderDBCommand>();
@@ -178,5 +234,7 @@ public class CreatePurchaseOrderTests : IntegrationTestBase
         result.Should().NotBeNull();
 
         result.Title.Should().Be("Internal Server Error");
+
+        mockProducer.Verify(x => x.ProduceAsync(It.IsAny<CreatePurchaseOrderResponse>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

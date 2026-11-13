@@ -17,6 +17,8 @@ host.ConfigureAppConfiguration((hostingContext, config) =>
 
 host.ConfigureServices((ctx, services) =>
 {
+    services.AddSingleton<IWorkDuration, WorkDuration>();
+
     services.AddAWS(ctx.Configuration);
     services.AddConsumer<PurchaseOrderConsumer, PurchaseOrderConsumerDescriptor>();
     services.AddProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic>();

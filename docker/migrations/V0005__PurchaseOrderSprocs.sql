@@ -3,9 +3,9 @@ USE Inventory
 GO
 
 CREATE PROC warehouse.usp_GetPurchaseOrders
-    @ProductId INT = 0,
-    @CountryId INT = 0,
-    @CustomerId INT = 0
+    @ProductId INT = NULL,
+    @CountryId INT = NULL,
+    @CustomerId INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON
@@ -32,13 +32,13 @@ BEGIN
     ON co.CustomerId = po.CustomerId
     AND 
     (
-        @CustomerId = 0 OR co.CustomerId = @CustomerId
+        @CustomerId IS NULL OR co.CustomerId = @CustomerId
     )
     JOIN warehouse.Country c
     ON c.CountryId = po.CountryId
     AND 
     (
-        @CountryId = 0 OR c.CountryId = @CountryId
+        @CountryId IS NULL OR c.CountryId = @CountryId
     )
     JOIN warehouse.PurchaseOrderLine pol
     ON pol.PurchaseOrderId = po.PurchaseOrderId
@@ -46,7 +46,7 @@ BEGIN
     ON pc.ProductCountryId = pol.ProductCountryId
     AND
     (
-        @ProductId = 0 OR pc.ProductId = @ProductId
+        @ProductId IS NULL OR pc.ProductId = @ProductId
     )
     GROUP BY po.PurchaseOrderId,
              po.OrderDate,

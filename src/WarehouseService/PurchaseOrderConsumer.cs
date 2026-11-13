@@ -14,7 +14,7 @@ public record FulfilPurchaseOrderRequest
 /// <summary>
 /// Describes the consumer for consuming newly created purchase orders.
 /// </summary>
-public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
+public class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 {
     /// <inheritdoc/>
     public string TopicName => "PurchaseOrderCreated";
@@ -26,27 +26,32 @@ public sealed class PurchaseOrderConsumerDescriptor : IQueueDescriptor
 /// <summary>
 /// A consumer that consumes purchase orders.
 /// </summary>
-public sealed class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest, PurchaseOrderConsumerDescriptor>
+public class PurchaseOrderConsumer : SQSConsumer<FulfilPurchaseOrderRequest>
 {
     private readonly ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> _producer;
 
-    private readonly Random _random = new();
+    private readonly ILogger<PurchaseOrderConsumer> _logger;
+
+    private readonly IWorkDuration _workDuration;
 
     public PurchaseOrderConsumer(
-        ISQSSource<PurchaseOrderConsumerDescriptor> source,
         ISNSProducer<ShipPurchaseOrderRequest, ShipPurchaseOrderTopic> producer,
+        IWorkDuration workDuration,
         ILogger<PurchaseOrderConsumer> logger)
-        : base(source, logger)
     {
         _producer = producer;
+
+        _workDuration = workDuration;
+
+        _logger = logger;
     }
 
     /// <inheritdoc/>
-    protected override async Task HandleAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
+    protected override async Task ConsumeAsync(FulfilPurchaseOrderRequest payload, CancellationToken cancellationToken)
     {
         _logger.LogInformation($"Warehouse has received a new Purchase Order, id: {payload.PurchaseOrderId}");
 
-        int preparationTimeSeconds = _random.Next(10, 51);
+        int preparationTimeSeconds = _workDuration.GetDuration();
 
         _logger.LogInformation($"Team is working hard to fulfill the purchase order. Estimated wait time: {preparationTimeSeconds} seconds.");
 

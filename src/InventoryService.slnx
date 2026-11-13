@@ -4,5 +4,6 @@
   <Project Path="InventoryService/InventoryService.csproj" />
   <Project Path="Messaging.UnitTests/Messaging.UnitTests.csproj" Id="06652588-cb47-4451-8143-4d2d81b289bd" />
   <Project Path="Messaging/Messaging.csproj" Id="415f6c0f-c403-47d9-893b-a69099e9d971" />
+  <Project Path="WarehouseService.UnitTests/WarehouseService.UnitTests.csproj" Id="43347fd5-0816-472a-adab-3efd61d6e273" />
   <Project Path="WarehouseService/WarehouseService.csproj" Id="867f6a1a-c4cd-4958-ab60-68fe385eca51" />
 </Solution>
